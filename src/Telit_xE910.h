@@ -27,7 +27,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -218,6 +218,29 @@ class xE910_AT {
 		 */
 		bool SLED(const uint8_t _SLED);
 
+		/**
+		 * @brief Set TXMON pin behaviour.
+		 * @details AT Command : AT#TXMONMODE=[<n>]\r\n (16 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _TXMONMODE Enable flag
+		 * 0 - TXMON pin goes high when a call is started and it drops down when
+		 * the call is ended. It also goes high when a location update starts, 
+		 * and it drops down when the location update procedure stops. Finally 
+		 * it goes high during SMS transmission and receiving. Even if the 
+		 * TXMON in this case is set as GPIO in output, the read command 
+		 * AT#GPIO=5,2 returns #GPIO:2,0, as the GPIO is in alternate mode.
+		 * 1 - TXMON is set in alternate mode and the Timer unit controls its state. 
+		 * TXMON goes high before power ramps start raising and drops down after 
+		 * power ramps stop falling down. This behaviour is repeated for every 
+		 * transmission burst.
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool TXMONMODE(const uint8_t _TXMONMODE);
 
 
 	private:
