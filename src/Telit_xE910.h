@@ -27,7 +27,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {false, false, false, false};
+		Command_Control_Struct Command_Control {false, false, false, false, false, false, false};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -103,9 +103,47 @@ class xE910_AT {
 		 */
 		bool K(const uint8_t _K);
 
+		/**
+		 * @brief Set command sends to the device a password which is necessary 
+		 * before it can be operated (SIM PIN, SIM PUK, PH-SIM PIN, etc.).
+		 * If the PIN required is SIM PUK or SIM PUK2, the <newpin> is required. 
+		 * This second pin, <newpin> will replace the old pin in the SIM.
+		 * The command may be used to change the SIM PIN by sending it with 
+		 * both parameters <pin> and <newpin>.
+		 * @details AT Command : AT+CPIN?\r\n (10 Byte)
+		 * @details AT Response : \r\n+CPIN: READY\r\n\r\nOK\r\n (22 Byte)
+		 * 
+		 * @version 01.00.00
+		 *  
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CPIN(void);
 
+		/**
+		 * @brief Execution command returns the product serial number, identified 
+		 * as the IMEI of the mobile, without command echo.
+		 * @details AT Command : AT+CGSN\r\n (9 Byte)
+		 * @details AT Response : \r\n351732055366390\r\n\r\nOK\r\n (25 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CGSN(void);
 
-
+		/**
+		 * @brief Execution command returns the device board serial number.
+		 * @details AT Command : AT+GSN\r\n (8 Byte)
+		 * @details AT Response : \r\n0000328245\r\n\r\nOK\r\n (20 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool GSN(void);
 
 
 
