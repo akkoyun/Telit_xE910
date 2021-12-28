@@ -12,10 +12,11 @@
 /**
  * Library global variables declarations.
  */
-const char 	Version[9] 					= "01.00.04";		/// Library Version
-uint64_t 	IMEI						= 0;				// IMEI Variable
-uint32_t 	Serial_Number				= 0;				// Serial Number Variable
-uint64_t 	ICCID						= 0;				// ICCID Variable
+const char 	Version[9] 					= "01.00.08";		/// Library Version
+uint64_t 	IMEI						= 0;				/// IMEI Variable
+uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
+uint64_t 	ICCID						= 0;				/// ICCID Variable
+uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
 
 /**
  * @brief Command control structure.
@@ -29,6 +30,7 @@ struct Command_Control_Struct {
 	bool								CGSN;				/// CGSN Command Control Variable
 	bool								GSN;				/// GSN Command Control Variable
 	bool								ICCID;				/// ICCID Command Control Variable
+	bool								GMI;				/// GMI Command Control Variable
 };
 
 

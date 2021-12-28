@@ -679,7 +679,89 @@ bool xE910_AT::CCID(void) {
 	}
 
 }
+bool xE910_AT::GMI(void) {
 
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 15;
+
+	// Set Control Variable
+	Command_Control.GMI = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+GMI"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "Telit") != NULL) {
+
+			// Set Manufacturer Variable
+			Manufacturer = 1;
+
+			// Set Control Variable
+			Command_Control.GMI = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Manufacturer Variable
+			Manufacturer = 0;
+
+			// Set Control Variable
+			Command_Control.GMI = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Manufacturer Variable
+		Manufacturer = 0;
+
+		// Set Control Variable
+		Command_Control.GMI = false;
+
+		// End Function
+		return (false);
+
+    }
+
+}
 
 
 
