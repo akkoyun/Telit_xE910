@@ -303,9 +303,177 @@ bool xE910_AT::K(const uint8_t _K) {
 		return (false);
 
     }
+
 }
+bool xE910_AT::CPIN(void) {
 
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
 
+    // Declare Response Length
+    uint8_t _Response_Length = 22;
+
+	// Set Control Variable
+	Command_Control.CPIN = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+CPIN?"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "READY") != NULL) {
+
+			// Set Control Variable
+			Command_Control.CPIN = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.CPIN = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.CPIN = false;
+
+		// End Function
+		return (false);
+
+    }
+
+}
+bool xE910_AT::CGSN(void) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 25;
+
+	// Set Control Variable
+	Command_Control.CGSN = false;
+
+	// Clear UART Buffer
+	_Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+CGSN"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+		uint8_t _Data_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+		char _IMEI[18];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Handle Data
+			if (_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) {
+
+				// Get Data
+				_IMEI[_Data_Order] = _Response[_Read_Order];
+
+				// Increase Data Order
+				_Data_Order++;
+
+			}
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set IMEI Variable
+			IMEI = atoi(_IMEI);
+
+			// Set Control Variable
+			Command_Control.CGSN = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set IMEI Variable
+			IMEI = 0;
+
+			// Set Control Variable
+			Command_Control.CGSN = false;
+
+			// End Function
+			return (false);
+
+		}
+
+	} else {
+
+		// Set IMEI Variable
+		IMEI = 0;
+
+		// Set Control Variable
+		Command_Control.CGSN = false;
+
+		// End Function
+		return (false);
+
+    }
+}
 
 
 
