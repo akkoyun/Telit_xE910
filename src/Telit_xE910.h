@@ -27,7 +27,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {false};
+		Command_Control_Struct Command_Control {false, false};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -45,7 +45,22 @@ class xE910_AT {
 		 */
 		bool ATE(const bool _n);
 
-
+		/**
+		 * @brief Set command enables/disables the report of result code.
+		 * @details AT Command : AT+CMEE[<n>]\r\n (10 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _CMEE Enable flag
+		 * 0 - disable +CME ERROR:<err> reports, use only ERROR report.
+		 * 1 - enable +CME ERROR:<err> reports, with <err> in numeric format 
+		 * 2 - enable +CME ERROR: <err> reports, with <err> in verbose format
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CMEE(const uint8_t _CMEE);
 
 
 
