@@ -145,6 +145,18 @@ class xE910_AT {
 		 */
 		bool GSN(void);
 
+		/**
+		 * @brief Execution command reads on SIM the ICCID (card identification 
+		 * number that provides a unique identification number for the SIM)
+		 * @details AT Command : AT#CCID\r\n (9 Byte)
+		 * @details AT Response : \r\n#CCID: 8990011916180288209\r\n\r\nOK\r\n (36 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CCID(void);
 
 
 
