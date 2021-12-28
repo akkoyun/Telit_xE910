@@ -845,6 +845,103 @@ bool xE910_AT::GMM(void) {
     }
 
 }
+bool xE910_AT::GMR(void) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 19;
+
+	// Set Control Variable
+	Command_Control.GMR = false;
+
+	// Clear UART Buffer
+	_Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+GMR"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+		uint8_t _Data_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+		char _Modem_Firmware[10];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Handle Data
+			if ((_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) or _Response[_Read_Order] == 46) {
+
+				// Get Data
+				_Modem_Firmware[_Data_Order] = _Response[_Read_Order];
+
+				// Increase Data Order
+				_Data_Order++;
+
+			}
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Firmware Variable
+			memset(Modem_Firmware, 0, sizeof(Modem_Firmware));
+			strcpy(Modem_Firmware, _Modem_Firmware);
+
+			// Set Control Variable
+			Command_Control.GMR = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Firmware Variable
+			memset(Modem_Firmware, 0, sizeof(Modem_Firmware));
+
+			// Set Control Variable
+			Command_Control.GMR = false;
+
+			// End Function
+			return (false);
+
+		}
+
+	} else {
+
+		// Set Firmware Variable
+		memset(Modem_Firmware, 0, sizeof(Modem_Firmware));
+
+		// Set Control Variable
+		Command_Control.GMR = false;
+
+		// End Function
+		return (false);
+
+    }
+	
+}
 
 
 

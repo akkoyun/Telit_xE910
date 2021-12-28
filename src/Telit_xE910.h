@@ -27,7 +27,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -188,6 +188,17 @@ class xE910_AT {
 		 */
 		bool GMM(void);
 
+		/**
+		 * @brief Execution command returns the model identification.
+		 * @details AT Command : AT+GMR\r\n (8 Byte)
+		 * @details AT Response : \r\n13.00.007\r\n\r\nOK\r\n (19 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool GMR(void);
 
 
 
