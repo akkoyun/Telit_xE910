@@ -27,7 +27,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {false, false, false, false, false, false, false, false};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -173,6 +173,20 @@ class xE910_AT {
 		 */
 		bool GMI(void);
 
+		/**
+		 * @brief Execution command returns the model identification.
+		 * @details AT Command : AT+GMM\r\n (8 Byte)
+		 * @details AT Response : \r\nGE910-QUAD\r\n\r\nOK\r\n (20 Byte)
+		 * 
+		 * 0 - No model
+		 * 1 - "GE910-QUAD"
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool GMM(void);
 
 
 
