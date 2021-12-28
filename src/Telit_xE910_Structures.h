@@ -14,6 +14,7 @@
  */
 const char 	Version[9] 					= "01.00.04";		/// Library Version
 uint64_t 	IMEI						= 0;				// IMEI Variable
+uint32_t 	Serial_Number				= 0;				// Serial Number Variable
 
 /**
  * @brief Command control structure.
@@ -25,6 +26,7 @@ struct Command_Control_Struct {
 	bool								K;					/// K Command Control Variable
 	bool								CPIN;				/// CPIN Command Control Variable
 	bool								CGSN;				/// CGSN Command Control Variable
+	bool								GSN;				/// GSN Command Control Variable
 };
 
 

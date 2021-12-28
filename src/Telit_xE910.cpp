@@ -474,6 +474,101 @@ bool xE910_AT::CGSN(void) {
 
     }
 }
+bool xE910_AT::GSN(void) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 20;
+
+	// Set Control Variable
+	Command_Control.GSN = false;
+
+	// Clear UART Buffer
+	_Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+GSN"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+		uint8_t _Data_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+		char _Serial_Number[10];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Handle Data
+			if (_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) {
+
+				// Get Data
+				_Serial_Number[_Data_Order] = _Response[_Read_Order];
+
+				// Increase Data Order
+				_Data_Order++;
+
+			}
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set IMEI Variable
+			Serial_Number = atoi(_Serial_Number);
+
+			// Set Control Variable
+			Command_Control.GSN = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set IMEI Variable
+			Serial_Number = 0;
+
+			// Set Control Variable
+			Command_Control.GSN = false;
+
+			// End Function
+			return (false);
+
+		}
+
+	} else {
+
+		// Set IMEI Variable
+		Serial_Number = 0;
+
+		// Set Control Variable
+		Command_Control.GSN = false;
+
+		// End Function
+		return (false);
+
+    }
+}
 
 
 

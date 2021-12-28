@@ -27,7 +27,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {false, false, false, false, false, false};
+		Command_Control_Struct Command_Control {false, false, false, false, false, false, false};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -133,6 +133,17 @@ class xE910_AT {
 		 */
 		bool CGSN(void);
 
+		/**
+		 * @brief Execution command returns the device board serial number.
+		 * @details AT Command : AT+GSN\r\n (8 Byte)
+		 * @details AT Response : \r\n0000328245\r\n\r\nOK\r\n (20 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool GSN(void);
 
 
 
