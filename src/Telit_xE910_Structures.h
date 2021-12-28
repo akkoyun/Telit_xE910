@@ -22,6 +22,7 @@ struct Command_Control_Struct {
 	bool								ATE;				/// ATE Command Control Variable
 	bool								CMEE;				/// CMEE Command Control Variable
 	bool								FCLASS;				/// FCLASS Command Control Variable
+	bool								K;					/// K Command Control Variable
 };
 
 

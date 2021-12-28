@@ -27,7 +27,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {false, false, false};
+		Command_Control_Struct Command_Control {false, false, false, false};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -67,7 +67,7 @@ class xE910_AT {
 		 * mode (data, fax, voice), hence all the calls done afterwards 
 		 * will be data or voice.
 		 * @details AT Command : AT+FCLASS[<n>]\r\n (12 Byte)
-		 * @details AT Response : \r\nON\r\n (6 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
 		 * @version 01.00.00
 		 *  
@@ -81,6 +81,27 @@ class xE910_AT {
 		 */
 		bool FCLASS(const uint8_t _FCLASS);
 
+		/**
+		 * @brief Set command controls the RS232 flow control behaviour.
+		 * @details AT Command : AT&K[<n>]\r\n (7 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _K Parameter flag
+		 * 0 - no flow control
+		 * 1 - hardware mono-directional flow control (only CTS active)
+		 * 2 - software mono-directional flow control (XON/XOFF)
+		 * 3 - hardware bi-directional flow control (both RTS/CTS active) (factory default) 
+		 * 4 - software bi-directional with filtering (XON/XOFF)
+		 * 5 - pass through: software bi-directional without filtering (XON/XOFF)
+		 * 6 - both hardware bi-directional flow control (both RTS/CTS active) and 
+		 * software bi-directional flow control (XON/XOFF) with filtering
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool K(const uint8_t _K);
 
 
 
