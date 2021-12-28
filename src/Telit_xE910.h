@@ -27,7 +27,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {false, false};
+		Command_Control_Struct Command_Control {false, false, false};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -36,14 +36,14 @@ class xE910_AT {
 		 * 
 		 * @version 01.00.00
 		 * 
-		 * @param _n Command echo state
+		 * @param _ECHO Command echo state
 		 * TRUE : Echo ON [Factory Default]
 		 * FALSE : Echo OFF
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool ATE(const bool _n);
+		bool ATE(const bool _ECHO);
 
 		/**
 		 * @brief Set command enables/disables the report of result code.
@@ -62,7 +62,24 @@ class xE910_AT {
 		 */
 		bool CMEE(const uint8_t _CMEE);
 
-
+		/**
+		 * @brief Set command sets the wireless module in specified connection 
+		 * mode (data, fax, voice), hence all the calls done afterwards 
+		 * will be data or voice.
+		 * @details AT Command : AT+FCLASS[<n>]\r\n (12 Byte)
+		 * @details AT Response : \r\nON\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 *  
+		 * @param _FCLASS Parameter flag
+		 * 0 - data
+		 * 1 - fax class 1 
+		 * 8 - voice
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool FCLASS(const uint8_t _FCLASS);
 
 
 

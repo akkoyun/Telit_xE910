@@ -8,7 +8,7 @@
 
 #include <Telit_xE910.h>
 
-bool xE910_AT::ATE(const bool _n) {
+bool xE910_AT::ATE(const bool _ECHO) {
 
     // Declare Response Length
     uint8_t _Response_Length = 12;
@@ -21,7 +21,7 @@ bool xE910_AT::ATE(const bool _n) {
 
 	// Send UART Command
 	GSM_Serial.print(F("ATE"));
-	GSM_Serial.print(String(_n));
+	GSM_Serial.print(String(_ECHO));
 	GSM_Serial.print(F("\r\n"));
 
 	// Wait for UART Data Send
@@ -155,7 +155,80 @@ bool xE910_AT::CMEE(const uint8_t _CMEE) {
     }
 
 }
+bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
 
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 6;
+
+	// Set Control Variable
+	Command_Control.FCLASS = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+FCLASS="));
+	GSM_Serial.print(String(_FCLASS));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.FCLASS = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.FCLASS = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.FCLASS = false;
+
+		// End Function
+		return (false);
+
+    }
+}
 
 
 

@@ -12,7 +12,7 @@
 /**
  * Library global variables declarations.
  */
-const char 	Version[9] 					= "01.00.01";		/// Library Version
+const char 	Version[9] 					= "01.00.03";		/// Library Version
 
 
 /**
@@ -21,6 +21,7 @@ const char 	Version[9] 					= "01.00.01";		/// Library Version
 struct Command_Control_Struct {
 	bool								ATE;				/// ATE Command Control Variable
 	bool								CMEE;				/// CMEE Command Control Variable
+	bool								FCLASS;				/// FCLASS Command Control Variable
 };
 
 
