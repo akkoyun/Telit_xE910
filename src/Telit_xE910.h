@@ -27,7 +27,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -199,6 +199,24 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool GMR(void);
+
+		/**
+		 * @brief Set command sets the behaviour of the STAT_LED GPIO
+		 * @details AT Command : AT#SLED=[<n>]\r\n (11 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _SLED Enable flag
+		 * 0 - GPIO tied Low
+		 * 1 - GPIO tied High
+		 * 2 - GPIO handled by Module Software
+		 * 3 - GPIO is turned on and off alternatively
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SLED(const uint8_t _SLED);
 
 
 

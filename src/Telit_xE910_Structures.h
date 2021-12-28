@@ -12,7 +12,7 @@
 /**
  * Library global variables declarations.
  */
-const char 	Version[9] 					= "01.00.10";		/// Library Version
+const char 	Version[9] 					= "01.00.11";		/// Library Version
 uint64_t 	IMEI						= 0;				/// IMEI Variable
 uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
 uint64_t 	ICCID						= 0;				/// ICCID Variable
@@ -35,6 +35,7 @@ struct Command_Control_Struct {
 	bool								GMI;				/// GMI Command Control Variable
 	bool								GMM;				/// GMM Command Control Variable
 	bool								GMR;				/// GMR Command Control Variable
+	bool								SLED;				/// SLED Command Control Variable
 };
 
 

@@ -940,7 +940,82 @@ bool xE910_AT::GMR(void) {
 		return (false);
 
     }
-	
+
+}
+bool xE910_AT::SLED(const uint8_t _SLED) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 6;
+
+	// Set Control Variable
+	Command_Control.SLED = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#SLED="));
+	GSM_Serial.print(String(_SLED));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.SLED = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.SLED = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.SLED = false;
+
+		// End Function
+		return (false);
+
+    }
+
 }
 
 
