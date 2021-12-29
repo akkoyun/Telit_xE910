@@ -464,6 +464,41 @@ class xE910_AT {
 		 */
 		bool SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uint8_t _Recv_Data_Mode, const uint8_t _Keep_Alive, const uint8_t _Listen_Auto_Rsp, const uint8_t _Send_Data_Mode);
 
+		/**
+		 * @brief Set command sets the socket configuration extended parameters 
+		 * for features not included in #SCFGEXT command.
+		 * @details AT Command : AT#SCFGEXT2=[<conn_id>],[<bufferstart>],[<abortconnattemp>],[<sringlen>],[<sringto>],[<nocarriermode>]\r\n (26 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Conn_ID socket connection identifier (1-6)
+		 * @param _Buffer_Start Set the sending timeout method based on new data received from the serial port. 
+		 * (<txTo> timeout value is set by #SCFG command) Restart of transmission timer will be done when new 
+		 * data are received from the serial port.
+		 * 0 - old behaviour for transmission timer
+		 * 1 - new behaviour for transmission timer
+		 * @param _Abort_Conn_Attempt Enable connection attempt(#SD/#SKTD/#SKTOP) abort before 
+		 * CONNECT(online mode) or OK(command mode)
+		 * 0 – Not possible to interrupt connection attempt
+		 * 1 – It is possible to interrupt the connection attempt
+		 * @param _SRing_Len this parameter sets the length of data received in one 
+		 * SRING URC in sring mode 2 or 3 ( see AT#SCFGEXT )
+		 * 0 – factory default, means 64 bytes
+		 * 1 – means that the length is equal to the maximum TCP payload size accepted 
+		 * in download in case of TCP connections, same as 0 in case of UDP connections
+		 * @param _SRing_To this parameter sets the delay among one SRING URC and 
+		 * the other, in sring mode 2 or 3 ( see AT#SCFGEXT )
+		 * 0 – factory default, means 10 hundreds of milliseconds 
+		 * 1..10: value in hundreds of milliseconds
+		 * @param _No_Carrier_Mode this parameter permits to choose NO CARRIER 
+		 * indication format when the socket is closed as follows
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, const uint8_t _Abort_Conn_Attempt, const uint8_t _SRing_Len, const uint8_t _SRing_To, const uint8_t _No_Carrier_Mode);
+
 
 	private:
 
