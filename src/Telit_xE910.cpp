@@ -8,6 +8,93 @@
 
 #include <Telit_xE910.h>
 
+bool xE910_HARDWARE::Communication(const bool _State) {
+
+	// Enable Communication 
+	if (_State) PORTJ &= 0b11101111;
+
+	// Disable Communication
+	if (_State) PORTJ |= 0b00010000;
+
+	// Control Buffer Enable Signal
+	if ((PINJ & (1 << PINJ4)) == (1 << PINJ4)) {
+	
+		// Bufer EN Signal High
+		return(false);
+	
+	} else {
+		
+		// Bufer EN Signal LOW
+		return(true);
+	
+	}
+
+}
+bool xE910_HARDWARE::PowerMonitor(void) {
+
+	// Control for PWMon (PJ3)
+	if ((PINJ & (1 << PINJ3)) == (1 << PINJ3)) {
+
+		// Set Variable
+		Power_Monitor = POWERED;
+
+		// Power Monitor 3V3 HIGH
+		return (true);
+
+	} else {
+
+		// Set Variable
+		Power_Monitor = NOT_POWERED;
+
+		// Power Monitor 3V3 LOW
+		return (false);
+
+	}
+
+}
+void xE910_HARDWARE::OnOff(const uint16_t _Time) {
+
+	// Set On/Off Signal HIGH [PJ6]
+	PORTJ |= 0b01000000;
+
+	// Command Delay
+	delay(_Time);
+
+	// Set On/Off Signal LOW [PJ6]
+	PORTJ &= 0b10111111;
+
+}
+void xE910_HARDWARE::ShutDown(const uint16_t _Time) {
+
+	// Set Shut Down Signal HIGH [PJ5]
+	PORTJ |= 0b00100000;
+
+	// Command Delay
+	delay(_Time);
+
+	// Set Shut Down Signal LOW [PJ5]
+	PORTJ &= 0b11011111;
+
+}
+void xE910_HARDWARE::Power_Switch(const bool _State) {
+
+	// Set GSM Power Enable
+	if (_State) PORTH |= 0b00000100;
+
+	// Set GSM Power Disable
+	if (!_State) PORTH &= 0b11111011;
+
+}
+void xE910_HARDWARE::LED(const bool _State) {
+
+	// Set GSM LED Power Enable
+	if (_State) PORTH &= 0b11101111;
+
+	// Set GSM LED Power Disable
+	if (!_State) PORTH |= 0b00010000;
+
+}
+
 bool xE910_AT::ATE(const bool _ECHO) {
 
     // Declare Response Length
@@ -1092,6 +1179,81 @@ bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
     }
 
 }
+bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 6;
+
+	// Set Control Variable
+	Command_Control.REGMODE = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#REGMODE="));
+	GSM_Serial.print(String(_REGMODE));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.REGMODE = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.REGMODE = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.REGMODE = false;
+
+		// End Function
+		return (false);
+
+    }
+
+}
 bool xE910_AT::CREG(void) {
 
 	// Command Chain Delay (Advice by Telit)
@@ -1292,18 +1454,299 @@ bool xE910_AT::CREG(void) {
 	return (false);
 
 }
+bool xE910_AT::CGREG(void) {
 
+	// Control for CREG
+	if (CREG_Status == HOME_REGISTERED or CREG_Status == ROAMING_REGISTERED) {
+	
+		// Command Chain Delay (Advice by Telit)
+		delay(10);
 
+		// Declare Function Variables
+		bool _Control = false;
+		uint8_t _Error_WD = 0;
 
+		// Declare Stat Variable
+		uint8_t _Stat = NOT_REGISTERED;
 
+    	// Declare Response Length
+    	uint8_t _Response_Length = 6;
 
+		// Set Control Variable
+		Command_Control.CGREG = false;
 
+		// Send AT+CREG=1 Connection Command
+		while (!_Control) {
 
+			// Clear UART Buffer
+    		_Clear_UART_Buffer();
 
+			// Send UART Command
+			GSM_Serial.print(F("AT+CGREG=1"));
+			GSM_Serial.print(F("\r\n"));
 
+			// Wait for UART Data Send
+			GSM_Serial.flush();
 
+			// Handle Response
+			if (_Response_Wait(_Response_Length, 500)) {
 
+				// Declare Read Order Variable
+				uint8_t _Read_Order = 0;
 
+				// Declare Response Variable
+				char _Response[_Response_Length];
+
+				// Read UART Response
+				while (GSM_Serial.available() > 0) {
+
+					// Read Serial Char
+					_Response[_Read_Order] = GSM_Serial.read();
+
+					// Increase Read Order
+					_Read_Order++;
+
+					// Stream Delay
+					delayMicroseconds(500);
+
+				}
+
+				// Control for Response
+				if (strstr(_Response, "OK") != NULL) _Control = true;
+
+			} 
+
+			// Count for Error
+			_Error_WD++;
+
+			// Handle for Error
+			if (_Error_WD >= 10) return (false);
+	
+		}
+
+		// Reset Control Variables
+		_Control = false;
+		_Error_WD = 0;
+    	_Response_Length = 13;
+
+		// Command Chain Delay (Advice by Telit)
+		delay(10);
+
+		// Send CREG: 1 Connection Command
+		while (!_Control) {
+
+			// Handle Response
+			if (_Response_Wait(_Response_Length, 600)) {
+
+				// Declare Read Order Variable
+				uint8_t _Read_Order = 0;
+
+				// Declare Response Variable
+				char _Response[_Response_Length];
+
+				// Read UART Response
+				while (GSM_Serial.available() > 0) {
+
+					// Read Serial Char
+					_Response[_Read_Order] = GSM_Serial.read();
+
+					// Increase Read Order
+					_Read_Order++;
+
+					// Stream Delay
+					delayMicroseconds(500);
+
+				}
+
+				// Control for Response
+				if (strstr(_Response, "+CGREG:") != NULL) {
+
+					// Read Stat
+					_Stat = _Response[10];
+
+					// Handle Stat Variable
+					if (_Stat == 48) {
+
+						// Set Variable
+						CGREG_Status = NOT_REGISTERED;
+
+						// Set Control Variable
+						Command_Control.CGREG = false;
+
+						// Set Control Variable
+						_Control = false;
+
+					} // Not Registered [0]
+					if (_Stat == 49) {
+
+						// Set Variable
+						CGREG_Status = HOME_REGISTERED;
+
+						// Set Control Variable
+						Command_Control.CGREG = true;
+
+						// Set Control Variable
+						_Control = true;
+
+					} // Registered to Home Network [1]
+					if (_Stat == 50) {
+
+						// Set Variable
+						CGREG_Status = SEARCHING;
+
+						// Set Control Variable
+						Command_Control.CGREG = false;
+
+						// Set Control Variable
+						_Control = false;
+
+					} // Searching Network [2]
+					if (_Stat == 51) {
+
+						// Set Variable
+						CGREG_Status = DENIED;
+
+						// Set Control Variable
+						Command_Control.CGREG = false;
+
+						// Set Control Variable
+						_Control = false;
+
+					} // Registration Denied [3]
+					if (_Stat == 52) {
+
+						// Set Variable
+						CGREG_Status = UNKNOWN;
+
+						// Set Control Variable
+						Command_Control.CGREG = false;
+
+						// End Function
+						return (false);
+
+					} // Unknown Error [4]
+					if (_Stat == 53) {
+
+						// Set Variable
+						CGREG_Status = ROAMING_REGISTERED;
+
+						// Set Control Variable
+						Command_Control.CGREG = true;
+
+						// Set Control Variable
+						_Control = true;
+
+					} // Registered to Rooming Network [5]
+			
+				}
+
+		    } 
+
+			// Count for Error
+			_Error_WD++;
+
+			// Handle for Error
+			if (_Error_WD >= 3) return (false);
+	
+		}
+
+		// Control for Response
+		if ((CGREG_Status == HOME_REGISTERED) or (CGREG_Status == ROAMING_REGISTERED)) return (true);
+
+		// End Function
+		return (false);
+
+	}
+
+	// End Function
+	return (false);
+
+}
+bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 6;
+
+	// Set Control Variable
+	Command_Control.CGDCONT = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+CGDCONT="));
+	GSM_Serial.print(String(_Cid));
+	GSM_Serial.print(F(",\""));
+	GSM_Serial.print(String(_PDP_Type));
+	GSM_Serial.print(F("\",\""));
+	GSM_Serial.print(String(_APN));
+	GSM_Serial.print(F("\",\""));
+	GSM_Serial.print(String(_PDP_Addr));
+	GSM_Serial.print(F("\","));
+	GSM_Serial.print(String(_D_Comp));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_H_Comp));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.CGDCONT = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.CGDCONT = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.CGDCONT = false;
+
+		// End Function
+		return (false);
+
+    }
+
+}
 
 void xE910_AT::_Clear_UART_Buffer(void) {
 
@@ -1336,12 +1779,11 @@ bool xE910_AT::_Response_Wait(uint16_t _Length, uint32_t _TimeOut) {
 
 }
 
-
 void xE910_GSM::Initialize(void) {
 
 }
 
-
 // Define Library Class
 xE910_AT GSM_AT;
 xE910_GSM GSM;
+xE910_HARDWARE GSM_HARDWARE;

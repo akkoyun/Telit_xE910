@@ -116,10 +116,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acd2caff4fae484b5ac48a08bf5a414e3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classx_e910___a_t.html#acd2caff4fae484b5ac48a08bf5a414e3">CREG</a> (void)</td></tr>
 <tr class="memdesc:acd2caff4fae484b5ac48a08bf5a414e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set command enables/disables network registration reports depending on the parameter &lt;mode&gt;.  <a href="classx_e910___a_t.html#acd2caff4fae484b5ac48a08bf5a414e3">More...</a><br /></td></tr>
 <tr class="separator:acd2caff4fae484b5ac48a08bf5a414e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0bc49185884ef54eb93807f13b03d512"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classx_e910___a_t.html#a0bc49185884ef54eb93807f13b03d512">CGREG</a> (void)</td></tr>
+<tr class="memdesc:a0bc49185884ef54eb93807f13b03d512"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set command controls the presentation of an unsolicited result code.  <a href="classx_e910___a_t.html#a0bc49185884ef54eb93807f13b03d512">More...</a><br /></td></tr>
+<tr class="separator:a0bc49185884ef54eb93807f13b03d512"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:ae92af0fab7c97b16fc69f58a5af66065"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_command___control___struct.html">Command_Control_Struct</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classx_e910___a_t.html#ae92af0fab7c97b16fc69f58a5af66065">Command_Control</a> {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}</td></tr>
+<tr class="memitem:ae92af0fab7c97b16fc69f58a5af66065"><td class="memItemLeft" align="right" valign="top"><a class="el" href="struct_command___control___struct.html">Command_Control_Struct</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classx_e910___a_t.html#ae92af0fab7c97b16fc69f58a5af66065">Command_Control</a> {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}</td></tr>
 <tr class="memdesc:ae92af0fab7c97b16fc69f58a5af66065"><td class="mdescLeft">&#160;</td><td class="mdescRight">Command control variable structure.  <a href="classx_e910___a_t.html#ae92af0fab7c97b16fc69f58a5af66065">More...</a><br /></td></tr>
 <tr class="separator:ae92af0fab7c97b16fc69f58a5af66065"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -183,6 +186,35 @@ false - Command fails </dd></dl>
 \r\nOK\r<br  />
  (36 Byte)</p>
 <dl class="section version"><dt>Version</dt><dd>01.00.00</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true - Command successful </dd>
+<dd>
+false - Command fails </dd></dl>
+
+</div>
+</div>
+<a id="a0bc49185884ef54eb93807f13b03d512" name="a0bc49185884ef54eb93807f13b03d512"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0bc49185884ef54eb93807f13b03d512">&#9670;&nbsp;</a></span>CGREG()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool xE910_AT::CGREG </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set command controls the presentation of an unsolicited result code. </p>
+<p >AT Command : AT+CGREG=[&lt;mode&gt;]\r<br  />
+ (11 Byte)</p>
+<p >AT Response : \r\nOK\r<br  />
+ (6 Byte)</p>
+<dl class="section version"><dt>Version</dt><dd>01.00.00</dd></dl>
+<p>0 - disable network registration unsolicited result code 1 - enable network registration unsolicited result code; if there is a change in the terminal GPRS network registration status, it is issued the unsolicited result code. 2 - enable network registration and location information unsolicited result code; if there is a change of the network cell, it is issued the unsolicited result code.</p>
 <dl class="section return"><dt>Returns</dt><dd>true - Command successful </dd>
 <dd>
 false - Command fails </dd></dl>
@@ -573,7 +605,7 @@ false - Command fails </dd></dl>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="struct_command___control___struct.html">Command_Control_Struct</a> xE910_AT::Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}</td>
+          <td class="memname"><a class="el" href="struct_command___control___struct.html">Command_Control_Struct</a> xE910_AT::Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}</td>
         </tr>
       </table>
 </div><div class="memdoc">
