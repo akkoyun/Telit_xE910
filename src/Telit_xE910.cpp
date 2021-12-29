@@ -1333,7 +1333,7 @@ bool xE910_AT::CREG(void) {
 	while (!_Control) {
 
 		// Handle Response
-		if (_Response_Wait(_Response_Length, 600)) {
+		if (_Response_Wait(_Response_Length, 6000)) {
 
 			// Declare Read Order Variable
 			uint8_t _Read_Order = 0;
@@ -2079,6 +2079,279 @@ bool xE910_AT::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const ui
 		return (false);
 
     }
+
+}
+bool xE910_AT::SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_ID, const char *_Password) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+	// Control for Stat
+	if (_Stat == 0) {
+
+    	// Declare Response Length
+    	uint8_t _Response_Length = 6;
+
+		// Set Control Variable
+		Command_Control.SGACT = false;
+
+		// Clear UART Buffer
+    	_Clear_UART_Buffer();
+
+		// Send UART Command
+		GSM_Serial.print(F("AT#SGACT="));
+		GSM_Serial.print(String(_Cid));
+		GSM_Serial.print(F(","));
+		GSM_Serial.print(String(_Stat));
+		GSM_Serial.print(F("\r\n"));
+
+		// Wait for UART Data Send
+		GSM_Serial.flush();
+
+		// Handle Response
+		if (_Response_Wait(_Response_Length, 500)) {
+
+			// Declare Read Order Variable
+			uint8_t _Read_Order = 0;
+
+			// Declare Response Variable
+			char _Response[_Response_Length];
+
+			// Read UART Response
+			while (GSM_Serial.available() > 0) {
+
+				// Read Serial Char
+				_Response[_Read_Order] = GSM_Serial.read();
+
+				// Increase Read Order
+				_Read_Order++;
+
+				// Stream Delay
+				delayMicroseconds(500);
+
+			}
+
+			// Control for Response
+			if (strstr(_Response, "OK") != NULL) {
+
+				// Set Control Variable
+				Command_Control.SGACT = true;
+
+				// End Function
+				return (true);
+
+			} else {
+
+				// Set Control Variable
+				Command_Control.SGACT = false;
+
+				// End Function
+				return (false);
+
+			}
+
+    	} else {
+
+			// Set Control Variable
+			Command_Control.SGACT = false;
+
+			// End Function
+			return (false);
+
+    	}
+
+	} else if (_Stat == 1) {
+
+		// Declare Function Variables
+		bool _Control = false;
+		uint8_t _Error_WD = 0;
+
+    	// Declare Response Length
+    	uint8_t _Response_Length = 6;
+
+		// Set Control Variable
+		Command_Control.SGACT = false;
+
+		// Clear UART Buffer
+    	_Clear_UART_Buffer();
+
+		// Send Connection Command
+		while (!_Control) {
+
+			// Clear UART Buffer
+    		_Clear_UART_Buffer();
+
+			// Send UART Command
+			GSM_Serial.print(F("AT#SGACT="));
+			GSM_Serial.print(String(_Cid));
+			GSM_Serial.print(F(","));
+			GSM_Serial.print(String(_Stat));
+
+			// Check Username and Password
+			if (_User_ID != "" and _Password != "") {
+
+				// Send Username and Password		
+				GSM_Serial.print(F(",\""));
+				GSM_Serial.print(String(_User_ID));
+				GSM_Serial.print(F("\",\""));
+				GSM_Serial.print(String(_Password));
+				GSM_Serial.print(F("\""));
+
+			}
+
+			// Send Command End
+			GSM_Serial.print(F("\r\n"));
+
+			// Wait for UART Data Send
+			GSM_Serial.flush();
+
+			// Handle Response
+			if (_Response_Wait(_Response_Length, 2000)) {
+
+				// Declare Read Order Variable
+				uint8_t _Read_Order = 0;
+
+				// Declare Response Variable
+				char _Response[_Response_Length];
+
+				// Read UART Response
+				while (GSM_Serial.available() > 0) {
+
+					// Read Serial Char
+					_Response[_Read_Order] = GSM_Serial.read();
+
+					// Increase Read Order
+					_Read_Order++;
+
+					// Stream Delay
+					delayMicroseconds(500);
+
+				}
+
+				// Control for Response
+				if (strstr(_Response, "OK") != NULL) _Control = true;
+
+	    	} 
+
+			// Count for Error
+			_Error_WD++;
+
+			// Handle for Error
+			if (_Error_WD >= 10) return (false);
+	
+		}
+
+		// Reset Control Variables
+		_Control = false;
+		_Error_WD = 0;
+    	_Response_Length = 25;
+
+		// Recieve Connection Command
+		while (!_Control) {
+
+			// Handle Response
+			if (_Response_Wait(_Response_Length, 150000)) {
+
+				// Declare Read Order Variable
+				uint8_t _Read_Order = 0;
+				uint8_t _Data_Order = 0;
+
+				// Declare Response Variable
+				char _Response[_Response_Length];
+
+				// Read UART Response
+				while (GSM_Serial.available() > 0) {
+
+					// Read Serial Char
+					_Response[_Read_Order] = GSM_Serial.read();
+
+					// Handle Data
+					if ((_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) or _Response[_Read_Order] == 46) {
+
+						// Get Data
+						IP_Address[_Data_Order] = _Response[_Read_Order];
+
+						// Increase Data Order
+						_Data_Order++;
+
+					}
+
+					// Increase Read Order
+					_Read_Order++;
+
+					// Stream Delay
+					delayMicroseconds(500);
+
+				}
+
+				// Control for Command
+				if (strstr(_Response, "#SGACT:") != NULL) {
+
+					// Set Control Variable
+					Command_Control.SGACT = true;
+
+					// Set Control Variable
+					_Control = true;
+
+				} else if (strstr(_Response, "+CME ERROR: 553") != NULL) {
+
+					// Set Control Variable
+					Command_Control.SGACT = true;
+
+					// Set Control Variable
+					_Control = true;
+
+				} else {
+
+					// Set Control Variable
+					Command_Control.SGACT = false;
+
+					// Set Control Variable
+					_Control = false;
+
+				}
+
+			}
+
+			// Count for Error
+			_Error_WD++;
+
+			// Handle for Error
+			if (_Error_WD > 3) return (false);
+
+		}
+
+		// Control for Connection
+		if (sizeof(IP_Address) >= 7) {
+
+			// Set Variable
+			IP_Status = CONNECTED;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Variable
+			IP_Status = NOT_CONNECTED;
+
+			// End Function
+			return (false);
+
+		}
+	
+	} else {
+
+		// Set Control Variable
+		Command_Control.SGACT = false;
+
+		// End Function
+		return (false);
+
+	}
+
+	// End Function
+	return (false);
 
 }
 

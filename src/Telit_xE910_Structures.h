@@ -12,7 +12,7 @@
 /**
  * Library global variables declarations.
  */
-const char 	Version[9] 					= "01.00.21";		/// Library Version
+const char 	Version[9] 					= "01.00.22";		/// Library Version
 bool		Power_Monitor				= false;			/// GSM Power Monitor Signal
 uint64_t 	IMEI						= 0;				/// IMEI Variable
 uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
@@ -22,6 +22,9 @@ uint8_t 	Model 						= 0;				/// Modem Model Variable
 char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
 uint8_t		CREG_Status					= 0;				/// CREG Status Variable
 uint8_t		CGREG_Status				= 0;				/// CGREG Status Variable
+uint8_t		SGACT_Status				= 0;				/// SGACT Status Variable
+char		IP_Address[16]				= "";				/// IP Address Variable
+bool		IP_Status					= false;			/// Connection Status
 
 /**
  * @brief Command control structure.
@@ -48,6 +51,7 @@ struct Command_Control_Struct {
 	bool								SCFGEXT;			/// SCFGEXT Command Control Variable
 	bool								SCFGEXT2;			/// SCFGEXT2 Command Control Variable
 	bool								SCFGEXT3;			/// SCFGEXT3 Command Control Variable
+	bool								SGACT;				/// SGACT Command Control Variable
 };
 
 /**
@@ -76,6 +80,14 @@ enum Function_State {
 enum Power_State {
 	NOT_POWERED							= 0,				// False
 	POWERED								= 1					// True
+};
+
+/**
+ * @brief GPRS connection state defination structure
+ */
+enum Connection_State {
+	NOT_CONNECTED						= 0,				// No IP Address
+	CONNECTED							= 1					// Valid IP Address
 };
 
 #endif

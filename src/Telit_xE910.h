@@ -104,7 +104,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -522,6 +522,25 @@ class xE910_AT {
 		 */
 		bool SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const uint8_t _Closure_Type_Cmd_Mode_Enabling);
 
+		/**
+		 * @brief Execution command is used to activate or deactivate either the 
+		 * GSM context or the specified PDP context.
+		 * @details AT Command : AT#SGACT=<cid>,<stat>,[<userid>],[<password>]\r\n (20 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @param _Cid PDP context identifier
+		 * 0 - specifies the GSM context
+		 * 1..5 - numeric parameter which specifies a particular PDP context definition
+		 * @param _Stat status identifier
+		 * 0 - deactivate the context
+		 * 1 - activate the context
+		 * @param _User_ID string type, used only if the context requires it
+		 * @param _Password string type, used only if the context requires it
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_ID, const char *_Password);
 
 
 	private:
