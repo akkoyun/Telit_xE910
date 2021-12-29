@@ -104,7 +104,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -403,7 +403,124 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp);
+		
+		/**
+		 * @brief Set command sets the socket configuration parameters.
+		 * @details AT Command : AT#SCFG=[<conn_id>],[<cid>],[<pktsz>],[<maxto>],[<connto>],[<txto>]\r\n (27 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Conn_ID socket connection identifier (1-6)
+		 * @param _Cid PDP context identifier
+		 * 0 - specifies the GSM context
+		 * 1..5 - numeric parameter which specifies a particular PDP context definition
+		 * @param _Pkt_Sz packet size to be used by the TCP/UDP/IP stack for data sending.
+		 * 0 - select automatically default value(300).
+		 * 1..1500 - packet size in bytes.
+		 * @param _Max_To exchange timeout (or socket inactivity timeout); if there’s 
+		 * no data exchange within this timeout period the connection is closed.
+		 * 0 - no timeout
+		 * 1..65535 - timeout value in seconds (default 90 s.)
+		 * @param _Conn_To connection timeout; if we can’t establish a connection to the remote
+		 * within this timeout period, an error is raised.
+		 * 10..1200 - timeout value in hundreds of milliseconds (default 600)
+		 * @param _TX_To data sending timeout; after this period data are sent also 
+		 * if they’re less than max packet size.
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _Pkt_Sz, const uint16_t _Max_To, const uint16_t _Conn_To, const uint8_t _TX_To);
 
+		/**
+		 * @brief Set command sets the socket configuration extended parameters.
+		 * @details AT Command : AT#SCFGEXT=[<conn_id>],[<srmode>],[<recvdatamode>],[<keepalive>],[<listenautorsp>],[<senddatamode>]\r\n (24 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Conn_ID socket connection identifier (1-6)
+		 * @param _Sr_Mode SRing unsolicited mode
+		 * 0 - Normal (default)
+		 * 1 – Data amount
+		 * 2 - Data view
+		 * 3 – Data view with UDP datagram informations
+		 * @param _Recv_Data_Mode data view mode for received data
+		 * 0- text mode (default)
+		 * 1- hexadecimal mode
+		 * @param _Keep_Alive Set the TCP Keepalive value in minutes
+		 * 0 – Deactivated (default)
+		 * 1 – 240 – Keepalive time in minutes
+		 * @param _Listen_Auto_Rsp Set the listen auto-response mode, that affects the commands AT#SL and AT#SLUDP
+		 * 0 - Deactivated (default)
+		 * 1 – Activated
+		 * @param _Send_Data_Mode data mode for sending data in command mode(AT#SSEND)
+		 * 0 - data represented as text (default)
+		 * 1 - data represented as sequence of hexadecimal numbers (from 00 to FF)
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uint8_t _Recv_Data_Mode, const uint8_t _Keep_Alive, const uint8_t _Listen_Auto_Rsp, const uint8_t _Send_Data_Mode);
+
+		/**
+		 * @brief Set command sets the socket configuration extended parameters 
+		 * for features not included in #SCFGEXT command.
+		 * @details AT Command : AT#SCFGEXT2=[<conn_id>],[<bufferstart>],[<abortconnattemp>],[<sringlen>],[<sringto>],[<nocarriermode>]\r\n (26 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Conn_ID socket connection identifier (1-6)
+		 * @param _Buffer_Start Set the sending timeout method based on new data received from the serial port. 
+		 * (<txTo> timeout value is set by #SCFG command) Restart of transmission timer will be done when new 
+		 * data are received from the serial port.
+		 * 0 - old behaviour for transmission timer
+		 * 1 - new behaviour for transmission timer
+		 * @param _Abort_Conn_Attempt Enable connection attempt(#SD/#SKTD/#SKTOP) abort before 
+		 * CONNECT(online mode) or OK(command mode)
+		 * 0 – Not possible to interrupt connection attempt
+		 * 1 – It is possible to interrupt the connection attempt
+		 * @param _SRing_Len this parameter sets the length of data received in one 
+		 * SRING URC in sring mode 2 or 3 ( see AT#SCFGEXT )
+		 * 0 – factory default, means 64 bytes
+		 * 1 – means that the length is equal to the maximum TCP payload size accepted 
+		 * in download in case of TCP connections, same as 0 in case of UDP connections
+		 * @param _SRing_To this parameter sets the delay among one SRING URC and 
+		 * the other, in sring mode 2 or 3 ( see AT#SCFGEXT )
+		 * 0 – factory default, means 10 hundreds of milliseconds 
+		 * 1..10: value in hundreds of milliseconds
+		 * @param _No_Carrier_Mode this parameter permits to choose NO CARRIER 
+		 * indication format when the socket is closed as follows
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, const uint8_t _Abort_Conn_Attempt, const uint8_t _SRing_Len, const uint8_t _SRing_To, const uint8_t _No_Carrier_Mode);
+
+		/**
+		 * @brief Set command sets the socket configuration extended parameters 
+		 * for features not included in #SCFGEXT command nor in #SCFGEXT2 command.
+		 * @details AT Command : AT#SCFGEXT3=[<conn_id>],[<immrsp>],[<closuretypecmdmodeenabling>]\r\n (19 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Conn_ID socket connection identifier (1-6)
+		 * @param _Imm_Rsp Enables AT#SD command mode immediate response
+		 * 0 – factory default, means that AT#SD in command mode (see AT#SD) returns after the socket is connected
+		 * 1 – means that AT#SD in command mode returns immediately. Then the state of the connection can be read by the AT command AT#SS
+		 * @param _Closure_Type_Cmd_Mode_Enabling Setting this parameter, successive #SD or #SL with 
+		 * <closureType> parameter 255 setting takes effect in command mode. It has been introduced 
+		 * due to retrocompatibility reason regarding <closureType> behaviour in command mode.
+		 * 0 – #SD or #SL <closureType> 255 in command mode has no effect 
+		 * 1 – #SD or #SL <closureType> 255 in command mode takes effect
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const uint8_t _Closure_Type_Cmd_Mode_Enabling);
 
 
 
