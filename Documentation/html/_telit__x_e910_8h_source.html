@@ -95,7 +95,7 @@ $(function() {
 <div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
 <div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keyword">public</span>:</div>
 <div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classx_e910___a_t.html#ae92af0fab7c97b16fc69f58a5af66065">   30</a></span>        <a class="code hl_struct" href="struct_command___control___struct.html">Command_Control_Struct</a> <a class="code hl_variable" href="classx_e910___a_t.html#ae92af0fab7c97b16fc69f58a5af66065">Command_Control</a> {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno"><a class="line" href="classx_e910___a_t.html#ae92af0fab7c97b16fc69f58a5af66065">   30</a></span>        <a class="code hl_struct" href="struct_command___control___struct.html">Command_Control_Struct</a> <a class="code hl_variable" href="classx_e910___a_t.html#ae92af0fab7c97b16fc69f58a5af66065">Command_Control</a> {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};</div>
 <div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
 <div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classx_e910___a_t.html#af0c4c86678d934712cc8fff5e50682e9">ATE</a>(<span class="keyword">const</span> <span class="keywordtype">bool</span> _ECHO);</div>
 <div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span> </div>
@@ -121,41 +121,56 @@ $(function() {
 <div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span> </div>
 <div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classx_e910___a_t.html#afe378cc20557e9bce58327d28b49b22c">SLED</a>(<span class="keyword">const</span> uint8_t _SLED);</div>
 <div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span> </div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span> </div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span> </div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>    <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span> </div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        <span class="keywordtype">void</span> _Clear_UART_Buffer(<span class="keywordtype">void</span>);  </div>
-<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span> </div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        <span class="keywordtype">bool</span> _Response_Wait(uint16_t _Length, uint32_t _TimeOut);</div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>    </div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>};</div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span> </div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno"><a class="line" href="classx_e910___g_s_m.html">  243</a></span><span class="keyword">class </span><a class="code hl_class" href="classx_e910___g_s_m.html">xE910_GSM</a> {</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classx_e910___a_t.html#a256fdcc239dbfe0a19c045ae47ebb7c4">TXMONMODE</a>(<span class="keyword">const</span> uint8_t _TXMONMODE);</div>
 <div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span> </div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    <span class="keyword">public</span>:</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span> </div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classx_e910___g_s_m.html#afbbb652002c80266b7cd56cfa740f636">Initialize</a>();</div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span> </div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>    <span class="keyword">private</span>:</div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>    </div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    </div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>};</div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span> </div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span> </div>
-<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span> </div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span> </div>
-<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
-<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span> </div>
-<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span><span class="keyword">extern</span> <a class="code hl_class" href="classx_e910___a_t.html">xE910_AT</a> <a class="code hl_variable" href="_telit__x_e910_8h.html#ae63efe596aba644f3252d1d4d3a154a2">GSM_AT</a>;</div>
-<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span><span class="keyword">extern</span> <a class="code hl_class" href="classx_e910___g_s_m.html">xE910_GSM</a> <a class="code hl_variable" href="_telit__x_e910_8h.html#a6e13aa88e76038ed3ea8fa2f6237a130">GSM</a>;</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>        <span class="keywordtype">bool</span> <a class="code hl_function" href="classx_e910___a_t.html#acd2caff4fae484b5ac48a08bf5a414e3">CREG</a>(<span class="keywordtype">void</span>);</div>
 <div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span> </div>
-<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span><span class="preprocessor">#endif </span><span class="comment">/* defined(__Energy__) */</span><span class="preprocessor"></span></div>
-<div class="ttc" id="a_telit__x_e910_8h_html_a6e13aa88e76038ed3ea8fa2f6237a130"><div class="ttname"><a href="_telit__x_e910_8h.html#a6e13aa88e76038ed3ea8fa2f6237a130">GSM</a></div><div class="ttdeci">xE910_GSM GSM</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:1073</div></div>
-<div class="ttc" id="a_telit__x_e910_8h_html_ae63efe596aba644f3252d1d4d3a154a2"><div class="ttname"><a href="_telit__x_e910_8h.html#ae63efe596aba644f3252d1d4d3a154a2">GSM_AT</a></div><div class="ttdeci">xE910_AT GSM_AT</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:1072</div></div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span> </div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span> </div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span> </div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span> </div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span> </div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span> </div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span> </div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span> </div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span> </div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span> </div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span> </div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span> </div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>        <span class="keywordtype">void</span> _Clear_UART_Buffer(<span class="keywordtype">void</span>);  </div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span> </div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>        <span class="keywordtype">bool</span> _Response_Wait(uint16_t _Length, uint32_t _TimeOut);</div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    </div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>};</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span> </div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno"><a class="line" href="classx_e910___g_s_m.html">  294</a></span><span class="keyword">class </span><a class="code hl_class" href="classx_e910___g_s_m.html">xE910_GSM</a> {</div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span> </div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span> </div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>        <span class="keywordtype">void</span> <a class="code hl_function" href="classx_e910___g_s_m.html#afbbb652002c80266b7cd56cfa740f636">Initialize</a>();</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span> </div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    </div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>    </div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>};</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span> </div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span> </div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span> </div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span> </div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span> </div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span> </div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span><span class="keyword">extern</span> <a class="code hl_class" href="classx_e910___a_t.html">xE910_AT</a> <a class="code hl_variable" href="_telit__x_e910_8h.html#ae63efe596aba644f3252d1d4d3a154a2">GSM_AT</a>;</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span><span class="keyword">extern</span> <a class="code hl_class" href="classx_e910___g_s_m.html">xE910_GSM</a> <a class="code hl_variable" href="_telit__x_e910_8h.html#a6e13aa88e76038ed3ea8fa2f6237a130">GSM</a>;</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span> </div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="preprocessor">#endif </span><span class="comment">/* defined(__Energy__) */</span><span class="preprocessor"></span></div>
+<div class="ttc" id="a_telit__x_e910_8h_html_a6e13aa88e76038ed3ea8fa2f6237a130"><div class="ttname"><a href="_telit__x_e910_8h.html#a6e13aa88e76038ed3ea8fa2f6237a130">GSM</a></div><div class="ttdeci">xE910_GSM GSM</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:1347</div></div>
+<div class="ttc" id="a_telit__x_e910_8h_html_ae63efe596aba644f3252d1d4d3a154a2"><div class="ttname"><a href="_telit__x_e910_8h.html#ae63efe596aba644f3252d1d4d3a154a2">GSM_AT</a></div><div class="ttdeci">xE910_AT GSM_AT</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:1346</div></div>
 <div class="ttc" id="a_telit__x_e910___structures_8h_html"><div class="ttname"><a href="_telit__x_e910___structures_8h.html">Telit_xE910_Structures.h</a></div></div>
 <div class="ttc" id="aclassx_e910___a_t_html"><div class="ttname"><a href="classx_e910___a_t.html">xE910_AT</a></div><div class="ttdef"><b>Definition:</b> Telit_xE910.h:23</div></div>
 <div class="ttc" id="aclassx_e910___a_t_html_a16fbe69cbd843677b128d4f9e3adee21"><div class="ttname"><a href="classx_e910___a_t.html#a16fbe69cbd843677b128d4f9e3adee21">xE910_AT::CMEE</a></div><div class="ttdeci">bool CMEE(const uint8_t _CMEE)</div><div class="ttdoc">Set command enables/disables the report of result code.</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:83</div></div>
+<div class="ttc" id="aclassx_e910___a_t_html_a256fdcc239dbfe0a19c045ae47ebb7c4"><div class="ttname"><a href="classx_e910___a_t.html#a256fdcc239dbfe0a19c045ae47ebb7c4">xE910_AT::TXMONMODE</a></div><div class="ttdeci">bool TXMONMODE(const uint8_t _TXMONMODE)</div><div class="ttdoc">Set TXMON pin behaviour.</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:1020</div></div>
 <div class="ttc" id="aclassx_e910___a_t_html_a345276471076a820c585d2c49145927a"><div class="ttname"><a href="classx_e910___a_t.html#a345276471076a820c585d2c49145927a">xE910_AT::GMM</a></div><div class="ttdeci">bool GMM(void)</div><div class="ttdoc">Execution command returns the model identification.</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:765</div></div>
 <div class="ttc" id="aclassx_e910___a_t_html_a50156f9a5d4315df37d817a634881058"><div class="ttname"><a href="classx_e910___a_t.html#a50156f9a5d4315df37d817a634881058">xE910_AT::FCLASS</a></div><div class="ttdeci">bool FCLASS(const uint8_t _FCLASS)</div><div class="ttdoc">Set command sets the wireless module in specified connection mode (data, fax, voice),...</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:158</div></div>
 <div class="ttc" id="aclassx_e910___a_t_html_a578c1d9ac1d447bd1c4c36d3ce0a797f"><div class="ttname"><a href="classx_e910___a_t.html#a578c1d9ac1d447bd1c4c36d3ce0a797f">xE910_AT::CGSN</a></div><div class="ttdeci">bool CGSN(void)</div><div class="ttdoc">Execution command returns the product serial number, identified as the IMEI of the mobile,...</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:382</div></div>
@@ -165,12 +180,13 @@ $(function() {
 <div class="ttc" id="aclassx_e910___a_t_html_aa3ee45038aa9e9c4d31531956646788a"><div class="ttname"><a href="classx_e910___a_t.html#aa3ee45038aa9e9c4d31531956646788a">xE910_AT::CCID</a></div><div class="ttdeci">bool CCID(void)</div><div class="ttdoc">Execution command reads on SIM the ICCID (card identification number that provides a unique identific...</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:572</div></div>
 <div class="ttc" id="aclassx_e910___a_t_html_ab1d733e46db22b191de2f5d3ba510e03"><div class="ttname"><a href="classx_e910___a_t.html#ab1d733e46db22b191de2f5d3ba510e03">xE910_AT::CPIN</a></div><div class="ttdeci">bool CPIN(void)</div><div class="ttdoc">Set command sends to the device a password which is necessary before it can be operated (SIM PIN,...</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:308</div></div>
 <div class="ttc" id="aclassx_e910___a_t_html_ab73c01757672ff1885a132a74bfdafce"><div class="ttname"><a href="classx_e910___a_t.html#ab73c01757672ff1885a132a74bfdafce">xE910_AT::GMI</a></div><div class="ttdeci">bool GMI(void)</div><div class="ttdoc">Execution command returns the manufacturer identification.</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:682</div></div>
+<div class="ttc" id="aclassx_e910___a_t_html_acd2caff4fae484b5ac48a08bf5a414e3"><div class="ttname"><a href="classx_e910___a_t.html#acd2caff4fae484b5ac48a08bf5a414e3">xE910_AT::CREG</a></div><div class="ttdeci">bool CREG(void)</div><div class="ttdoc">Set command enables/disables network registration reports depending on the parameter &lt;mode&gt;.</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:1095</div></div>
 <div class="ttc" id="aclassx_e910___a_t_html_ae92af0fab7c97b16fc69f58a5af66065"><div class="ttname"><a href="classx_e910___a_t.html#ae92af0fab7c97b16fc69f58a5af66065">xE910_AT::Command_Control</a></div><div class="ttdeci">Command_Control_Struct Command_Control</div><div class="ttdoc">Command control variable structure.</div><div class="ttdef"><b>Definition:</b> Telit_xE910.h:30</div></div>
 <div class="ttc" id="aclassx_e910___a_t_html_af0c4c86678d934712cc8fff5e50682e9"><div class="ttname"><a href="classx_e910___a_t.html#af0c4c86678d934712cc8fff5e50682e9">xE910_AT::ATE</a></div><div class="ttdeci">bool ATE(const bool _ECHO)</div><div class="ttdoc">Set function to enable or disable the command echo.</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:11</div></div>
 <div class="ttc" id="aclassx_e910___a_t_html_afe378cc20557e9bce58327d28b49b22c"><div class="ttname"><a href="classx_e910___a_t.html#afe378cc20557e9bce58327d28b49b22c">xE910_AT::SLED</a></div><div class="ttdeci">bool SLED(const uint8_t _SLED)</div><div class="ttdoc">Set command sets the behaviour of the STAT_LED GPIO.</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:945</div></div>
-<div class="ttc" id="aclassx_e910___g_s_m_html"><div class="ttname"><a href="classx_e910___g_s_m.html">xE910_GSM</a></div><div class="ttdef"><b>Definition:</b> Telit_xE910.h:243</div></div>
-<div class="ttc" id="aclassx_e910___g_s_m_html_afbbb652002c80266b7cd56cfa740f636"><div class="ttname"><a href="classx_e910___g_s_m.html#afbbb652002c80266b7cd56cfa740f636">xE910_GSM::Initialize</a></div><div class="ttdeci">void Initialize()</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:1066</div></div>
-<div class="ttc" id="astruct_command___control___struct_html"><div class="ttname"><a href="struct_command___control___struct.html">Command_Control_Struct</a></div><div class="ttdoc">Modem Firmware Version Variable.</div><div class="ttdef"><b>Definition:</b> Telit_xE910_Structures.h:26</div></div>
+<div class="ttc" id="aclassx_e910___g_s_m_html"><div class="ttname"><a href="classx_e910___g_s_m.html">xE910_GSM</a></div><div class="ttdef"><b>Definition:</b> Telit_xE910.h:294</div></div>
+<div class="ttc" id="aclassx_e910___g_s_m_html_afbbb652002c80266b7cd56cfa740f636"><div class="ttname"><a href="classx_e910___g_s_m.html#afbbb652002c80266b7cd56cfa740f636">xE910_GSM::Initialize</a></div><div class="ttdeci">void Initialize()</div><div class="ttdef"><b>Definition:</b> Telit_xE910.cpp:1340</div></div>
+<div class="ttc" id="astruct_command___control___struct_html"><div class="ttname"><a href="struct_command___control___struct.html">Command_Control_Struct</a></div><div class="ttdoc">CREG Status Variable.</div><div class="ttdef"><b>Definition:</b> Telit_xE910_Structures.h:27</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

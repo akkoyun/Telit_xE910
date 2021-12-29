@@ -12,13 +12,14 @@
 /**
  * Library global variables declarations.
  */
-const char 	Version[9] 					= "01.00.12";		/// Library Version
+const char 	Version[9] 					= "01.00.13";		/// Library Version
 uint64_t 	IMEI						= 0;				/// IMEI Variable
 uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
 uint64_t 	ICCID						= 0;				/// ICCID Variable
 uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
 uint8_t 	Model 						= 0;				/// Modem Model Variable
 char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
+uint8_t		CREG_Status					= 0;				/// CREG Status Variable
 
 /**
  * @brief Command control structure.
@@ -37,11 +38,19 @@ struct Command_Control_Struct {
 	bool								GMR;				/// GMR Command Control Variable
 	bool								SLED;				/// SLED Command Control Variable
 	bool								TXMONMODE;			/// TXMONMODE Command Control Variable
+	bool								CREG;				/// CREG Command Control Variable
 };
 
-
-
-
-
+/**
+ * @brief CREG and CGREG status defination structure
+ */
+enum GSM_Stat {
+	NOT_REGISTERED						= 0,				// 0
+	HOME_REGISTERED						= 1,				// 1
+	SEARCHING							= 2,				// 2
+	DENIED								= 3,				// 3
+	UNKNOWN								= 4,				// 4
+	ROAMING_REGISTERED					= 5					// 5
+};
 
 #endif

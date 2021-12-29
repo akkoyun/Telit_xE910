@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['manufacturer_0',['Manufacturer',['../_telit__x_e910___structures_8h.html#a01175174fc635cae9199b823b9cc9382',1,'Telit_xE910_Structures.h']]],
-  ['model_1',['Model',['../_telit__x_e910___structures_8h.html#a29586ea3bf70d10dbb4deddf21299079',1,'Telit_xE910_Structures.h']]],
-  ['modem_5ffirmware_2',['Modem_Firmware',['../_telit__x_e910___structures_8h.html#aeadebd0d595c68f03abecae55979243a',1,'Telit_xE910_Structures.h']]]
+  ['iccid_0',['ICCID',['../struct_command___control___struct.html#a7b3bf43b1ef458581ff2e6fd44a3fca8',1,'Command_Control_Struct::ICCID()'],['../_telit__x_e910___structures_8h.html#a787e545ed664f229e255624be87746c4',1,'ICCID():&#160;Telit_xE910_Structures.h']]],
+  ['imei_1',['IMEI',['../_telit__x_e910___structures_8h.html#aef9231643ad774bb7653c559a1d8d9ef',1,'Telit_xE910_Structures.h']]],
+  ['initialize_2',['Initialize',['../classx_e910___g_s_m.html#afbbb652002c80266b7cd56cfa740f636',1,'xE910_GSM']]]
 ];

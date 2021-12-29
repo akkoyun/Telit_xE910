@@ -242,6 +242,34 @@ class xE910_AT {
 		 */
 		bool TXMONMODE(const uint8_t _TXMONMODE);
 
+		/**
+		 * @brief Set command enables/disables network registration 
+		 * reports depending on the parameter <mode>.
+		 * @details AT Command : AT+CREG=[<mode>]\r\n (11 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * 0 - disable network registration unsolicited result code (factory default) 
+		 * 1 - enable network registration unsolicited result code
+		 * 2 - enable network registration unsolicited result code with network Cell identification data
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CREG(void);
+
+
+
+
+
+
+
+
+
+
+
+
 
 	private:
 

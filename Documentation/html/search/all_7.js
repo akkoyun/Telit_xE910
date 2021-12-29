@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['serial_5fnumber_0',['Serial_Number',['../_telit__x_e910___structures_8h.html#a1e05f2acf8f49a861d8938ac1a2f94cf',1,'Telit_xE910_Structures.h']]],
-  ['sled_1',['SLED',['../struct_command___control___struct.html#a7fcea30172fcfe0ae53c2df73746dc23',1,'Command_Control_Struct::SLED()'],['../classx_e910___a_t.html#afe378cc20557e9bce58327d28b49b22c',1,'xE910_AT::SLED()']]]
+  ['k_0',['K',['../struct_command___control___struct.html#a747830c2ac64f26ab498da755d3b6285',1,'Command_Control_Struct::K()'],['../classx_e910___a_t.html#a98707ee41a21b8877b08b8784c3667fd',1,'xE910_AT::K()']]]
 ];
