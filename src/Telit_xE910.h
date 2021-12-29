@@ -104,7 +104,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -403,7 +403,35 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp);
-
+		
+		/**
+		 * @brief Set command sets the socket configuration parameters.
+		 * @details AT Command : AT#SCFG=[<conn_id>],[<cid>],[<pktsz>],[<maxto>],[<connto>],[<txto>]\r\n (27 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Conn_ID socket connection identifier (1-6)
+		 * @param _Cid PDP context identifier
+		 * 0 - specifies the GSM context
+		 * 1..5 - numeric parameter which specifies a particular PDP context definition
+		 * @param _Pkt_Sz packet size to be used by the TCP/UDP/IP stack for data sending.
+		 * 0 - select automatically default value(300).
+		 * 1..1500 - packet size in bytes.
+		 * @param _Max_To exchange timeout (or socket inactivity timeout); if there’s 
+		 * no data exchange within this timeout period the connection is closed.
+		 * 0 - no timeout
+		 * 1..65535 - timeout value in seconds (default 90 s.)
+		 * @param _Conn_To connection timeout; if we can’t establish a connection to the remote
+		 * within this timeout period, an error is raised.
+		 * 10..1200 - timeout value in hundreds of milliseconds (default 600)
+		 * @param _TX_To data sending timeout; after this period data are sent also 
+		 * if they’re less than max packet size.
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _Pkt_Sz, const uint16_t _Max_To, const uint16_t _Conn_To, const uint8_t _TX_To);
 
 
 
