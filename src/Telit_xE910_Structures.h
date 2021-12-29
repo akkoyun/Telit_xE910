@@ -12,7 +12,7 @@
 /**
  * Library global variables declarations.
  */
-const char 	Version[9] 					= "01.00.20";		/// Library Version
+const char 	Version[9] 					= "01.00.21";		/// Library Version
 bool		Power_Monitor				= false;			/// GSM Power Monitor Signal
 uint64_t 	IMEI						= 0;				/// IMEI Variable
 uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
@@ -47,6 +47,7 @@ struct Command_Control_Struct {
 	bool								SCFG;				/// SCFG Command Control Variable
 	bool								SCFGEXT;			/// SCFGEXT Command Control Variable
 	bool								SCFGEXT2;			/// SCFGEXT2 Command Control Variable
+	bool								SCFGEXT3;			/// SCFGEXT3 Command Control Variable
 };
 
 /**

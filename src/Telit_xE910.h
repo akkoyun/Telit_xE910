@@ -104,7 +104,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -498,6 +498,30 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, const uint8_t _Abort_Conn_Attempt, const uint8_t _SRing_Len, const uint8_t _SRing_To, const uint8_t _No_Carrier_Mode);
+
+		/**
+		 * @brief Set command sets the socket configuration extended parameters 
+		 * for features not included in #SCFGEXT command nor in #SCFGEXT2 command.
+		 * @details AT Command : AT#SCFGEXT3=[<conn_id>],[<immrsp>],[<closuretypecmdmodeenabling>]\r\n (19 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Conn_ID socket connection identifier (1-6)
+		 * @param _Imm_Rsp Enables AT#SD command mode immediate response
+		 * 0 – factory default, means that AT#SD in command mode (see AT#SD) returns after the socket is connected
+		 * 1 – means that AT#SD in command mode returns immediately. Then the state of the connection can be read by the AT command AT#SS
+		 * @param _Closure_Type_Cmd_Mode_Enabling Setting this parameter, successive #SD or #SL with 
+		 * <closureType> parameter 255 setting takes effect in command mode. It has been introduced 
+		 * due to retrocompatibility reason regarding <closureType> behaviour in command mode.
+		 * 0 – #SD or #SL <closureType> 255 in command mode has no effect 
+		 * 1 – #SD or #SL <closureType> 255 in command mode takes effect
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const uint8_t _Closure_Type_Cmd_Mode_Enabling);
+
 
 
 	private:
