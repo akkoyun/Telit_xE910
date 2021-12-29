@@ -29,6 +29,7 @@ class xE910_GSM {
 	public:
 
 		void Initialize();
+		void Power();
 
 	private:
 	
@@ -103,7 +104,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -317,6 +318,25 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool TXMONMODE(const uint8_t _TXMONMODE);
+
+		/**
+		 * @brief There are situations in which the presentation of the URCs controlled by 
+		 * either +CREG and +CGREG are slightly different from ETSI specifications. 
+		 * We identified this behaviour and decided to maintain it as default for backward 
+		 * compatibility issues, while we’re offering a more formal ‘Enhanced Operation Mode’ 
+		 * through #REGMODE.
+		 * @details AT Command : AT#REGMODE=[<mode>]\r\n (14 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * 0 - basic operation mode
+		 * 1 - enhanced operation mode
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool REGMODE(const uint8_t _REGMODE);
 
 		/**
 		 * @brief Set command enables/disables network registration 

@@ -12,7 +12,7 @@
 /**
  * Library global variables declarations.
  */
-const char 	Version[9] 					= "01.00.15";		/// Library Version
+const char 	Version[9] 					= "01.00.16";		/// Library Version
 bool		Power_Monitor				= false;			/// GSM Power Monitor Signal
 uint64_t 	IMEI						= 0;				/// IMEI Variable
 uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
@@ -40,6 +40,7 @@ struct Command_Control_Struct {
 	bool								GMR;				/// GMR Command Control Variable
 	bool								SLED;				/// SLED Command Control Variable
 	bool								TXMONMODE;			/// TXMONMODE Command Control Variable
+	bool								REGMODE;			/// REGMODE Command Control Variable
 	bool								CREG;				/// CREG Command Control Variable
 	bool								CGREG;				/// CGREG Command Control Variable
 };
