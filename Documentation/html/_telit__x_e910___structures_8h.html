@@ -69,6 +69,7 @@ $(function() {
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#define-members">Macros</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">Telit_xE910_Structures.h File Reference</div></div>
 </div><!--header-->
@@ -79,7 +80,7 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
 Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_command___control___struct.html">Command_Control_Struct</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modem Firmware Version Variable.  <a href="struct_command___control___struct.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">CREG Status Variable.  <a href="struct_command___control___struct.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="define-members" name="define-members"></a>
@@ -89,9 +90,24 @@ Macros</h2></td></tr>
 <tr class="memitem:aa3537d29c4e834967e8f08754bf2e8f9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_telit__x_e910___structures_8h.html#aa3537d29c4e834967e8f08754bf2e8f9">GSM_Serial_Baud</a>&#160;&#160;&#160;115200</td></tr>
 <tr class="separator:aa3537d29c4e834967e8f08754bf2e8f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a0a2904db130377cfcacfba8f3e2b86fb"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fb">GSM_Stat</a> { <br />
+&#160;&#160;<a class="el" href="_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fba894e1a2a3a5390ef8d64a893014b70d0">NOT_REGISTERED</a> = 0
+, <a class="el" href="_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fbae6685e8f52c8bbbdf3b8627b8eb56d35">HOME_REGISTERED</a> = 1
+, <a class="el" href="_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fbaa0c0f46a51df7452ca25be1d4594e8ba">SEARCHING</a> = 2
+, <a class="el" href="_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fba08f1ea1cb5cac34a4f4237e5259fcabb">DENIED</a> = 3
+, <br />
+&#160;&#160;<a class="el" href="_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fba6ce26a62afab55d7606ad4e92428b30c">UNKNOWN</a> = 4
+, <a class="el" href="_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fba483b3970112454e41a057a21c33b9c88">ROAMING_REGISTERED</a> = 5
+<br />
+ }</td></tr>
+<tr class="memdesc:a0a2904db130377cfcacfba8f3e2b86fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">CREG and CGREG status defination structure.  <a href="_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fb">More...</a><br /></td></tr>
+<tr class="separator:a0a2904db130377cfcacfba8f3e2b86fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:aa2d6f80985e1f43b2690e0cc9c44625b"><td class="memItemLeft" align="right" valign="top">const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_telit__x_e910___structures_8h.html#aa2d6f80985e1f43b2690e0cc9c44625b">Version</a> [9] = &quot;01.00.11&quot;</td></tr>
+<tr class="memitem:aa2d6f80985e1f43b2690e0cc9c44625b"><td class="memItemLeft" align="right" valign="top">const char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_telit__x_e910___structures_8h.html#aa2d6f80985e1f43b2690e0cc9c44625b">Version</a> [9] = &quot;01.00.13&quot;</td></tr>
 <tr class="separator:aa2d6f80985e1f43b2690e0cc9c44625b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef9231643ad774bb7653c559a1d8d9ef"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_telit__x_e910___structures_8h.html#aef9231643ad774bb7653c559a1d8d9ef">IMEI</a> = 0</td></tr>
 <tr class="memdesc:aef9231643ad774bb7653c559a1d8d9ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Library Version.  <a href="_telit__x_e910___structures_8h.html#aef9231643ad774bb7653c559a1d8d9ef">More...</a><br /></td></tr>
@@ -111,6 +127,9 @@ Variables</h2></td></tr>
 <tr class="memitem:aeadebd0d595c68f03abecae55979243a"><td class="memItemLeft" align="right" valign="top">char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_telit__x_e910___structures_8h.html#aeadebd0d595c68f03abecae55979243a">Modem_Firmware</a> [10] = &quot;&quot;</td></tr>
 <tr class="memdesc:aeadebd0d595c68f03abecae55979243a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modem Model Variable.  <a href="_telit__x_e910___structures_8h.html#aeadebd0d595c68f03abecae55979243a">More...</a><br /></td></tr>
 <tr class="separator:aeadebd0d595c68f03abecae55979243a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2b53b837c115b47ae663a10c0c74d262"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="_telit__x_e910___structures_8h.html#a2b53b837c115b47ae663a10c0c74d262">CREG_Status</a> = 0</td></tr>
+<tr class="memdesc:a2b53b837c115b47ae663a10c0c74d262"><td class="mdescLeft">&#160;</td><td class="mdescRight">Modem Firmware Version Variable.  <a href="_telit__x_e910___structures_8h.html#a2b53b837c115b47ae663a10c0c74d262">More...</a><br /></td></tr>
+<tr class="separator:a2b53b837c115b47ae663a10c0c74d262"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a2dddfadcbf3906da2374ab73acd45ee3" name="a2dddfadcbf3906da2374ab73acd45ee3"></a>
@@ -142,7 +161,48 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a0a2904db130377cfcacfba8f3e2b86fb" name="a0a2904db130377cfcacfba8f3e2b86fb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a2904db130377cfcacfba8f3e2b86fb">&#9670;&nbsp;</a></span>GSM_Stat</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fb">GSM_Stat</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>CREG and CGREG status defination structure. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a0a2904db130377cfcacfba8f3e2b86fba894e1a2a3a5390ef8d64a893014b70d0" name="a0a2904db130377cfcacfba8f3e2b86fba894e1a2a3a5390ef8d64a893014b70d0"></a>NOT_REGISTERED&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a0a2904db130377cfcacfba8f3e2b86fbae6685e8f52c8bbbdf3b8627b8eb56d35" name="a0a2904db130377cfcacfba8f3e2b86fbae6685e8f52c8bbbdf3b8627b8eb56d35"></a>HOME_REGISTERED&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a0a2904db130377cfcacfba8f3e2b86fbaa0c0f46a51df7452ca25be1d4594e8ba" name="a0a2904db130377cfcacfba8f3e2b86fbaa0c0f46a51df7452ca25be1d4594e8ba"></a>SEARCHING&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a0a2904db130377cfcacfba8f3e2b86fba08f1ea1cb5cac34a4f4237e5259fcabb" name="a0a2904db130377cfcacfba8f3e2b86fba08f1ea1cb5cac34a4f4237e5259fcabb"></a>DENIED&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a0a2904db130377cfcacfba8f3e2b86fba6ce26a62afab55d7606ad4e92428b30c" name="a0a2904db130377cfcacfba8f3e2b86fba6ce26a62afab55d7606ad4e92428b30c"></a>UNKNOWN&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a0a2904db130377cfcacfba8f3e2b86fba483b3970112454e41a057a21c33b9c88" name="a0a2904db130377cfcacfba8f3e2b86fba483b3970112454e41a057a21c33b9c88"></a>ROAMING_REGISTERED&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+</div>
+</div>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="a2b53b837c115b47ae663a10c0c74d262" name="a2b53b837c115b47ae663a10c0c74d262"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2b53b837c115b47ae663a10c0c74d262">&#9670;&nbsp;</a></span>CREG_Status</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t CREG_Status = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Modem Firmware Version Variable. </p>
+
+</div>
+</div>
 <a id="a787e545ed664f229e255624be87746c4" name="a787e545ed664f229e255624be87746c4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a787e545ed664f229e255624be87746c4">&#9670;&nbsp;</a></span>ICCID</h2>
 
@@ -246,7 +306,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const char Version[9] = &quot;01.00.11&quot;</td>
+          <td class="memname">const char Version[9] = &quot;01.00.13&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">

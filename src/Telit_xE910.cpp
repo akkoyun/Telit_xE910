@@ -1092,7 +1092,206 @@ bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
     }
 
 }
+bool xE910_AT::CREG(void) {
 
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+	// Declare Function Variables
+	bool _Control = false;
+	uint8_t _Error_WD = 0;
+
+	// Declare Stat Variable
+	uint8_t _Stat = NOT_REGISTERED;
+
+    // Declare Response Length
+    uint8_t _Response_Length = 6;
+
+	// Set Control Variable
+	Command_Control.CREG = false;
+
+	// Send AT+CREG=1 Connection Command
+	while (!_Control) {
+
+		// Clear UART Buffer
+    	_Clear_UART_Buffer();
+
+		// Send UART Command
+		GSM_Serial.print(F("AT+CREG=1"));
+		GSM_Serial.print(F("\r\n"));
+
+		// Wait for UART Data Send
+		GSM_Serial.flush();
+
+		// Handle Response
+		if (_Response_Wait(_Response_Length, 500)) {
+
+			// Declare Read Order Variable
+			uint8_t _Read_Order = 0;
+
+			// Declare Response Variable
+			char _Response[_Response_Length];
+
+			// Read UART Response
+			while (GSM_Serial.available() > 0) {
+
+				// Read Serial Char
+				_Response[_Read_Order] = GSM_Serial.read();
+
+				// Increase Read Order
+				_Read_Order++;
+
+				// Stream Delay
+				delayMicroseconds(500);
+
+			}
+
+			// Control for Response
+			if (strstr(_Response, "OK") != NULL) _Control = true;
+
+	    } 
+
+		// Count for Error
+		_Error_WD++;
+
+		// Handle for Error
+		if (_Error_WD >= 10) return (false);
+	
+	}
+
+	// Reset Control Variables
+	_Control = false;
+	_Error_WD = 0;
+    _Response_Length = 12;
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+	// Send CREG: 1 Connection Command
+	while (!_Control) {
+
+		// Handle Response
+		if (_Response_Wait(_Response_Length, 600)) {
+
+			// Declare Read Order Variable
+			uint8_t _Read_Order = 0;
+
+			// Declare Response Variable
+			char _Response[_Response_Length];
+
+			// Read UART Response
+			while (GSM_Serial.available() > 0) {
+
+				// Read Serial Char
+				_Response[_Read_Order] = GSM_Serial.read();
+
+				// Increase Read Order
+				_Read_Order++;
+
+				// Stream Delay
+				delayMicroseconds(500);
+
+			}
+
+			// Control for Response
+			if (strstr(_Response, "+CREG:") != NULL) {
+
+				// Read Stat
+				_Stat = _Response[9];
+
+				// Handle Stat Variable
+				if (_Stat == 48) {
+
+					// Set Variable
+					CREG_Status = NOT_REGISTERED;
+
+					// Set Control Variable
+					Command_Control.CREG = false;
+
+					// Set Control Variable
+					_Control = false;
+
+				} // Not Registered [0]
+				if (_Stat == 49) {
+
+					// Set Variable
+					CREG_Status = HOME_REGISTERED;
+
+					// Set Control Variable
+					Command_Control.CREG = true;
+
+					// Set Control Variable
+					_Control = true;
+
+				} // Registered to Home Network [1]
+				if (_Stat == 50) {
+
+					// Set Variable
+					CREG_Status = SEARCHING;
+
+					// Set Control Variable
+					Command_Control.CREG = false;
+
+					// Set Control Variable
+					_Control = false;
+
+				} // Searching Network [2]
+				if (_Stat == 51) {
+
+					// Set Variable
+					CREG_Status = DENIED;
+
+					// Set Control Variable
+					Command_Control.CREG = false;
+
+					// Set Control Variable
+					_Control = false;
+
+				} // Registration Denied [3]
+				if (_Stat == 52) {
+
+					// Set Variable
+					CREG_Status = UNKNOWN;
+
+					// Set Control Variable
+					Command_Control.CREG = false;
+
+					// End Function
+					return (false);
+
+				} // Unknown Error [4]
+				if (_Stat == 53) {
+
+					// Set Variable
+					CREG_Status = ROAMING_REGISTERED;
+
+					// Set Control Variable
+					Command_Control.CREG = true;
+
+					// Set Control Variable
+					_Control = true;
+
+				} // Registered to Rooming Network [5]
+			
+			}
+
+	    } 
+
+		// Count for Error
+		_Error_WD++;
+
+		// Handle for Error
+		if (_Error_WD >= 3) return (false);
+	
+	}
+
+	// Control for Response
+	if ((CREG_Status == HOME_REGISTERED) or (CREG_Status == ROAMING_REGISTERED)) return (true);
+
+	// End Function
+	return (false);
+
+}
 
 
 
