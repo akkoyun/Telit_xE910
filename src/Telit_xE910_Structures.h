@@ -12,7 +12,8 @@
 /**
  * Library global variables declarations.
  */
-const char 	Version[9] 					= "01.00.14";		/// Library Version
+const char 	Version[9] 					= "01.00.15";		/// Library Version
+bool		Power_Monitor				= false;			/// GSM Power Monitor Signal
 uint64_t 	IMEI						= 0;				/// IMEI Variable
 uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
 uint64_t 	ICCID						= 0;				/// ICCID Variable
@@ -53,6 +54,22 @@ enum GSM_Stat {
 	DENIED								= 3,				// 3
 	UNKNOWN								= 4,				// 4
 	ROAMING_REGISTERED					= 5					// 5
+};
+
+/**
+ * @brief Library functions state defination structure
+ */
+enum Function_State {
+	DISABLE								= 0,				// False
+	ENABLE								= 1					// True
+};
+
+/**
+ * @brief Library functions power state defination structure
+ */
+enum Power_State {
+	NOT_POWERED							= 0,				// False
+	POWERED								= 1					// True
 };
 
 #endif

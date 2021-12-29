@@ -8,6 +8,93 @@
 
 #include <Telit_xE910.h>
 
+bool xE910_HARDWARE::Communication(const bool _State) {
+
+	// Enable Communication 
+	if (_State) PORTJ &= 0b11101111;
+
+	// Disable Communication
+	if (_State) PORTJ |= 0b00010000;
+
+	// Control Buffer Enable Signal
+	if ((PINJ & (1 << PINJ4)) == (1 << PINJ4)) {
+	
+		// Bufer EN Signal High
+		return(false);
+	
+	} else {
+		
+		// Bufer EN Signal LOW
+		return(true);
+	
+	}
+
+}
+bool xE910_HARDWARE::PowerMonitor(void) {
+
+	// Control for PWMon (PJ3)
+	if ((PINJ & (1 << PINJ3)) == (1 << PINJ3)) {
+
+		// Set Variable
+		Power_Monitor = POWERED;
+
+		// Power Monitor 3V3 HIGH
+		return (true);
+
+	} else {
+
+		// Set Variable
+		Power_Monitor = NOT_POWERED;
+
+		// Power Monitor 3V3 LOW
+		return (false);
+
+	}
+
+}
+void xE910_HARDWARE::OnOff(const uint16_t _Time) {
+
+	// Set On/Off Signal HIGH [PJ6]
+	PORTJ |= 0b01000000;
+
+	// Command Delay
+	delay(_Time);
+
+	// Set On/Off Signal LOW [PJ6]
+	PORTJ &= 0b10111111;
+
+}
+void xE910_HARDWARE::ShutDown(const uint16_t _Time) {
+
+	// Set Shut Down Signal HIGH [PJ5]
+	PORTJ |= 0b00100000;
+
+	// Command Delay
+	delay(_Time);
+
+	// Set Shut Down Signal LOW [PJ5]
+	PORTJ &= 0b11011111;
+
+}
+void xE910_HARDWARE::Power_Switch(const bool _State) {
+
+	// Set GSM Power Enable
+	if (_State) PORTH |= 0b00000100;
+
+	// Set GSM Power Disable
+	if (!_State) PORTH &= 0b11111011;
+
+}
+void xE910_HARDWARE::LED(const bool _State) {
+
+	// Set GSM LED Power Enable
+	if (_State) PORTH &= 0b11101111;
+
+	// Set GSM LED Power Disable
+	if (!_State) PORTH |= 0b00010000;
+
+}
+
 bool xE910_AT::ATE(const bool _ECHO) {
 
     // Declare Response Length
@@ -1501,18 +1588,6 @@ bool xE910_AT::CGREG(void) {
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 void xE910_AT::_Clear_UART_Buffer(void) {
 
 	while (GSM_Serial.available() > 0) {
@@ -1544,12 +1619,11 @@ bool xE910_AT::_Response_Wait(uint16_t _Length, uint32_t _TimeOut) {
 
 }
 
-
 void xE910_GSM::Initialize(void) {
 
 }
 
-
 // Define Library Class
 xE910_AT GSM_AT;
 xE910_GSM GSM;
+xE910_HARDWARE GSM_HARDWARE;

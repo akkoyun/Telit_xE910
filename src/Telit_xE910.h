@@ -20,6 +20,82 @@
 #include <Telit_xE910_Structures.h>
 #endif
 
+/**
+ * @brief GSM Modem global function class
+ * @version 01.00.00
+ */
+class xE910_GSM {
+
+	public:
+
+		void Initialize();
+
+	private:
+	
+	
+};
+
+/**
+ * @brief GSM Modem hardware function class.
+ * @version 01.00.00
+ */
+class xE910_HARDWARE {
+
+	public:
+
+		/**
+		 * @brief Enable or disable voltage translator buffer.
+		 * @version 01.00.00
+		 * @param _State Buffer state
+		 * @return true - Buffer enabled
+		 * @return false - Buffer disabled
+		 */
+		bool Communication(const bool _State);
+
+		/**
+		 * @brief Controls GSM modem power monitor signal.
+		 * @version 01.00.00
+		 * @return true - GSM powered
+		 * @return false - GSM not powered
+		 */
+		bool PowerMonitor(void);
+
+		/**
+		 * @brief On or off GSM modem.
+		 * @version 01.00.00
+		 * @param _Time Signal time
+		 */
+		void OnOff(const uint16_t _Time);
+
+		/**
+		 * @brief Shut down GSM modem.
+		 * @version 01.00.00
+		 * @param _Time Signal time
+		 */
+		void ShutDown(const uint16_t _Time);
+
+		/**
+		 * @brief GSM modem main power switch control.
+		 * @version 01.00.00
+		 * @param _State Power state
+		 */
+		void Power_Switch(const bool _State);
+
+		/**
+		 * @brief GSM modem LED inducators power switch control.
+		 * @version 01.00.00
+		 * @param _State LED state
+		 */
+		void LED(const bool _State);
+
+	private:
+
+};
+
+/**
+ * @brief GSM Modem AT command set function class.
+ * @version 01.00.00
+ */
 class xE910_AT {
 
 	public:
@@ -277,17 +353,6 @@ class xE910_AT {
 		 */
 		bool CGREG(void);
 
-
-
-
-
-
-
-
-
-
-
-
 	private:
 
 		/**
@@ -305,26 +370,11 @@ class xE910_AT {
  		* @return false - Message can not recieved.
  		*/
 		bool _Response_Wait(uint16_t _Length, uint32_t _TimeOut);
-	
+
 };
-
-class xE910_GSM {
-
-	public:
-
-		void Initialize();
-
-	private:
-	
-	
-};
-
-
-
-
-
 
 extern xE910_AT GSM_AT;
+extern xE910_HARDWARE GSM_HARDWARE;
 extern xE910_GSM GSM;
 
-#endif /* defined(__Energy__) */
+#endif /* defined(__Telit_xE910__) */
