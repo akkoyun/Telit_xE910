@@ -104,7 +104,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -372,6 +372,40 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool CGREG(void);
+
+		/**
+		 * @brief Set command specifies PDP context parameter values for a 
+		 * PDP context identified by the (local) context identification parameter, <cid>
+		 * @details AT Command : AT+CGDCONT=[<cid>],[<PDP_type>],[<APN>],[<PDP_addr>],[<d_comp>],[<h_comp>]\r\n (37 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Cid (PDP Context Identifier) 
+		 * numeric parameter which specifies a particular PDP context definition.
+		 * @param _PDP_Type (Packet Data Protocol type) 
+		 * a string parameter which specifies the type of packet data protocol
+		 * @param _APN (Access Point Name) 
+		 * a string parameter which is a logical name that is used to select the 
+		 * GGSN or the external packet data network. If the value is empty (“”) 
+		 * or omitted, then the subscription value will be requested.
+		 * @param _PDP_Addr 
+		 * a string parameter that identifies the terminal in the address space 
+		 * applicable to the PDP. The allocated address may be read using the +CGPADDR command.
+		 * @param _D_Comp numeric parameter that controls PDP data compression
+		 * 0 - off (default if value is omitted)
+		 * 1 - on
+		 * @param _H_Comp numeric parameter that controls PDP header compression
+		 * 0 - off (default if value is omitted)
+		 * 1 - on
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp);
+
+
+
 
 	private:
 
