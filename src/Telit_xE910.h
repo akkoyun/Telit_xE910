@@ -27,7 +27,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -259,6 +259,23 @@ class xE910_AT {
 		 */
 		bool CREG(void);
 
+		/**
+		 * @brief Set command controls the presentation of an unsolicited result code
+		 * @details AT Command : AT+CGREG=[<mode>]\r\n (11 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * 0 - disable network registration unsolicited result code
+		 * 1 - enable network registration unsolicited result code; if there is a change in the
+		 * terminal GPRS network registration status, it is issued the unsolicited result code.
+		 * 2 - enable network registration and location information unsolicited result code; 
+		 * if there is a change of the network cell, it is issued the unsolicited result code.
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CGREG(void);
 
 
 

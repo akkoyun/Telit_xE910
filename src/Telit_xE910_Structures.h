@@ -12,7 +12,7 @@
 /**
  * Library global variables declarations.
  */
-const char 	Version[9] 					= "01.00.13";		/// Library Version
+const char 	Version[9] 					= "01.00.14";		/// Library Version
 uint64_t 	IMEI						= 0;				/// IMEI Variable
 uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
 uint64_t 	ICCID						= 0;				/// ICCID Variable
@@ -20,6 +20,7 @@ uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
 uint8_t 	Model 						= 0;				/// Modem Model Variable
 char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
 uint8_t		CREG_Status					= 0;				/// CREG Status Variable
+uint8_t		CGREG_Status				= 0;				/// CGREG Status Variable
 
 /**
  * @brief Command control structure.
@@ -39,6 +40,7 @@ struct Command_Control_Struct {
 	bool								SLED;				/// SLED Command Control Variable
 	bool								TXMONMODE;			/// TXMONMODE Command Control Variable
 	bool								CREG;				/// CREG Command Control Variable
+	bool								CGREG;				/// CGREG Command Control Variable
 };
 
 /**
