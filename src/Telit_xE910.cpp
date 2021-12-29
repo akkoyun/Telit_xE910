@@ -1832,6 +1832,91 @@ bool xE910_AT::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _
     }
 
 }
+bool xE910_AT::SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uint8_t _Recv_Data_Mode, const uint8_t _Keep_Alive, const uint8_t _Listen_Auto_Rsp, const uint8_t _Send_Data_Mode) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 6;
+
+	// Set Control Variable
+	Command_Control.SCFGEXT = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#SCFGEXT="));
+	GSM_Serial.print(String(_Conn_ID));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Sr_Mode));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Recv_Data_Mode));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Keep_Alive));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Listen_Auto_Rsp));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Send_Data_Mode));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.SCFGEXT = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.SCFGEXT = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.SCFGEXT = false;
+
+		// End Function
+		return (false);
+
+    }
+
+}
 
 
 void xE910_AT::_Clear_UART_Buffer(void) {

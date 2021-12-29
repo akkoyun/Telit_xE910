@@ -104,7 +104,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -433,6 +433,36 @@ class xE910_AT {
 		 */
 		bool SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _Pkt_Sz, const uint16_t _Max_To, const uint16_t _Conn_To, const uint8_t _TX_To);
 
+		/**
+		 * @brief Set command sets the socket configuration extended parameters.
+		 * @details AT Command : AT#SCFGEXT=[<conn_id>],[<srmode>],[<recvdatamode>],[<keepalive>],[<listenautorsp>],[<senddatamode>]\r\n (24 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Conn_ID socket connection identifier (1-6)
+		 * @param _Sr_Mode SRing unsolicited mode
+		 * 0 - Normal (default)
+		 * 1 – Data amount
+		 * 2 - Data view
+		 * 3 – Data view with UDP datagram informations
+		 * @param _Recv_Data_Mode data view mode for received data
+		 * 0- text mode (default)
+		 * 1- hexadecimal mode
+		 * @param _Keep_Alive Set the TCP Keepalive value in minutes
+		 * 0 – Deactivated (default)
+		 * 1 – 240 – Keepalive time in minutes
+		 * @param _Listen_Auto_Rsp Set the listen auto-response mode, that affects the commands AT#SL and AT#SLUDP
+		 * 0 - Deactivated (default)
+		 * 1 – Activated
+		 * @param _Send_Data_Mode data mode for sending data in command mode(AT#SSEND)
+		 * 0 - data represented as text (default)
+		 * 1 - data represented as sequence of hexadecimal numbers (from 00 to FF)
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uint8_t _Recv_Data_Mode, const uint8_t _Keep_Alive, const uint8_t _Listen_Auto_Rsp, const uint8_t _Send_Data_Mode);
 
 
 	private:
