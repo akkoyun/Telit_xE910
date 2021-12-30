@@ -67,6 +67,72 @@ bool xE910_GSM::Power_ON(const bool _Power_Switch, const bool _LED_Switch, const
 	return (false);
 
 }
+bool xE910_GSM::Power_OFF(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch, const bool _Clear_Variables) {
+
+		// Turn Off Modem
+		if (GSM_HARDWARE.PowerMonitor()) {
+
+			// Power OFF GSM Modem
+			GSM_HARDWARE.ShutDown(200);
+
+			// Disable GSM LED Power
+			if (_LED_Switch) GSM_HARDWARE.LED(false);
+
+			// Disable GSM Modem Voltage Translator
+			if (_Communication_Switch) GSM_HARDWARE.Communication(false);
+
+			// Disable GSM Modem Main Power Switch
+			if (_Power_Switch) GSM_HARDWARE.Power_Switch(false);
+
+			// Command Delay
+			delay(1000);
+
+		}
+
+		// Clear Library Variables
+		if (_Clear_Variables) {
+
+			// Set Variable
+			GSM_HARDWARE.Power_Monitor = NOT_POWERED;
+			GSM_AT.Connection_Status = NOT_CONNECTED;
+
+			// Set Control Variables
+			GSM_AT.Command_Control.ATE 			= false;
+			GSM_AT.Command_Control.CCLK			= false;
+			GSM_AT.Command_Control.CGDCONT		= false;
+			GSM_AT.Command_Control.CGREG		= false;
+			GSM_AT.Command_Control.CGSN			= false;
+			GSM_AT.Command_Control.CMEE			= false;
+			GSM_AT.Command_Control.CPIN			= false;
+			GSM_AT.Command_Control.CREG			= false;
+			GSM_AT.Command_Control.CSQ			= false;
+			GSM_AT.Command_Control.CTZU			= false;
+			GSM_AT.Command_Control.FCLASS		= false;
+			GSM_AT.Command_Control.GMI			= false;
+			GSM_AT.Command_Control.GMM			= false;
+			GSM_AT.Command_Control.GMR			= false;
+			GSM_AT.Command_Control.GSN			= false;
+			GSM_AT.Command_Control.ICCID		= false;
+			GSM_AT.Command_Control.K			= false;
+			GSM_AT.Command_Control.NITZ			= false;
+			GSM_AT.Command_Control.NTP			= false;
+			GSM_AT.Command_Control.REGMODE		= false;
+			GSM_AT.Command_Control.SCFG			= false;
+			GSM_AT.Command_Control.SCFGEXT2		= false;
+			GSM_AT.Command_Control.SCFGEXT3		= false;
+			GSM_AT.Command_Control.SCFGEXT		= false;
+			GSM_AT.Command_Control.SERVINFO		= false;
+			GSM_AT.Command_Control.SGACT		= false;
+			GSM_AT.Command_Control.SHDN			= false;
+			GSM_AT.Command_Control.SLED			= false;
+			GSM_AT.Command_Control.TXMONMODE	= false;
+
+		}
+
+		// End Function
+		return (true);
+
+}
 void xE910_GSM::Initialize(void) {
 
 }
