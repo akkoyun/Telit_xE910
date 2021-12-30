@@ -31,7 +31,7 @@ class xE910_GSM {
 		/**
  		* Library global variables declarations.
 		 */
-		const char 	Version[9] 					= "01.00.23";		/// Library Version
+		const char 	Version[9] 					= "01.00.24";		/// Library Version
 
 		void Initialize();
 		void Power();
@@ -119,6 +119,7 @@ class xE910_AT {
 		uint64_t 	ICCID						= 0;				/// ICCID Variable
 		uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
 		uint8_t 	Model 						= 0;				/// Modem Model Variable
+		uint16_t 	Operator 					= 0;				/// Operator Variable
 		uint8_t 	Signal_RSSI 				= 0;				/// Signal Variable
 		char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
 		uint8_t		CREG_Status					= 0;				/// CREG Status Variable
@@ -130,7 +131,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -314,6 +315,18 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool CSQ(void);
+
+		/**
+		 * @brief Execution command reports information about serving cell, in the format.
+		 * @details AT Command : AT#SERVINFO\r\n (13 Byte)
+		 * @details AT Response : \r\n#SERVINFO: 3,-81,"Turkcell","28601",52,855E,04,1,,"II",01,6\r\n\r\nOK\r\n (69 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SERVINFO(void);
 
 		/**
 		 * @brief Set command sets the behaviour of the STAT_LED GPIO

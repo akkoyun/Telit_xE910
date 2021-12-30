@@ -1132,6 +1132,94 @@ bool xE910_AT::CSQ(void) {
 	}
 
 }
+bool xE910_AT::SERVINFO(void) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+   	// Declare Response Length
+   	uint8_t _Response_Length = 60;
+
+	// Set Control Variable
+	Command_Control.SERVINFO = false;
+
+	// Clear UART Buffer
+	_Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#SERVINFO"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 1000)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "#SERVINFO:") != NULL) {
+
+			// Control Operator ID
+			Operator = 99;												// Unknown Operator
+			if (strstr(_Response, "28601") != NULL) Operator = 28601;	// Turkcell
+			if (strstr(_Response, "28602") != NULL) Operator = 28602;	// Vodafone
+			if (strstr(_Response, "28603") != NULL) Operator = 28603;	// Turk Telecom
+			if (strstr(_Response, "28604") != NULL) Operator = 28604;	// Turk Telecom
+
+			// Set Control Variable
+			Command_Control.SERVINFO = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Signal Variable
+			Operator = 0;
+
+			// Set Control Variable
+			Command_Control.SERVINFO = false;
+
+			// End Function
+			return (false);
+
+		}
+
+
+	} else {
+
+		// Set Signal Variable
+		Operator = 0;
+
+		// Set Control Variable
+		Command_Control.SERVINFO = false;
+
+		// End Function
+		return (false);
+		
+	}
+
+}
 bool xE910_AT::SLED(const uint8_t _SLED) {
 
 	// Command Chain Delay (Advice by Telit)
