@@ -39,6 +39,7 @@ struct Command_Control_Struct {
 	bool								SERVINFO;			/// SERVINFO Command Control Variable
 	bool								CTZU;				/// CTZU Command Control Variable
 	bool								NITZ;				/// NITZ Command Control Variable
+	bool								NTP;				/// NTP Command Control Variable
 };
 
 /**

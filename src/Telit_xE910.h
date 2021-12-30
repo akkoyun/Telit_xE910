@@ -31,7 +31,7 @@ class xE910_GSM {
 		/**
  		* Library global variables declarations.
 		 */
-		const char 	Version[9] 					= "01.00.26";		/// Library Version
+		const char 	Version[9] 					= "01.00.27";		/// Library Version
 
 		void Initialize();
 		void Power();
@@ -127,11 +127,17 @@ class xE910_AT {
 		uint8_t		SGACT_Status				= 0;				/// SGACT Status Variable
 		char		IP_Address[16]				= "";				/// IP Address Variable
 		bool		Connection_Status			= false;			/// Connection Status
+		uint8_t 	RTC_Day						= 29;				// Day Variable
+		uint8_t 	RTC_Month					= 10;				// Month Variable
+		uint16_t 	RTC_Year					= 1923;				// Year Variable
+		uint8_t 	RTC_Hour					= 0;				// Hour Variable
+		uint8_t 	RTC_Minute					= 0;				// Minute Variable
+		uint8_t 	RTC_Second					= 0;				// Second Variable
 
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -622,6 +628,24 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool NITZ(const bool _State);
+
+		/**
+		 * @brief This command permits to calculate and update date and time through 
+		 * NTP protocol(RFC2030), sending a request to a NTP server.
+		 * @details AT Command : AT#NTP="<NTPserver>",<NTPport>,<updatemodule>,<timeout>\r\n (x Byte)
+		 * @details AT Response : \r\n#NTP: 20/10/16,08:55:58\r\nOK\r\n (31 byte)
+		 * 
+		 * @param _NTP_Addr address of the NTP server, string type.
+		 * @param _NTP_Port NTP server port to contact
+		 * @param _Update_Module_Clock 
+		 * 0 - no update module clock 
+		 * 1 – update module clock
+		 * @param _Time_Out waiting timeout for server response in seconds (1-10 sec)
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _Update_Module_Clock, const uint8_t _Time_Out);
 
 	private:
 
