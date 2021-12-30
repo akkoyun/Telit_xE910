@@ -133,7 +133,392 @@ bool xE910_GSM::Power_OFF(const bool _Power_Switch, const bool _LED_Switch, cons
 		return (true);
 
 }
-void xE910_GSM::Initialize(void) {
+bool xE910_GSM::Initialize(const bool _Debug) {
+
+	// Set Global Variable
+	Debug_Mode = _Debug;
+
+	// Declare Watchdog Variable
+	uint8_t _Error_WD = 0;
+
+	// Control for Power Monitor
+	if (GSM_HARDWARE.PowerMonitor()) {
+
+		// Control for Connection
+		if (!GSM_AT.Connection_Status) {
+		
+			// **************************************************
+			// AT Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT.........................................."));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.AT) {
+
+				// Process Command
+				GSM_AT.AT();
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.AT) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.AT) return (false);
+
+			// **************************************************
+			// ATE Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("ATE=1......................................."));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.ATE) {
+
+				// Process Command
+				GSM_AT.ATE(true);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.ATE) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.ATE) return (false);
+
+			// **************************************************
+			// CMEE Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+CMEE=1..................................."));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.CMEE) {
+
+				// Process Command
+				GSM_AT.CMEE(1);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.CMEE) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.CMEE) return (false);
+
+			// **************************************************
+			// FCLASS Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+FCLASS=0................................."));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.FCLASS) {
+
+				// Process Command
+				GSM_AT.FCLASS(0);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.FCLASS) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.FCLASS) return (false);
+
+			// **************************************************
+			// K Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT&K0......................................."));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.K) {
+
+				// Process Command
+				GSM_AT.K(0);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.K) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.K) return (false);
+
+			// **************************************************
+			// CPIN Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+CPIN?...................................."));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.CPIN) {
+
+				// Process Command
+				GSM_AT.CPIN();
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.CPIN) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.CPIN) return (false);
+
+			// **************************************************
+			// CGSN Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+CGSN....................................."));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.CGSN) {
+
+				// Process Command
+				GSM_AT.CGSN();
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.CGSN) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.CGSN) return (false);
+
+			// **************************************************
+			// GSN Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+GSN......................................"));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.GSN) {
+
+				// Process Command
+				GSM_AT.GSN();
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.GSN) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.GSN) return (false);
+
+			// **************************************************
+			// ICCID Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+CCID....................................."));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.ICCID) {
+
+				// Process Command
+				GSM_AT.CCID();
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.ICCID) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.ICCID) return (false);
+
+			// **************************************************
+			// GMI Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+GMI......................................"));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.GMI) {
+
+				// Process Command
+				GSM_AT.GMI();
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.GMI) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.GMI) return (false);
+
+			// **************************************************
+			// GMM Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+GMM......................................"));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.GMM) {
+
+				// Process Command
+				GSM_AT.GMM();
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.GMM) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.GMM) return (false);
+
+			// **************************************************
+			// GMR Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+GMR......................................"));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.GMR) {
+
+				// Process Command
+				GSM_AT.GMR();
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.GMR) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.GMR) return (false);
+
+			// End Function
+			return(true);
+
+		}
+
+		// End Function
+		return(false);
+
+	}
+
+	// End Function
+	return(false);
 
 }
 
@@ -224,6 +609,77 @@ void xE910_HARDWARE::LED(const bool _State) {
 
 }
 
+bool xE910_AT::AT(void) {
+
+    // Declare Response Length
+    uint8_t _Response_Length = 12;
+
+	// Set Control Variable
+	Command_Control.AT = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.AT = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.AT = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.AT = false;
+
+		// End Function
+		return (false);
+
+    }
+
+}
 bool xE910_AT::ATE(const bool _ECHO) {
 
     // Declare Response Length

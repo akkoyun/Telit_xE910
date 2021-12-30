@@ -13,6 +13,7 @@
  * @brief Command control structure.
  */
 struct Command_Control_Struct {
+	bool								AT;					/// AT Command Control Variable
 	bool								ATE;				/// ATE Command Control Variable
 	bool								CMEE;				/// CMEE Command Control Variable
 	bool								FCLASS;				/// FCLASS Command Control Variable

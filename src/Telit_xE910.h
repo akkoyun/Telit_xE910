@@ -29,11 +29,10 @@ class xE910_GSM {
 	public:
 
 		/**
- 		* Library global variables declarations.
-		 */
+		* Library global variables declarations.
+		*/
 		const char 	Version[9] 					= "01.00.31";		/// Library Version
-
-		void Initialize();
+		bool		Debug_Mode					= false;			/// Debug Mode Variable
 
 		/**
 		 * @brief Power ON procedure of GSM modem.
@@ -53,6 +52,13 @@ class xE910_GSM {
 		 * @version 01.00.00
 		 */
 		bool Power_OFF(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch, const bool _Clear_Variables);
+
+		/**
+		 * @brief GSM Modem initialize function
+		 * @param _Debug Enable debug mode 
+		 * @version 01.00.00
+		 */
+		bool Initialize(const bool _Debug);
 
 	private:
 	
@@ -137,14 +143,16 @@ class xE910_AT {
 		uint64_t 	ICCID						= 0;				/// ICCID Variable
 		uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
 		uint8_t 	Model 						= 0;				/// Modem Model Variable
+		char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
+
 		uint16_t 	Operator 					= 0;				/// Operator Variable
 		uint8_t 	Signal_RSSI 				= 0;				/// Signal Variable
-		char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
 		uint8_t		CREG_Status					= 0;				/// CREG Status Variable
 		uint8_t		CGREG_Status				= 0;				/// CGREG Status Variable
 		uint8_t		SGACT_Status				= 0;				/// SGACT Status Variable
 		char		IP_Address[16]				= "";				/// IP Address Variable
 		bool		Connection_Status			= false;			/// Connection Status
+
 		uint8_t 	RTC_Day						= 29;				// Day Variable
 		uint8_t 	RTC_Month					= 10;				// Month Variable
 		uint16_t 	RTC_Year					= 1923;				// Year Variable
@@ -155,7 +163,9 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+		bool AT(void);
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
