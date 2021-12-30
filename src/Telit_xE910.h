@@ -28,6 +28,11 @@ class xE910_GSM {
 
 	public:
 
+		/**
+ 		* Library global variables declarations.
+		 */
+		const char 	Version[9] 					= "01.00.23";		/// Library Version
+
 		void Initialize();
 		void Power();
 
@@ -43,6 +48,11 @@ class xE910_GSM {
 class xE910_HARDWARE {
 
 	public:
+
+		/**
+ 		* Library global variables declarations.
+		 */
+		bool		Power_Monitor				= false;			/// GSM Power Monitor Signal
 
 		/**
 		 * @brief Enable or disable voltage translator buffer.
@@ -100,6 +110,22 @@ class xE910_HARDWARE {
 class xE910_AT {
 
 	public:
+
+		/**
+ 		* Library global variables declarations.
+		 */
+		uint64_t 	IMEI						= 0;				/// IMEI Variable
+		uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
+		uint64_t 	ICCID						= 0;				/// ICCID Variable
+		uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
+		uint8_t 	Model 						= 0;				/// Modem Model Variable
+		uint8_t 	Signal_RSSI 				= 0;				/// Signal Variable
+		char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
+		uint8_t		CREG_Status					= 0;				/// CREG Status Variable
+		uint8_t		CGREG_Status				= 0;				/// CGREG Status Variable
+		uint8_t		SGACT_Status				= 0;				/// SGACT Status Variable
+		char		IP_Address[16]				= "";				/// IP Address Variable
+		bool		Connection_Status			= false;			/// Connection Status
 
 		/**
 	 	* @brief Command control variable structure.
@@ -276,6 +302,18 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool GMR(void);
+
+		/**
+		 * @brief Execution command reports received signal quality indicators in the form.
+		 * @details AT Command : AT+CSQ\r\n (8 Byte)
+		 * @details AT Response : \r\n+CSQ: xx,x\r\n\r\nOK\r\n (19 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CSQ(void);
 
 		/**
 		 * @brief Set command sets the behaviour of the STAT_LED GPIO
@@ -540,7 +578,7 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_ID, const char *_Password);
+		bool SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID, const char *_Password);
 
 
 	private:
