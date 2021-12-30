@@ -37,6 +37,7 @@ struct Command_Control_Struct {
 	bool								SGACT;				/// SGACT Command Control Variable
 	bool								CSQ;				/// CSQ Command Control Variable
 	bool								SERVINFO;			/// SERVINFO Command Control Variable
+	bool								CTZU;				/// CTZU Command Control Variable
 };
 
 /**

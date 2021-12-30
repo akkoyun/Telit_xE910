@@ -31,7 +31,7 @@ class xE910_GSM {
 		/**
  		* Library global variables declarations.
 		 */
-		const char 	Version[9] 					= "01.00.24";		/// Library Version
+		const char 	Version[9] 					= "01.00.25";		/// Library Version
 
 		void Initialize();
 		void Power();
@@ -131,7 +131,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -593,6 +593,19 @@ class xE910_AT {
 		 */
 		bool SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID, const char *_Password);
 
+		/**
+		 * @brief This command enables and disables automatic time zone update via NITZ.
+		 * @details AT Command : AT+CTZU\r\n (9 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @param _State Parameter
+		 * 0 Disable automatic time zone update via NITZ (default) 
+		 * 1 Enable automatic time zone update via NITZ
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CTZU(const bool _State);
 
 	private:
 
