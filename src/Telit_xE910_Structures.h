@@ -10,23 +10,6 @@
 #define		GSM_Serial_Baud				115200				/// GSM Serial terminal connection speed defination.
 
 /**
- * Library global variables declarations.
- */
-const char 	Version[9] 					= "01.00.22";		/// Library Version
-bool		Power_Monitor				= false;			/// GSM Power Monitor Signal
-uint64_t 	IMEI						= 0;				/// IMEI Variable
-uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
-uint64_t 	ICCID						= 0;				/// ICCID Variable
-uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
-uint8_t 	Model 						= 0;				/// Modem Model Variable
-char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
-uint8_t		CREG_Status					= 0;				/// CREG Status Variable
-uint8_t		CGREG_Status				= 0;				/// CGREG Status Variable
-uint8_t		SGACT_Status				= 0;				/// SGACT Status Variable
-char		IP_Address[16]				= "";				/// IP Address Variable
-bool		IP_Status					= false;			/// Connection Status
-
-/**
  * @brief Command control structure.
  */
 struct Command_Control_Struct {
@@ -52,6 +35,12 @@ struct Command_Control_Struct {
 	bool								SCFGEXT2;			/// SCFGEXT2 Command Control Variable
 	bool								SCFGEXT3;			/// SCFGEXT3 Command Control Variable
 	bool								SGACT;				/// SGACT Command Control Variable
+	bool								CSQ;				/// CSQ Command Control Variable
+	bool								SERVINFO;			/// SERVINFO Command Control Variable
+	bool								CTZU;				/// CTZU Command Control Variable
+	bool								NITZ;				/// NITZ Command Control Variable
+	bool								NTP;				/// NTP Command Control Variable
+	bool								CCLK;				/// CCLK Command Control Variable
 };
 
 /**

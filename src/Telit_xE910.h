@@ -28,6 +28,11 @@ class xE910_GSM {
 
 	public:
 
+		/**
+ 		* Library global variables declarations.
+		 */
+		const char 	Version[9] 					= "01.00.28";		/// Library Version
+
 		void Initialize();
 		void Power();
 
@@ -43,6 +48,11 @@ class xE910_GSM {
 class xE910_HARDWARE {
 
 	public:
+
+		/**
+ 		* Library global variables declarations.
+		 */
+		bool		Power_Monitor				= false;			/// GSM Power Monitor Signal
 
 		/**
 		 * @brief Enable or disable voltage translator buffer.
@@ -102,9 +112,32 @@ class xE910_AT {
 	public:
 
 		/**
+ 		* Library global variables declarations.
+		 */
+		uint64_t 	IMEI						= 0;				/// IMEI Variable
+		uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
+		uint64_t 	ICCID						= 0;				/// ICCID Variable
+		uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
+		uint8_t 	Model 						= 0;				/// Modem Model Variable
+		uint16_t 	Operator 					= 0;				/// Operator Variable
+		uint8_t 	Signal_RSSI 				= 0;				/// Signal Variable
+		char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
+		uint8_t		CREG_Status					= 0;				/// CREG Status Variable
+		uint8_t		CGREG_Status				= 0;				/// CGREG Status Variable
+		uint8_t		SGACT_Status				= 0;				/// SGACT Status Variable
+		char		IP_Address[16]				= "";				/// IP Address Variable
+		bool		Connection_Status			= false;			/// Connection Status
+		uint8_t 	RTC_Day						= 29;				// Day Variable
+		uint8_t 	RTC_Month					= 10;				// Month Variable
+		uint16_t 	RTC_Year					= 1923;				// Year Variable
+		uint8_t 	RTC_Hour					= 0;				// Hour Variable
+		uint8_t 	RTC_Minute					= 0;				// Minute Variable
+		uint8_t 	RTC_Second					= 0;				// Second Variable
+
+		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -276,6 +309,30 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool GMR(void);
+
+		/**
+		 * @brief Execution command reports received signal quality indicators in the form.
+		 * @details AT Command : AT+CSQ\r\n (8 Byte)
+		 * @details AT Response : \r\n+CSQ: xx,x\r\n\r\nOK\r\n (19 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CSQ(void);
+
+		/**
+		 * @brief Execution command reports information about serving cell, in the format.
+		 * @details AT Command : AT#SERVINFO\r\n (13 Byte)
+		 * @details AT Response : \r\n#SERVINFO: 3,-81,"Turkcell","28601",52,855E,04,1,,"II",01,6\r\n\r\nOK\r\n (69 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SERVINFO(void);
 
 		/**
 		 * @brief Set command sets the behaviour of the STAT_LED GPIO
@@ -540,8 +597,65 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_ID, const char *_Password);
+		bool SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID, const char *_Password);
 
+		/**
+		 * @brief This command enables and disables automatic time zone update via NITZ.
+		 * @details AT Command : AT+CTZU=[<state>]\r\n (9 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @param _State Parameter
+		 * 0 Disable automatic time zone update via NITZ (default) 
+		 * 1 Enable automatic time zone update via NITZ
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CTZU(const bool _State);
+
+		/**
+		 * @brief Set command enables/disables automatic date/time updating and Network Timezone 
+		 * unsolicited indication. Date and time information can be sent by the network after 
+		 * GSM registration or after GPRS attach.
+		 * @details AT Command : AT+NITZ=[<state>]\r\n (11 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @param _State Parameter
+		 * 0 - disables automatic set (factory default)
+		 * 1 - enables automatic set
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool NITZ(const bool _State);
+
+		/**
+		 * @brief This command permits to calculate and update date and time through 
+		 * NTP protocol(RFC2030), sending a request to a NTP server.
+		 * @details AT Command : AT#NTP="<NTPserver>",<NTPport>,<updatemodule>,<timeout>\r\n (x Byte)
+		 * @details AT Response : \r\n#NTP: 20/10/16,08:55:58\r\nOK\r\n (31 byte)
+		 * 
+		 * @param _NTP_Addr address of the NTP server, string type.
+		 * @param _NTP_Port NTP server port to contact
+		 * @param _Update_Module_Clock 
+		 * 0 - no update module clock 
+		 * 1 – update module clock
+		 * @param _Time_Out waiting timeout for server response in seconds (1-10 sec)
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _Update_Module_Clock, const uint8_t _Time_Out);
+
+		/**
+		 * @brief Set command sets the real-time clock of the ME.
+		 * @details AT Command : AT+CCLK?\r\n (10 Byte)
+		 * @details AT Response : \r\n+CCLK: "21/12/30,12:37:34"\r\nOK\r\n (34 byte)
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CCLK(void);
 
 	private:
 
@@ -563,8 +677,9 @@ class xE910_AT {
 
 };
 
-extern xE910_AT GSM_AT;
-extern xE910_HARDWARE GSM_HARDWARE;
 extern xE910_GSM GSM;
+extern xE910_HARDWARE GSM_HARDWARE;
+extern xE910_AT GSM_AT;
+extern xE910_AT GSM_RTC;
 
 #endif /* defined(__Telit_xE910__) */

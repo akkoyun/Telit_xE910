@@ -8,6 +8,10 @@
 
 #include <Telit_xE910.h>
 
+void xE910_GSM::Initialize(void) {
+
+}
+
 bool xE910_HARDWARE::Communication(const bool _State) {
 
 	// Enable Communication 
@@ -1027,6 +1031,193 @@ bool xE910_AT::GMR(void) {
 		return (false);
 
     }
+
+}
+bool xE910_AT::CSQ(void) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+   	// Declare Response Length
+   	uint8_t _Response_Length = 19;
+
+	// Set Control Variable
+	Command_Control.CSQ = false;
+
+	// Clear UART Buffer
+	_Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+CSQ"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 1000)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+		uint8_t _Data_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Declare Response Data
+		char _CSQ[2]; 
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Handle Data
+			if (_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) {
+
+				// Get Data
+				_CSQ[_Data_Order] = _Response[_Read_Order];
+
+				// Increase Data Order
+				_Data_Order++;
+
+			}
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Signal Variable
+			Signal_RSSI = atoi(_CSQ);
+
+			// Set Control Variable
+			Command_Control.CSQ = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Signal Variable
+			Signal_RSSI = 0;
+
+			// Set Control Variable
+			Command_Control.CSQ = false;
+
+			// End Function
+			return (false);
+
+		}
+
+
+	} else {
+
+		// Set Signal Variable
+		Signal_RSSI = 0;
+
+		// Set Control Variable
+		Command_Control.CSQ = false;
+
+		// End Function
+		return (false);
+		
+	}
+
+}
+bool xE910_AT::SERVINFO(void) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+   	// Declare Response Length
+   	uint8_t _Response_Length = 60;
+
+	// Set Control Variable
+	Command_Control.SERVINFO = false;
+
+	// Clear UART Buffer
+	_Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#SERVINFO"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 1000)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "#SERVINFO:") != NULL) {
+
+			// Control Operator ID
+			Operator = 99;												// Unknown Operator
+			if (strstr(_Response, "28601") != NULL) Operator = 28601;	// Turkcell
+			if (strstr(_Response, "28602") != NULL) Operator = 28602;	// Vodafone
+			if (strstr(_Response, "28603") != NULL) Operator = 28603;	// Turk Telecom
+			if (strstr(_Response, "28604") != NULL) Operator = 28604;	// Turk Telecom
+
+			// Set Control Variable
+			Command_Control.SERVINFO = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Signal Variable
+			Operator = 0;
+
+			// Set Control Variable
+			Command_Control.SERVINFO = false;
+
+			// End Function
+			return (false);
+
+		}
+
+
+	} else {
+
+		// Set Signal Variable
+		Operator = 0;
+
+		// Set Control Variable
+		Command_Control.SERVINFO = false;
+
+		// End Function
+		return (false);
+		
+	}
 
 }
 bool xE910_AT::SLED(const uint8_t _SLED) {
@@ -2081,19 +2272,19 @@ bool xE910_AT::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const ui
     }
 
 }
-bool xE910_AT::SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_ID, const char *_Password) {
+bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID, const char *_Password) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
+	// Set Control Variable
+	Command_Control.SGACT = false;
 
-	// Control for Stat
-	if (_Stat == 0) {
+	// Deactivate the Context
+	if (!_Stat) {
+
+		// Command Chain Delay (Advice by Telit)
+		delay(10);
 
     	// Declare Response Length
     	uint8_t _Response_Length = 6;
-
-		// Set Control Variable
-		Command_Control.SGACT = false;
 
 		// Clear UART Buffer
     	_Clear_UART_Buffer();
@@ -2109,7 +2300,7 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_
 		GSM_Serial.flush();
 
 		// Handle Response
-		if (_Response_Wait(_Response_Length, 500)) {
+		if (_Response_Wait(_Response_Length, 1000)) {
 
 			// Declare Read Order Variable
 			uint8_t _Read_Order = 0;
@@ -2150,17 +2341,15 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_
 
 			}
 
-    	} else {
-
-			// Set Control Variable
-			Command_Control.SGACT = false;
-
-			// End Function
-			return (false);
-
     	}
 
-	} else if (_Stat == 1) {
+		// End Function
+		return (false);
+
+	}
+	
+	// Activate the Context
+	if (_Stat) {
 
 		// Declare Function Variables
 		bool _Control = false;
@@ -2168,9 +2357,6 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_
 
     	// Declare Response Length
     	uint8_t _Response_Length = 6;
-
-		// Set Control Variable
-		Command_Control.SGACT = false;
 
 		// Clear UART Buffer
     	_Clear_UART_Buffer();
@@ -2199,14 +2385,14 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_
 
 			}
 
-			// Send Command End
+			// Send Command Termination
 			GSM_Serial.print(F("\r\n"));
 
 			// Wait for UART Data Send
 			GSM_Serial.flush();
 
 			// Handle Response
-			if (_Response_Wait(_Response_Length, 2000)) {
+			if (_Response_Wait(_Response_Length, 1000)) {
 
 				// Declare Read Order Variable
 				uint8_t _Read_Order = 0;
@@ -2244,6 +2430,8 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_
 		// Reset Control Variables
 		_Control = false;
 		_Error_WD = 0;
+
+    	// Declare Response Length
     	_Response_Length = 25;
 
 		// Recieve Connection Command
@@ -2325,7 +2513,7 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_
 		if (sizeof(IP_Address) >= 7) {
 
 			// Set Variable
-			IP_Status = CONNECTED;
+			Connection_Status = CONNECTED;
 
 			// End Function
 			return (true);
@@ -2333,25 +2521,398 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const uint8_t _Stat, const char *_User_
 		} else {
 
 			// Set Variable
-			IP_Status = NOT_CONNECTED;
+			Connection_Status = NOT_CONNECTED;
 
 			// End Function
 			return (false);
 
 		}
 	
-	} else {
+	} 
+
+	// End Function
+	return (false);
+
+}
+bool xE910_AT::CTZU(const bool _State) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 6;
+
+	// Set Control Variable
+	Command_Control.CTZU = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+CTZU="));
+	GSM_Serial.print(String(_State));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.CTZU = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.CTZU = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
 
 		// Set Control Variable
-		Command_Control.SGACT = false;
+		Command_Control.CTZU = false;
 
 		// End Function
 		return (false);
 
-	}
+    }
 
-	// End Function
-	return (false);
+}
+bool xE910_AT::NITZ(const bool _State) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 6;
+
+	// Set Control Variable
+	Command_Control.NITZ = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#NITZ="));
+	GSM_Serial.print(String(_State));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.NITZ = true;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.NITZ = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.NITZ = false;
+
+		// End Function
+		return (false);
+
+    }
+
+}
+bool xE910_AT::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _Update_Module_Clock, const uint8_t _Time_Out) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 31;
+
+	// Set Control Variable
+	Command_Control.NTP = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#NTP=\""));
+	GSM_Serial.print(String(_NTP_Addr));
+	GSM_Serial.print(F("\","));
+	GSM_Serial.print(String(_NTP_Port));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Update_Module_Clock));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Time_Out));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.NTP = true;
+
+			// Declare Buffer
+			char _Buffer[2];
+
+			// Parse Year
+			_Buffer[0] = _Response[8];
+			_Buffer[1] = _Response[9];
+			RTC_Year = 2000 + (uint8_t)atoi(_Buffer);
+
+			// Parse Month
+			_Buffer[0] = _Response[11];
+			_Buffer[1] = _Response[12];
+			RTC_Month = (uint8_t)atoi(_Buffer);
+			if (RTC_Month > 12) RTC_Month = 1;
+
+			// Parse Day
+			_Buffer[0] = _Response[14];
+			_Buffer[1] = _Response[15];
+			RTC_Day = (uint8_t)atoi(_Buffer);
+			if (RTC_Day > 31) RTC_Day = 1;
+
+			// Parse Hour
+			_Buffer[0] = _Response[17];
+			_Buffer[1] = _Response[18];
+			RTC_Hour = (uint8_t)atoi(_Buffer);
+			if (RTC_Hour > 24) RTC_Hour = 0;
+
+			// Parse Minute
+			_Buffer[0] = _Response[20];
+			_Buffer[1] = _Response[21];
+			RTC_Minute = (uint8_t)atoi(_Buffer);
+			if (RTC_Minute > 60) RTC_Minute = 0;
+
+			// Parse Second
+			_Buffer[0] = _Response[23];
+			_Buffer[1] = _Response[24];
+			RTC_Second = (uint8_t)atoi(_Buffer);
+			if (RTC_Second > 60) RTC_Second = 0;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.NTP = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.NTP = false;
+
+		// End Function
+		return (false);
+
+    }
+	
+}
+bool xE910_AT::CCLK(void) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 34;
+
+	// Set Control Variable
+	Command_Control.CCLK = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+CCLK?"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.CCLK = true;
+
+			// Declare Buffer
+			char _Buffer[2];
+
+			// Parse Year
+			_Buffer[0] = _Response[10];
+			_Buffer[1] = _Response[11];
+			RTC_Year = 2000 + (uint8_t)atoi(_Buffer);
+
+			// Parse Month
+			_Buffer[0] = _Response[13];
+			_Buffer[1] = _Response[14];
+			RTC_Month = (uint8_t)atoi(_Buffer);
+			if (RTC_Month > 12) RTC_Month = 1;
+
+			// Parse Day
+			_Buffer[0] = _Response[16];
+			_Buffer[1] = _Response[17];
+			RTC_Day = (uint8_t)atoi(_Buffer);
+			if (RTC_Day > 31) RTC_Day = 1;
+
+			// Parse Hour
+			_Buffer[0] = _Response[19];
+			_Buffer[1] = _Response[20];
+			RTC_Hour = (uint8_t)atoi(_Buffer);
+			if (RTC_Hour > 24) RTC_Hour = 0;
+
+			// Parse Minute
+			_Buffer[0] = _Response[22];
+			_Buffer[1] = _Response[23];
+			RTC_Minute = (uint8_t)atoi(_Buffer);
+			if (RTC_Minute > 60) RTC_Minute = 0;
+
+			// Parse Second
+			_Buffer[0] = _Response[25];
+			_Buffer[1] = _Response[26];
+			RTC_Second = (uint8_t)atoi(_Buffer);
+			if (RTC_Second > 60) RTC_Second = 0;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.CCLK = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.CCLK = false;
+
+		// End Function
+		return (false);
+
+    }
 
 }
 
@@ -2386,11 +2947,8 @@ bool xE910_AT::_Response_Wait(uint16_t _Length, uint32_t _TimeOut) {
 
 }
 
-void xE910_GSM::Initialize(void) {
-
-}
-
 // Define Library Class
-xE910_AT GSM_AT;
 xE910_GSM GSM;
 xE910_HARDWARE GSM_HARDWARE;
+xE910_AT GSM_AT;
+xE910_AT GSM_RTC;
