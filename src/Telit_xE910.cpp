@@ -2803,6 +2803,118 @@ bool xE910_AT::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _U
     }
 	
 }
+bool xE910_AT::CCLK(void) {
+
+	// Command Chain Delay (Advice by Telit)
+	delay(10);
+
+    // Declare Response Length
+    uint8_t _Response_Length = 34;
+
+	// Set Control Variable
+	Command_Control.CCLK = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+CCLK?"));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 500)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delayMicroseconds(500);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// Set Control Variable
+			Command_Control.CCLK = true;
+
+			// Declare Buffer
+			char _Buffer[2];
+
+			// Parse Year
+			_Buffer[0] = _Response[10];
+			_Buffer[1] = _Response[11];
+			RTC_Year = 2000 + (uint8_t)atoi(_Buffer);
+
+			// Parse Month
+			_Buffer[0] = _Response[13];
+			_Buffer[1] = _Response[14];
+			RTC_Month = (uint8_t)atoi(_Buffer);
+			if (RTC_Month > 12) RTC_Month = 1;
+
+			// Parse Day
+			_Buffer[0] = _Response[16];
+			_Buffer[1] = _Response[17];
+			RTC_Day = (uint8_t)atoi(_Buffer);
+			if (RTC_Day > 31) RTC_Day = 1;
+
+			// Parse Hour
+			_Buffer[0] = _Response[19];
+			_Buffer[1] = _Response[20];
+			RTC_Hour = (uint8_t)atoi(_Buffer);
+			if (RTC_Hour > 24) RTC_Hour = 0;
+
+			// Parse Minute
+			_Buffer[0] = _Response[22];
+			_Buffer[1] = _Response[23];
+			RTC_Minute = (uint8_t)atoi(_Buffer);
+			if (RTC_Minute > 60) RTC_Minute = 0;
+
+			// Parse Second
+			_Buffer[0] = _Response[25];
+			_Buffer[1] = _Response[26];
+			RTC_Second = (uint8_t)atoi(_Buffer);
+			if (RTC_Second > 60) RTC_Second = 0;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Set Control Variable
+			Command_Control.CCLK = false;
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// Set Control Variable
+		Command_Control.CCLK = false;
+
+		// End Function
+		return (false);
+
+    }
+
+}
 
 void xE910_AT::_Clear_UART_Buffer(void) {
 

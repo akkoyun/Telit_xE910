@@ -31,7 +31,7 @@ class xE910_GSM {
 		/**
  		* Library global variables declarations.
 		 */
-		const char 	Version[9] 					= "01.00.27";		/// Library Version
+		const char 	Version[9] 					= "01.00.28";		/// Library Version
 
 		void Initialize();
 		void Power();
@@ -137,7 +137,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -647,6 +647,16 @@ class xE910_AT {
 		 */
 		bool NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _Update_Module_Clock, const uint8_t _Time_Out);
 
+		/**
+		 * @brief Set command sets the real-time clock of the ME.
+		 * @details AT Command : AT+CCLK?\r\n (10 Byte)
+		 * @details AT Response : \r\n+CCLK: "21/12/30,12:37:34"\r\nOK\r\n (34 byte)
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CCLK(void);
+
 	private:
 
 		/**
@@ -667,8 +677,9 @@ class xE910_AT {
 
 };
 
-extern xE910_AT GSM_AT;
-extern xE910_HARDWARE GSM_HARDWARE;
 extern xE910_GSM GSM;
+extern xE910_HARDWARE GSM_HARDWARE;
+extern xE910_AT GSM_AT;
+extern xE910_AT GSM_RTC;
 
 #endif /* defined(__Telit_xE910__) */
