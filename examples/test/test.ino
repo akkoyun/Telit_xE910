@@ -3,6 +3,7 @@
 
 void setup() {
 
+    GSM.Power_ON(false, false, true);
 
 }
 

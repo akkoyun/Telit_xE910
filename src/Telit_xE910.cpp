@@ -8,6 +8,65 @@
 
 #include <Telit_xE910.h>
 
+bool xE910_GSM::Power_ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch) {
+
+	// Serial communication activate
+	GSM_Serial.begin(GSM_Serial_Baud);
+
+	// Enable GSM Modem Power Switch
+	if (_Power_Switch) GSM_HARDWARE.Power_Switch(true);  
+	
+	// Enable GSM Modem LED Feed
+	if (_LED_Switch) GSM_HARDWARE.LED(true);
+
+	// Set Communication Signal LOW
+	if (_Communication_Switch) GSM_HARDWARE.Communication(true);
+
+	// GSM Boot Delay
+	delay(2000);
+	
+	// Turn On Modem
+	if (GSM_HARDWARE.PowerMonitor()) {
+
+		// Set Variable
+		GSM_HARDWARE.Power_Monitor = POWERED;
+		GSM_AT.Connection_Status = NOT_CONNECTED;
+
+		// End Function
+		return (true);
+
+	} else {
+
+		// Send On Off Signal
+		GSM_HARDWARE.OnOff(5000);
+
+		// Control for PWMon (PH7)
+		if (GSM_HARDWARE.PowerMonitor()) {
+
+			// Set Variable
+			GSM_HARDWARE.Power_Monitor = POWERED;
+			GSM_AT.Connection_Status = NOT_CONNECTED;
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// Send Shut Down Signal
+			GSM_HARDWARE.ShutDown(200);
+
+		}
+
+	}
+
+	// Set Variable
+	GSM_HARDWARE.Power_Monitor = NOT_POWERED;
+	GSM_AT.Connection_Status = NOT_CONNECTED;
+
+	// End Function
+	return (false);
+
+}
 void xE910_GSM::Initialize(void) {
 
 }

@@ -31,10 +31,14 @@ class xE910_GSM {
 		/**
  		* Library global variables declarations.
 		 */
-		const char 	Version[9] 					= "01.00.29";		/// Library Version
+		const char 	Version[9] 					= "01.00.30";		/// Library Version
 
 		void Initialize();
-		void Power();
+
+		/**
+		 * @brief Power ON procedure of GSM modem.
+		 */
+		bool Power_ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch);
 
 	private:
 	
