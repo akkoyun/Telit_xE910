@@ -31,7 +31,7 @@ class xE910_GSM {
 		/**
  		* Library global variables declarations.
 		 */
-		const char 	Version[9] 					= "01.00.28";		/// Library Version
+		const char 	Version[9] 					= "01.00.29";		/// Library Version
 
 		void Initialize();
 		void Power();
@@ -137,7 +137,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -154,6 +154,19 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool ATE(const bool _ECHO);
+
+		/**
+		 * @brief Execution command causes device detach from the network and shut down. 
+		 * Before definitive shut down an OK response is returned.
+		 * @details AT Command : AT#SHDN\r\n (9 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SHDN(void);
 
 		/**
 		 * @brief Set command enables/disables the report of result code.

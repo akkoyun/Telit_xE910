@@ -41,6 +41,7 @@ struct Command_Control_Struct {
 	bool								NITZ;				/// NITZ Command Control Variable
 	bool								NTP;				/// NTP Command Control Variable
 	bool								CCLK;				/// CCLK Command Control Variable
+	bool								SHDN;				/// SHDN Command Control Variable
 };
 
 /**
