@@ -31,7 +31,7 @@ class xE910_GSM {
 		/**
  		* Library global variables declarations.
 		 */
-		const char 	Version[9] 					= "01.00.25";		/// Library Version
+		const char 	Version[9] 					= "01.00.26";		/// Library Version
 
 		void Initialize();
 		void Power();
@@ -131,7 +131,7 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -595,7 +595,7 @@ class xE910_AT {
 
 		/**
 		 * @brief This command enables and disables automatic time zone update via NITZ.
-		 * @details AT Command : AT+CTZU\r\n (9 Byte)
+		 * @details AT Command : AT+CTZU=[<state>]\r\n (9 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
 		 * @param _State Parameter
@@ -606,6 +606,22 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool CTZU(const bool _State);
+
+		/**
+		 * @brief Set command enables/disables automatic date/time updating and Network Timezone 
+		 * unsolicited indication. Date and time information can be sent by the network after 
+		 * GSM registration or after GPRS attach.
+		 * @details AT Command : AT+NITZ=[<state>]\r\n (11 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @param _State Parameter
+		 * 0 - disables automatic set (factory default)
+		 * 1 - enables automatic set
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool NITZ(const bool _State);
 
 	private:
 
