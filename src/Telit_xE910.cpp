@@ -507,6 +507,172 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// End Function
 			if (!GSM_AT.Command_Control.GMR) return (false);
 
+			// **************************************************
+			// Initialize Complate
+			// **************************************************
+
+			// End Function
+			return(true);
+
+		}
+
+		// End Function
+		return(false);
+
+	}
+
+	// End Function
+	return(false);
+
+}
+bool xE910_GSM::Connect(void) { 
+
+}
+bool xE910_GSM::Socket_Listen(void) {
+
+}
+bool xE910_GSM::RSSI_Refresh(void) {
+
+	// **************************************************
+	// CPIN Command
+	// **************************************************
+
+	// Declare Watchdog Variable
+	uint8_t _Error_WD = 0;
+
+	// Set Control Variable
+	GSM_AT.Command_Control.CSQ = false;
+
+	// Command Debug
+	if (Debug_Mode) Serial.print(F("AT+CSQ......................................"));
+
+	// Process Command
+	while (!GSM_AT.Command_Control.CSQ) {
+
+		// Process Command
+		GSM_AT.CSQ();
+
+		// Set WD Variable
+		_Error_WD++;
+
+		// Control for WD
+		if (_Error_WD > 5) break;
+
+	}
+
+	// Print Command State
+	if (GSM_AT.Command_Control.CSQ) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+	// End Function
+	if (!GSM_AT.Command_Control.CSQ) return (false);
+
+}
+
+bool xE910_RTC::Time_Update(void) {
+
+	// Declare Watchdog Variable
+	uint8_t _Error_WD = 0;
+
+	// Control for Power Monitor
+	if (GSM_HARDWARE.PowerMonitor()) {
+
+		// Control for Connection
+		if (GSM_AT.Connection_Status) {
+		
+			// **************************************************
+			// NITZ Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (GSM.Debug_Mode) Serial.print(F("AT+NITZ....................................."));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.NITZ) {
+
+				// Process Command
+				GSM_AT.NITZ(true);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.NITZ) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.NITZ) return (false);
+
+			// **************************************************
+			// CTZU Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (GSM.Debug_Mode) Serial.print(F("AT+CTZU....................................."));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.CTZU) {
+
+				// Process Command
+				GSM_AT.CTZU(true);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.CTZU) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.CTZU) return (false);
+
+			// **************************************************
+			// NTP Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Command Debug
+			if (GSM.Debug_Mode) Serial.print(F("AT+NTP......................................"));
+
+			// Process Command
+			while (!GSM_AT.Command_Control.NTP) {
+
+				// Process Command
+				GSM_AT.NTP("85.199.214.98", 123, 1, 3);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (GSM_AT.Command_Control.NTP) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!GSM_AT.Command_Control.NTP) return (false);
+
+			// **************************************************
+			// Time Update Complate
+			// **************************************************
+
 			// End Function
 			return(true);
 
@@ -528,7 +694,7 @@ bool xE910_HARDWARE::Communication(const bool _State) {
 	if (_State) PORTJ &= 0b11101111;
 
 	// Disable Communication
-	if (_State) PORTJ |= 0b00010000;
+	if (!_State) PORTJ |= 0b00010000;
 
 	// Control Buffer Enable Signal
 	if ((PINJ & (1 << PINJ4)) == (1 << PINJ4)) {
@@ -612,7 +778,7 @@ void xE910_HARDWARE::LED(const bool _State) {
 bool xE910_AT::AT(void) {
 
     // Declare Response Length
-    uint8_t _Response_Length = 12;
+    uint8_t _Response_Length = 10;
 
 	// Set Control Variable
 	Command_Control.AT = false;
@@ -1226,7 +1392,7 @@ bool xE910_AT::GSN(void) {
 	delay(10);
 
     // Declare Response Length
-    uint8_t _Response_Length = 20;
+    uint8_t _Response_Length = 28;
 
 	// Set Control Variable
 	Command_Control.GSN = false;
@@ -1251,6 +1417,9 @@ bool xE910_AT::GSN(void) {
 		// Declare Response Variable
 		char _Response[_Response_Length];
 		char _Serial_Number[10];
+
+		// Clear Char Array
+		memset(_Serial_Number, 0, sizeof(_Serial_Number));
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
@@ -1281,7 +1450,7 @@ bool xE910_AT::GSN(void) {
 		if (strstr(_Response, "OK") != NULL) {
 
 			// Set IMEI Variable
-			Serial_Number = atoi(_Serial_Number);
+			Serial_Number = atol(_Serial_Number);
 
 			// Set Control Variable
 			Command_Control.GSN = true;
@@ -3602,8 +3771,10 @@ bool xE910_AT::_Response_Wait(uint16_t _Length, uint32_t _TimeOut) {
 
 }
 
+
+
 // Define Library Class
 xE910_GSM GSM;
 xE910_HARDWARE GSM_HARDWARE;
 xE910_AT GSM_AT;
-xE910_AT GSM_RTC;
+xE910_RTC GSM_RTC;

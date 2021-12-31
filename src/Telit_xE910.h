@@ -60,6 +60,10 @@ class xE910_GSM {
 		 */
 		bool Initialize(const bool _Debug);
 
+		bool Connect(void);
+		bool Socket_Listen(void);
+		bool RSSI_Refresh(void);
+
 	private:
 	
 	
@@ -165,6 +169,16 @@ class xE910_AT {
 	 	*/
 		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+		/**
+		 * @brief AT Function
+		 * @details AT Command : AT\r\n (4 Byte)
+		 * @details AT Response : AT\r\n\r\nOK\r\n (10 Byte)
+		 * 
+		 * @version 01.00.01
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
 		bool AT(void);
 
 		/**
@@ -289,7 +303,7 @@ class xE910_AT {
 		 * @details AT Command : AT+GSN\r\n (8 Byte)
 		 * @details AT Response : \r\n0000328245\r\n\r\nOK\r\n (20 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -718,9 +732,23 @@ class xE910_AT {
 
 };
 
+/**
+ * @brief GSM Modem RTC function class.
+ * @version 01.00.00
+ */
+class xE910_RTC {
+
+	public:
+
+		bool Time_Update(void);
+
+	private:
+
+};
+
 extern xE910_GSM GSM;
 extern xE910_HARDWARE GSM_HARDWARE;
 extern xE910_AT GSM_AT;
-extern xE910_AT GSM_RTC;
+extern xE910_RTC GSM_RTC;
 
 #endif /* defined(__Telit_xE910__) */
