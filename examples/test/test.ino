@@ -17,16 +17,22 @@ void setup() {
     GSM.Power_ON(false, false, true);
     GSM.Initialize(true);
 
+
+
+    Serial.print("IMEI Number   :"); Serial.println(GSM_AT.IMEI);
+    Serial.print("Serial Number :"); Serial.println(GSM_AT.Serial_Number);
+    Serial.print("ICCID         :"); Serial.println(GSM_AT.ICCID);
+    Serial.print("Manufacturer  :"); Serial.println(GSM_AT.Manufacturer);
+    Serial.print("Model         :"); Serial.println(GSM_AT.Model);
+    Serial.print("Firmware      :"); Serial.println(GSM_AT.Modem_Firmware);
+
+
+
 }
 
 void loop() {
 
-    //Serial.println(GSM_AT.IMEI);
-    Serial.println(GSM_AT.Serial_Number);
-    //Serial.println(GSM_AT.ICCID);
-    //Serial.println(GSM_AT.Manufacturer);
-    //Serial.println(GSM_AT.Model);
-    //Serial.println(GSM_AT.Modem_Firmware);
+
 
     delay(1000);
 

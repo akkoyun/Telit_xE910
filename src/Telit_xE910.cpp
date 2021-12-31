@@ -10,6 +10,9 @@
 
 bool xE910_GSM::Power_ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch) {
 
+	// Send Shut Down Signal
+	GSM_HARDWARE.ShutDown(200);
+
 	// Serial communication activate
 	GSM_Serial.begin(GSM_Serial_Baud);
 
@@ -185,13 +188,13 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			_Error_WD = 0;
 
 			// Command Debug
-			if (Debug_Mode) Serial.print(F("ATE=1......................................."));
+			if (Debug_Mode) Serial.print(F("ATE=0......................................."));
 
 			// Process Command
 			while (!GSM_AT.Command_Control.ATE) {
 
 				// Process Command
-				GSM_AT.ATE(true);
+				GSM_AT.ATE(false);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1321,7 +1324,6 @@ bool xE910_AT::CGSN(void) {
 
 		// Declare Response Variable
 		char _Response[_Response_Length];
-		char _IMEI[18];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
@@ -1333,7 +1335,7 @@ bool xE910_AT::CGSN(void) {
 			if (_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) {
 
 				// Get Data
-				_IMEI[_Data_Order] = _Response[_Read_Order];
+				IMEI[_Data_Order] = _Response[_Read_Order];
 
 				// Increase Data Order
 				_Data_Order++;
@@ -1351,9 +1353,6 @@ bool xE910_AT::CGSN(void) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set IMEI Variable
-			IMEI = atoi(_IMEI);
-
 			// Set Control Variable
 			Command_Control.CGSN = true;
 
@@ -1361,9 +1360,6 @@ bool xE910_AT::CGSN(void) {
 			return (true);
 
 		} else {
-
-			// Set IMEI Variable
-			IMEI = 0;
 
 			// Set Control Variable
 			Command_Control.CGSN = false;
@@ -1374,9 +1370,6 @@ bool xE910_AT::CGSN(void) {
 		}
 
 	} else {
-
-		// Set IMEI Variable
-		IMEI = 0;
 
 		// Set Control Variable
 		Command_Control.CGSN = false;
@@ -1392,7 +1385,7 @@ bool xE910_AT::GSN(void) {
 	delay(10);
 
     // Declare Response Length
-    uint8_t _Response_Length = 28;
+    uint8_t _Response_Length = 20;
 
 	// Set Control Variable
 	Command_Control.GSN = false;
@@ -1416,10 +1409,6 @@ bool xE910_AT::GSN(void) {
 
 		// Declare Response Variable
 		char _Response[_Response_Length];
-		char _Serial_Number[10];
-
-		// Clear Char Array
-		memset(_Serial_Number, 0, sizeof(_Serial_Number));
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
@@ -1431,7 +1420,7 @@ bool xE910_AT::GSN(void) {
 			if (_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) {
 
 				// Get Data
-				_Serial_Number[_Data_Order] = _Response[_Read_Order];
+				Serial_Number[_Data_Order] = _Response[_Read_Order];
 
 				// Increase Data Order
 				_Data_Order++;
@@ -1449,8 +1438,6 @@ bool xE910_AT::GSN(void) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set IMEI Variable
-			Serial_Number = atol(_Serial_Number);
 
 			// Set Control Variable
 			Command_Control.GSN = true;
@@ -1459,9 +1446,6 @@ bool xE910_AT::GSN(void) {
 			return (true);
 
 		} else {
-
-			// Set IMEI Variable
-			Serial_Number = 0;
 
 			// Set Control Variable
 			Command_Control.GSN = false;
@@ -1472,9 +1456,6 @@ bool xE910_AT::GSN(void) {
 		}
 
 	} else {
-
-		// Set IMEI Variable
-		Serial_Number = 0;
 
 		// Set Control Variable
 		Command_Control.GSN = false;
@@ -1517,7 +1498,6 @@ bool xE910_AT::CCID(void) {
 
 			// Declare Response Variable
 			char _Response[_Response_Length];
-			char _ICCID[20];
 
 			// Read UART Response
 			while (GSM_Serial.available() > 0) {
@@ -1529,7 +1509,7 @@ bool xE910_AT::CCID(void) {
 				if (_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) {
 
 					// Get Data
-					_ICCID[_Data_Order] = _Response[_Read_Order];
+					ICCID[_Data_Order] = _Response[_Read_Order];
 
 					// Increase Data Order
 					_Data_Order++;
@@ -1547,9 +1527,6 @@ bool xE910_AT::CCID(void) {
 			// Control for Response
 			if (strstr(_Response, "OK") != NULL) {
 
-				// Set ICCID Variable
-				ICCID = atoi(_ICCID);
-
 				// Set Control Variable
 				Command_Control.ICCID = true;
 
@@ -1557,9 +1534,6 @@ bool xE910_AT::CCID(void) {
 				return (true);
 
 			} else {
-
-				// Set IMEI Variable
-				ICCID = 0;
 
 				// Set Control Variable
 				Command_Control.ICCID = false;
@@ -1572,9 +1546,6 @@ bool xE910_AT::CCID(void) {
 
 		} else {
 
-			// Set IMEI Variable
-			ICCID = 0;
-
 			// Set Control Variable
 			Command_Control.ICCID = false;
 
@@ -1585,8 +1556,6 @@ bool xE910_AT::CCID(void) {
 
 	} else {
 
-		// Set IMEI Variable
-		ICCID = 0;
 
 		// End Function
 		return (false);
@@ -1784,6 +1753,9 @@ bool xE910_AT::GMR(void) {
 	// Handle Response
 	if (_Response_Wait(_Response_Length, 500)) {
 
+		// Clear Variable Array
+		memset(Modem_Firmware, 0, 10);
+
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
 		uint8_t _Data_Order = 0;
@@ -1821,8 +1793,7 @@ bool xE910_AT::GMR(void) {
 		if (strstr(_Response, "OK") != NULL) {
 
 			// Set Firmware Variable
-			memset(Modem_Firmware, 0, sizeof(Modem_Firmware));
-			strcpy(Modem_Firmware, _Modem_Firmware);
+			strncpy(Modem_Firmware, _Modem_Firmware, 9);
 
 			// Set Control Variable
 			Command_Control.GMR = true;
@@ -1831,9 +1802,6 @@ bool xE910_AT::GMR(void) {
 			return (true);
 
 		} else {
-
-			// Set Firmware Variable
-			memset(Modem_Firmware, 0, sizeof(Modem_Firmware));
 
 			// Set Control Variable
 			Command_Control.GMR = false;
@@ -1844,9 +1812,6 @@ bool xE910_AT::GMR(void) {
 		}
 
 	} else {
-
-		// Set Firmware Variable
-		memset(Modem_Firmware, 0, sizeof(Modem_Firmware));
 
 		// Set Control Variable
 		Command_Control.GMR = false;

@@ -15,6 +15,9 @@
 #include <Arduino.h>
 #endif
 
+// Define PGMspace Function
+#include <avr/pgmspace.h>
+
 // Define Library Structures
 #ifndef __Telit_xE910_Structures__
 #include <Telit_xE910_Structures.h>
@@ -142,9 +145,9 @@ class xE910_AT {
 		/**
  		* Library global variables declarations.
 		 */
-		uint64_t 	IMEI						= 0;				/// IMEI Variable
-		uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
-		uint64_t 	ICCID						= 0;				/// ICCID Variable
+		char		IMEI[17]					= "";				/// IMEI Variable
+		char		Serial_Number[11]			= "";				/// Serial Number Variable
+		char		ICCID[21]					= "";				/// ICCID Variable
 		uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
 		uint8_t 	Model 						= 0;				/// Modem Model Variable
 		char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
@@ -303,7 +306,7 @@ class xE910_AT {
 		 * @details AT Command : AT+GSN\r\n (8 Byte)
 		 * @details AT Response : \r\n0000328245\r\n\r\nOK\r\n (20 Byte)
 		 * 
-		 * @version 01.00.01
+		 * @version 01.00.02
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
