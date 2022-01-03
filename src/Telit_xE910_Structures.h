@@ -6,13 +6,14 @@
  * Modem communicates with microcontroller over UART interface.
  * version 01.00.00
  */
-#define		GSM_Serial					Serial				/// GSM Serial communication defination.
+#define		GSM_Serial					Serial3				/// GSM Serial communication defination.
 #define		GSM_Serial_Baud				115200				/// GSM Serial terminal connection speed defination.
 
 /**
  * @brief Command control structure.
  */
 struct Command_Control_Struct {
+	bool								AT;					/// AT Command Control Variable
 	bool								ATE;				/// ATE Command Control Variable
 	bool								CMEE;				/// CMEE Command Control Variable
 	bool								FCLASS;				/// FCLASS Command Control Variable

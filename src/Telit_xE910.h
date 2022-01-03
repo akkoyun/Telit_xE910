@@ -15,6 +15,9 @@
 #include <Arduino.h>
 #endif
 
+// Define PGMspace Function
+#include <avr/pgmspace.h>
+
 // Define Library Structures
 #ifndef __Telit_xE910_Structures__
 #include <Telit_xE910_Structures.h>
@@ -29,12 +32,40 @@ class xE910_GSM {
 	public:
 
 		/**
- 		* Library global variables declarations.
-		 */
-		const char 	Version[9] 					= "01.00.29";		/// Library Version
+		* Library global variables declarations.
+		*/
+		const char 	Version[9] 					= "01.00.31";		/// Library Version
+		bool		Debug_Mode					= false;			/// Debug Mode Variable
 
-		void Initialize();
-		void Power();
+		/**
+		 * @brief Power ON procedure of GSM modem.
+		 * @param _Power_Switch Enable GSM modem main power switch.
+		 * @param _LED_Switch Enable GSM modem LED inducator power switch.
+		 * @param _Communication_Switch Enable GSM modem voltage translator.
+		 * @version 01.00.00
+		 */
+		bool Power_ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch);
+
+		/**
+		 * @brief Power OFF procedure of GSM modem.
+		 * @param _Power_Switch Disable GSM modem main power switch.
+		 * @param _LED_Switch Disable GSM modem LED inducator power switch.
+		 * @param _Communication_Switch Disable GSM modem voltage translator.
+		 * @param _Clear_Variables Clear library control variables.
+		 * @version 01.00.00
+		 */
+		bool Power_OFF(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch, const bool _Clear_Variables);
+
+		/**
+		 * @brief GSM Modem initialize function
+		 * @param _Debug Enable debug mode 
+		 * @version 01.00.01
+		 */
+		bool Initialize(const bool _Debug);
+
+		bool Connect(void);
+		bool Socket_Listen(void);
+		bool RSSI_Refresh(void);
 
 	private:
 	
@@ -114,19 +145,23 @@ class xE910_AT {
 		/**
  		* Library global variables declarations.
 		 */
-		uint64_t 	IMEI						= 0;				/// IMEI Variable
-		uint32_t 	Serial_Number				= 0;				/// Serial Number Variable
-		uint64_t 	ICCID						= 0;				/// ICCID Variable
+		char		IMEI[17]					= "";				/// IMEI Variable
+		char		Serial_Number[11]			= "";				/// Serial Number Variable
+		char		ICCID[21]					= "";				/// ICCID Variable
 		uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
 		uint8_t 	Model 						= 0;				/// Modem Model Variable
+		char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
+		bool		Initialization_Status		= false;			/// Initialization Status
+
+		uint8_t		Connection_Time				= 0;				// CREG and CGREG time Variable
 		uint16_t 	Operator 					= 0;				/// Operator Variable
 		uint8_t 	Signal_RSSI 				= 0;				/// Signal Variable
-		char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
 		uint8_t		CREG_Status					= 0;				/// CREG Status Variable
 		uint8_t		CGREG_Status				= 0;				/// CGREG Status Variable
 		uint8_t		SGACT_Status				= 0;				/// SGACT Status Variable
 		char		IP_Address[16]				= "";				/// IP Address Variable
 		bool		Connection_Status			= false;			/// Connection Status
+
 		uint8_t 	RTC_Day						= 29;				// Day Variable
 		uint8_t 	RTC_Month					= 10;				// Month Variable
 		uint16_t 	RTC_Year					= 1923;				// Year Variable
@@ -137,7 +172,19 @@ class xE910_AT {
 		/**
 	 	* @brief Command control variable structure.
 	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+		/**
+		 * @brief AT Function
+		 * @details AT Command : AT\r\n (4 Byte)
+		 * @details AT Response : AT\r\n\r\nOK\r\n (10 Byte)
+		 * 
+		 * @version 01.00.01
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool AT(void);
 
 		/**
 		 * @brief Set function to enable or disable the command echo.
@@ -261,7 +308,7 @@ class xE910_AT {
 		 * @details AT Command : AT+GSN\r\n (8 Byte)
 		 * @details AT Response : \r\n0000328245\r\n\r\nOK\r\n (20 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.02
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -690,9 +737,23 @@ class xE910_AT {
 
 };
 
+/**
+ * @brief GSM Modem RTC function class.
+ * @version 01.00.00
+ */
+class xE910_RTC {
+
+	public:
+
+		bool Time_Update(void);
+
+	private:
+
+};
+
 extern xE910_GSM GSM;
 extern xE910_HARDWARE GSM_HARDWARE;
 extern xE910_AT GSM_AT;
-extern xE910_AT GSM_RTC;
+extern xE910_RTC GSM_RTC;
 
 #endif /* defined(__Telit_xE910__) */
