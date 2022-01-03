@@ -14,19 +14,20 @@ void setup() {
 
     Serial.begin(115200);
 
-    GSM.Power_ON(false, false, true);
     GSM.Initialize(true);
 
 
+    Serial.println("--------------------------------------------------");
+    Serial.print("Manufacturer      : "); if (GSM_AT.Manufacturer == 1) Serial.println("Telit");
+    Serial.print("Model             : "); if (GSM_AT.Model == 1) Serial.println("GE910 QUAD");
+    Serial.print("Firmware          : "); Serial.println(GSM_AT.Modem_Firmware);
+    Serial.print("IMEI Number       : "); Serial.println(GSM_AT.IMEI);
+    Serial.print("Serial Number     : "); Serial.println(GSM_AT.Serial_Number);
+    Serial.print("ICCID             : "); Serial.println(GSM_AT.ICCID);
+    Serial.println("--------------------------------------------------");
 
-    Serial.print("IMEI Number   :"); Serial.println(GSM_AT.IMEI);
-    Serial.print("Serial Number :"); Serial.println(GSM_AT.Serial_Number);
-    Serial.print("ICCID         :"); Serial.println(GSM_AT.ICCID);
-    Serial.print("Manufacturer  :"); Serial.println(GSM_AT.Manufacturer);
-    Serial.print("Model         :"); Serial.println(GSM_AT.Model);
-    Serial.print("Firmware      :"); Serial.println(GSM_AT.Modem_Firmware);
 
-
+    GSM.Connect();
 
 }
 

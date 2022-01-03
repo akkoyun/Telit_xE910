@@ -59,7 +59,7 @@ class xE910_GSM {
 		/**
 		 * @brief GSM Modem initialize function
 		 * @param _Debug Enable debug mode 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 */
 		bool Initialize(const bool _Debug);
 
@@ -151,7 +151,9 @@ class xE910_AT {
 		uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
 		uint8_t 	Model 						= 0;				/// Modem Model Variable
 		char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
+		bool		Initialization_Status		= false;			/// Initialization Status
 
+		uint8_t		Connection_Time				= 0;				// CREG and CGREG time Variable
 		uint16_t 	Operator 					= 0;				/// Operator Variable
 		uint8_t 	Signal_RSSI 				= 0;				/// Signal Variable
 		uint8_t		CREG_Status					= 0;				/// CREG Status Variable
