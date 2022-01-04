@@ -8,6 +8,10 @@
 
 #include <Telit_xE910.h>
 
+/**************************************************
+ * Batch Functions
+ **************************************************/
+
 bool xE910_GSM::Power_ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch) {
 
 	// Send Shut Down Signal
@@ -99,47 +103,26 @@ bool xE910_GSM::Power_OFF(const bool _Power_Switch, const bool _LED_Switch, cons
 			GSM_HARDWARE.Power_Monitor = NOT_POWERED;
 			GSM_AT.Connection_Status = NOT_CONNECTED;
 
-			// Set Control Variables
-			GSM_AT.Command_Control.ATE 			= false;
-			GSM_AT.Command_Control.CCLK			= false;
-			GSM_AT.Command_Control.CGDCONT		= false;
-			GSM_AT.Command_Control.CGREG		= false;
-			GSM_AT.Command_Control.CGSN			= false;
-			GSM_AT.Command_Control.CMEE			= false;
-			GSM_AT.Command_Control.CPIN			= false;
-			GSM_AT.Command_Control.CREG			= false;
-			GSM_AT.Command_Control.CSQ			= false;
-			GSM_AT.Command_Control.CTZU			= false;
-			GSM_AT.Command_Control.FCLASS		= false;
-			GSM_AT.Command_Control.GMI			= false;
-			GSM_AT.Command_Control.GMM			= false;
-			GSM_AT.Command_Control.GMR			= false;
-			GSM_AT.Command_Control.GSN			= false;
-			GSM_AT.Command_Control.ICCID		= false;
-			GSM_AT.Command_Control.K			= false;
-			GSM_AT.Command_Control.NITZ			= false;
-			GSM_AT.Command_Control.NTP			= false;
-			GSM_AT.Command_Control.REGMODE		= false;
-			GSM_AT.Command_Control.SCFG			= false;
-			GSM_AT.Command_Control.SCFGEXT2		= false;
-			GSM_AT.Command_Control.SCFGEXT3		= false;
-			GSM_AT.Command_Control.SCFGEXT		= false;
-			GSM_AT.Command_Control.SERVINFO		= false;
-			GSM_AT.Command_Control.SGACT		= false;
-			GSM_AT.Command_Control.SHDN			= false;
-			GSM_AT.Command_Control.SLED			= false;
-			GSM_AT.Command_Control.TXMONMODE	= false;
-
 		}
 
 		// End Function
 		return (true);
 
 }
-bool xE910_GSM::Initialize(const bool _Debug) {
+bool xE910_GSM::Begin(const bool _Debug) {
+
+	// GSM Module Port Definations
+	DDRJ	&= 0b11111011;	PORTJ	|= 0b00000100;	// PJ2 - Input / Pull Down [GSM Ring]
+	DDRJ	&= 0b11110111;	PORTJ	&= 0b11110111;	// PJ3 - Input / Pull Down [GSM Power Monitor]
+	DDRJ	|= 0b00010000;	PORTJ	|= 0b00010000;	// PJ4 - Output / Pull Down [GSM Communication Enable]
+	DDRJ	|= 0b00100000;	PORTJ	&= 0b11011111;	// PJ5 - Output / Pull Down [GSM Shut Down]
+	DDRJ	|= 0b01000000;	PORTJ	&= 0b10111111;	// PJ6 - Output / Pull Down [GSM On Off]
 
 	// Set Global Variable
 	Debug_Mode = _Debug;
+	
+	// Declare Response Status
+	bool _Response = false;
 
 	// Declare Watchdog Variable
 	uint8_t _Error_WD = 0;
@@ -173,10 +156,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			if (Debug_Mode) Serial.print(F("AT.........................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.AT) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.AT();
+				// Send Command
+				_Response = GSM_AT.AT();
 
 				// Set WD Variable
 				_Error_WD++;
@@ -187,10 +170,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.AT) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.AT) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// ATE Command
@@ -199,14 +182,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("ATE=0......................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.ATE) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.ATE(_Parameter_ATE);
+				// Send Command
+				_Response = GSM_AT.ATE(_Parameter_ATE);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -217,10 +203,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.ATE) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.ATE) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// CMEE Command
@@ -229,14 +215,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+CMEE=1..................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.CMEE) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.CMEE(_Parameter_CMEE);
+				// Send Command
+				_Response = GSM_AT.CMEE(_Parameter_CMEE);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -247,10 +236,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.CMEE) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.CMEE) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// FCLASS Command
@@ -259,14 +248,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+FCLASS=0................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.FCLASS) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.FCLASS(_Parameter_FCLASS);
+				// Send Command
+				_Response = GSM_AT.FCLASS(_Parameter_FCLASS);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -277,10 +269,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.FCLASS) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.FCLASS) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// K Command
@@ -289,14 +281,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT&K0......................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.K) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.K(_Parameter_K);
+				// Send Command
+				_Response = GSM_AT.K(_Parameter_K);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -307,10 +302,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.K) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.K) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// CPIN Command
@@ -319,14 +314,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+CPIN?...................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.CPIN) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.CPIN();
+				// Send Command
+				_Response = GSM_AT.CPIN();
 
 				// Set WD Variable
 				_Error_WD++;
@@ -337,10 +335,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.CPIN) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.CPIN) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// CGSN Command
@@ -349,14 +347,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+CGSN....................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.CGSN) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.CGSN();
+				// Send Command
+				_Response = GSM_AT.CGSN();
 
 				// Set WD Variable
 				_Error_WD++;
@@ -367,10 +368,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.CGSN) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.CGSN) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// GSN Command
@@ -379,14 +380,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+GSN......................................"));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.GSN) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.GSN();
+				// Send Command
+				_Response = GSM_AT.GSN();
 
 				// Set WD Variable
 				_Error_WD++;
@@ -397,10 +401,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.GSN) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.GSN) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// ICCID Command
@@ -409,14 +413,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+CCID....................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.ICCID) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.CCID();
+				// Send Command
+				_Response = GSM_AT.CCID();
 
 				// Set WD Variable
 				_Error_WD++;
@@ -427,10 +434,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.ICCID) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.ICCID) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// GMI Command
@@ -439,14 +446,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+GMI......................................"));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.GMI) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.GMI();
+				// Send Command
+				_Response = GSM_AT.GMI();
 
 				// Set WD Variable
 				_Error_WD++;
@@ -457,10 +467,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.GMI) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.GMI) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// GMM Command
@@ -469,14 +479,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+GMM......................................"));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.GMM) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.GMM();
+				// Send Command
+				_Response = GSM_AT.GMM();
 
 				// Set WD Variable
 				_Error_WD++;
@@ -487,10 +500,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.GMM) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.GMM) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// GMR Command
@@ -499,14 +512,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+GMR......................................"));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.GMR) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.GMR();
+				// Send Command
+				_Response = GSM_AT.GMR();
 
 				// Set WD Variable
 				_Error_WD++;
@@ -517,10 +533,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.GMR) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.GMR) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// SLED Command
@@ -529,14 +545,17 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+SLED=2..................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.SLED) {
+			while (!_Response) {
 
-				// Process Command
-				GSM_AT.SLED(_Parameter_SLED);
+				// Send Command
+				_Response = GSM_AT.SLED(_Parameter_SLED);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -547,10 +566,10 @@ bool xE910_GSM::Initialize(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.SLED) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.SLED) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// Initialize Complate
@@ -578,25 +597,42 @@ bool xE910_GSM::Connect(void) {
 	// Declare Watchdog Variable
 	uint8_t _Error_WD = 0;
 
+	// Declare Response Status
+	bool _Response = false;
+
 	// Control for Initialization Monitor
 	if (GSM_AT.Initialization_Status) {
 
 			// **************************************************
 			// Connection Parameters
 			// **************************************************
+
 			const bool 		_Parameter_TXMONMODE 			= 0;
+
+			const bool		_Parameter_CREG_Mode			= true;
+
+			const bool		_Parameter_CGREG_Mode			= true;
+
 			const uint8_t 	_Parameter_CDGCONT_Cid 			= 1;
 			const char 		*_Parameter_CGDCONT_PDP 		= "IP";
 			const char 		*_Parameter_CGDCONT_APN 		= "mgbs";
 			const char 		*_Parameter_CGDCONT_PDP_Addr 	= "";
 			const bool 		_Parameter_CGDCONT_D_Comp 		= true;
 			const bool 		_Parameter_CGDCONT_H_Comp 		= true;
-			const uint8_t 	_Parameter_SCFG_ConnID 			= 0;
+
+			const uint8_t 	_Parameter_SCFG_ConnID 			= 1;
 			const uint8_t 	_Parameter_SCFG_Cid 			= 1;
-			const uint16_t 	_Parameter_SCFG_Pkt_Sz 			= 300;
-			const uint16_t 	_Parameter_SCFG_Max_To 			= 90;
-			const uint16_t 	_Parameter_SCFG_Conn_To 		= 600;
-			const uint8_t 	_Parameter_SCFG_TX_To 			= 50;
+			const uint16_t 	_Parameter_SCFG_Pkt_Sz 			= 0;
+			const uint16_t 	_Parameter_SCFG_Max_To 			= 0;
+			const uint16_t 	_Parameter_SCFG_Conn_To 		= 150;
+			const uint8_t 	_Parameter_SCFG_TX_To 			= 0;
+
+			const uint8_t	_Parameter_SCFGEXT_ConnID		= 2;
+			const uint8_t	_Parameter_SCFGEXT_SRing		= 1;
+			const uint8_t	_Parameter_SCFGEXT_RcvMode		= 0;
+			const uint8_t	_Parameter_SCFGEXT_KeepAlieve	= 0;
+			const uint8_t	_Parameter_SCFGEXT_ListerRcp	= 0;
+			const uint8_t	_Parameter_SCFGEXT_SendMode		= 0;
 
 			// **************************************************
 			// TXMONMODE Command
@@ -605,16 +641,19 @@ bool xE910_GSM::Connect(void) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT#TXMONMODE="));
 			if (Debug_Mode) Serial.print(_Parameter_TXMONMODE);
 			if (Debug_Mode) Serial.print(F(".............................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.TXMONMODE) {
+			while (!_Response) {
 
 				// Process Command
-				GSM_AT.TXMONMODE(_Parameter_TXMONMODE);
+				_Response = GSM_AT.TXMONMODE(_Parameter_TXMONMODE);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -625,10 +664,10 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.TXMONMODE) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.TXMONMODE) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// CREG Command
@@ -640,14 +679,19 @@ bool xE910_GSM::Connect(void) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CREG=1,1................................."));
+			if (Debug_Mode) Serial.print(F("AT+CREG="));
+			if (Debug_Mode) Serial.print(_Parameter_CREG_Mode);
+			if (Debug_Mode) Serial.print(F("..................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.CREG) {
+			while (!_Response) {
 
 				// Process Command
-				GSM_AT.CREG();
+				_Response = GSM_AT.CREG(_Parameter_CREG_Mode);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -658,10 +702,10 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.CREG) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.CREG) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// CGREG Command
@@ -670,14 +714,19 @@ bool xE910_GSM::Connect(void) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CGREG=1,1................................"));
+			if (Debug_Mode) Serial.print(F("AT+CGREG="));
+			if (Debug_Mode) Serial.print(_Parameter_CGREG_Mode);
+			if (Debug_Mode) Serial.print(F(".................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.CGREG) {
+			while (!_Response) {
 
 				// Process Command
-				GSM_AT.CGREG();
+				_Response = GSM_AT.CGREG(_Parameter_CGREG_Mode);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -688,10 +737,10 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.CGREG) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.CGREG) return (false);
+			if (!_Response) return (false);
 
 			// Read Current Time
 			uint32_t _CRTime = millis() - _CTime;
@@ -707,14 +756,29 @@ bool xE910_GSM::Connect(void) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CGDCONT.................................."));
+			if (Debug_Mode) Serial.print(F("AT+CGDCONT="));
+			if (Debug_Mode) Serial.print(_Parameter_CDGCONT_Cid);
+			if (Debug_Mode) Serial.print(F(",\""));
+			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_PDP);
+			if (Debug_Mode) Serial.print(F("\",\""));
+			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_APN);
+			if (Debug_Mode) Serial.print(F("\",\""));
+			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_PDP_Addr);
+			if (Debug_Mode) Serial.print(F("\","));
+			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_D_Comp);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_H_Comp);
+			if (Debug_Mode) Serial.print(F("............."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.CGDCONT) {
+			while (!_Response) {
 
 				// Process Command
-				GSM_AT.CGDCONT(_Parameter_CDGCONT_Cid, _Parameter_CGDCONT_PDP, _Parameter_CGDCONT_APN, _Parameter_CGDCONT_PDP_Addr, _Parameter_CGDCONT_D_Comp, _Parameter_CGDCONT_H_Comp);
+				_Response = GSM_AT.CGDCONT(_Parameter_CDGCONT_Cid, _Parameter_CGDCONT_PDP, _Parameter_CGDCONT_APN, _Parameter_CGDCONT_PDP_Addr, _Parameter_CGDCONT_D_Comp, _Parameter_CGDCONT_H_Comp);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -725,10 +789,10 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.CGDCONT) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.CGDCONT) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// SCFG Command
@@ -737,14 +801,29 @@ bool xE910_GSM::Connect(void) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+SCFG....................................."));
+			if (Debug_Mode) Serial.print(F("AT#SCFG="));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_ConnID);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Cid);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Pkt_Sz);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Max_To);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Conn_To);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_TX_To);
+			if (Debug_Mode) Serial.print(F("......................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.SCFG) {
+			while (!_Response) {
 
 				// Process Command
-				GSM_AT.SCFG(_Parameter_SCFG_ConnID, _Parameter_SCFG_Cid, _Parameter_SCFG_Pkt_Sz, _Parameter_SCFG_Max_To, _Parameter_SCFG_Conn_To, _Parameter_SCFG_TX_To);
+				_Response = GSM_AT.SCFG(_Parameter_SCFG_ConnID, _Parameter_SCFG_Cid, _Parameter_SCFG_Pkt_Sz, _Parameter_SCFG_Max_To, _Parameter_SCFG_Conn_To, _Parameter_SCFG_TX_To);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -755,10 +834,88 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.SCFG) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.SCFG) return (false);
+			if (!_Response) return (false);
+
+			// **************************************************
+			// SCFGEXT Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT#SCFGEXT="));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_ConnID);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_SRing);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_RcvMode);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_KeepAlieve);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_ListerRcp);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_SendMode);
+			if (Debug_Mode) Serial.print(F("......................"));
+
+			// Process Command
+			while (!_Response) {
+
+				// Process Command
+				_Response = GSM_AT.SCFGEXT(_Parameter_SCFGEXT_ConnID, _Parameter_SCFGEXT_SRing, _Parameter_SCFGEXT_RcvMode, _Parameter_SCFGEXT_KeepAlieve, _Parameter_SCFGEXT_ListerRcp, _Parameter_SCFGEXT_SendMode);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!_Response) return (false);
+
+			// **************************************************
+			// SERVINFO Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT#SERVIFO.................................."));
+
+			// Process Command
+			while (!_Response) {
+
+				// Send Command
+				_Response = GSM_AT.SERVINFO();
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+		
+			// End Function
+			if (!_Response) return (false);
 
 			// **************************************************
 			// SGACT Command
@@ -767,15 +924,20 @@ bool xE910_GSM::Connect(void) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (Debug_Mode) Serial.print(F("AT+SGACT...................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.SGACT) {
+			while (!_Response) {
 
-				// Process Command
+				// Release IP if Exits
 				GSM_AT.SGACT(1, false, "", "");
-				GSM_AT.SGACT(1, true, "", "");
+
+				// Get IP Address
+				_Response = GSM_AT.SGACT(1, true, "", "");
 
 				// Set WD Variable
 				_Error_WD++;
@@ -786,26 +948,21 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.SGACT) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.SGACT) return (false);
-
-
+			if (!_Response) return (false);
 
 	}
-
-
-
-
-
-
 
 }
 bool xE910_GSM::Socket_Listen(void) {
 
 }
 bool xE910_GSM::RSSI_Refresh(void) {
+
+	// Declare Response Status
+	bool _Response = false;
 
 	// **************************************************
 	// CPIN Command
@@ -814,17 +971,17 @@ bool xE910_GSM::RSSI_Refresh(void) {
 	// Declare Watchdog Variable
 	uint8_t _Error_WD = 0;
 
-	// Set Control Variable
-	GSM_AT.Command_Control.CSQ = false;
+	// Set Response Variable
+	_Response = false;
 
 	// Command Debug
 	if (Debug_Mode) Serial.print(F("AT+CSQ......................................"));
 
 	// Process Command
-	while (!GSM_AT.Command_Control.CSQ) {
+	while (!_Response) {
 
 		// Process Command
-		GSM_AT.CSQ();
+		_Response = GSM_AT.CSQ();
 
 		// Set WD Variable
 		_Error_WD++;
@@ -835,17 +992,84 @@ bool xE910_GSM::RSSI_Refresh(void) {
 	}
 
 	// Print Command State
-	if (GSM_AT.Command_Control.CSQ) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+	if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 	// End Function
-	if (!GSM_AT.Command_Control.CSQ) return (false);
+	if (!_Response) return (false);
 
 }
+
+/**************************************************
+ * Variable Functions
+ **************************************************/
+
+String xE910_GSM::Manufacturer(void) {
+
+	if (GSM_AT.Manufacturer == 1) return("Telit");
+
+}
+String xE910_GSM::Model(void) {
+
+	if (GSM_AT.Model == 1) return("GE910 QUAD");
+
+}
+String xE910_GSM::Operator(void) {
+
+	if (GSM_AT.Operator == 28601) {
+
+		return("Turkcell");
+
+	} else if (GSM_AT.Operator == 28602) {
+
+		return("Vodafone");
+
+	} else if (GSM_AT.Operator == 28603) {
+
+		return("Turk Telekom");
+
+	} else if (GSM_AT.Operator == 28604) {
+
+		return("Turk Telekom");
+
+	} else {
+
+		return("Nan Turkish Operator");
+
+	}
+
+}
+String xE910_GSM::Firmware(void) {
+
+	return(GSM_AT.Modem_Firmware);
+
+}
+String xE910_GSM::IMEI(void) {
+
+	return(GSM_AT.IMEI);
+
+}
+String xE910_GSM::Serial_ID(void) {
+
+	return(GSM_AT.Serial_Number);
+
+}
+String xE910_GSM::ICCID(void) {
+
+	return(GSM_AT.ICCID);
+
+}
+
+/**************************************************
+ * Time Functions
+ **************************************************/
 
 bool xE910_RTC::Time_Update(void) {
 
 	// Declare Watchdog Variable
 	uint8_t _Error_WD = 0;
+
+	// Declare Response Status
+	bool _Response = false;
 
 	// Control for Power Monitor
 	if (GSM_HARDWARE.PowerMonitor()) {
@@ -860,14 +1084,17 @@ bool xE910_RTC::Time_Update(void) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (GSM.Debug_Mode) Serial.print(F("AT+NITZ....................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.NITZ) {
+			while (!_Response) {
 
 				// Process Command
-				GSM_AT.NITZ(true);
+				_Response = GSM_AT.NITZ(true);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -878,10 +1105,10 @@ bool xE910_RTC::Time_Update(void) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.NITZ) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (GSM.Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.NITZ) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// CTZU Command
@@ -890,14 +1117,17 @@ bool xE910_RTC::Time_Update(void) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (GSM.Debug_Mode) Serial.print(F("AT+CTZU....................................."));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.CTZU) {
+			while (!_Response) {
 
 				// Process Command
-				GSM_AT.CTZU(true);
+				_Response = GSM_AT.CTZU(true);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -908,10 +1138,10 @@ bool xE910_RTC::Time_Update(void) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.CTZU) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (GSM.Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.CTZU) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// NTP Command
@@ -920,14 +1150,17 @@ bool xE910_RTC::Time_Update(void) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
+
 			// Command Debug
 			if (GSM.Debug_Mode) Serial.print(F("AT+NTP......................................"));
 
 			// Process Command
-			while (!GSM_AT.Command_Control.NTP) {
+			while (!_Response) {
 
 				// Process Command
-				GSM_AT.NTP("85.199.214.98", 123, 1, 3);
+				_Response = GSM_AT.NTP("85.199.214.98", 123, 1, 3);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -938,10 +1171,10 @@ bool xE910_RTC::Time_Update(void) {
 			}
 
 			// Print Command State
-			if (GSM_AT.Command_Control.NTP) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (GSM.Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
 		
 			// End Function
-			if (!GSM_AT.Command_Control.NTP) return (false);
+			if (!_Response) return (false);
 
 			// **************************************************
 			// Time Update Complate
@@ -961,6 +1194,10 @@ bool xE910_RTC::Time_Update(void) {
 	return(false);
 
 }
+
+/**************************************************
+ * Hardware Functions
+ **************************************************/
 
 bool xE910_HARDWARE::Communication(const bool _State) {
 
@@ -1058,13 +1295,14 @@ void xE910_HARDWARE::LED(const bool _State) {
 
 }
 
+/**************************************************
+ * AT Command Set Functions
+ **************************************************/
+
 bool xE910_AT::AT(void) {
 
-    // Declare Response Length
+    // Command Response Length
     uint8_t _Response_Length = 10;
-
-	// Set Control Variable
-	Command_Control.AT = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -1102,16 +1340,10 @@ bool xE910_AT::AT(void) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.AT = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.AT = false;
 
 			// End Function
 			return (false);
@@ -1119,9 +1351,6 @@ bool xE910_AT::AT(void) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.AT = false;
 
 		// End Function
 		return (false);
@@ -1133,9 +1362,6 @@ bool xE910_AT::ATE(const bool _ECHO) {
 
     // Declare Response Length
     uint8_t _Response_Length = 12;
-
-	// Set Control Variable
-	Command_Control.ATE = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -1174,16 +1400,10 @@ bool xE910_AT::ATE(const bool _ECHO) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.ATE = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.ATE = false;
 
 			// End Function
 			return (false);
@@ -1191,9 +1411,6 @@ bool xE910_AT::ATE(const bool _ECHO) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.ATE = false;
 
 		// End Function
 		return (false);
@@ -1203,14 +1420,8 @@ bool xE910_AT::ATE(const bool _ECHO) {
 }
 bool xE910_AT::SHDN(void) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.SHDN = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -1248,16 +1459,10 @@ bool xE910_AT::SHDN(void) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.SHDN = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.SHDN = false;
 
 			// End Function
 			return (false);
@@ -1265,9 +1470,6 @@ bool xE910_AT::SHDN(void) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.SHDN = false;
 
 		// End Function
 		return (false);
@@ -1279,9 +1481,6 @@ bool xE910_AT::CMEE(const uint8_t _CMEE) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.CMEE = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -1320,16 +1519,10 @@ bool xE910_AT::CMEE(const uint8_t _CMEE) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.CMEE = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.CMEE = false;
 
 			// End Function
 			return (false);
@@ -1337,9 +1530,6 @@ bool xE910_AT::CMEE(const uint8_t _CMEE) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.CMEE = false;
 
 		// End Function
 		return (false);
@@ -1351,9 +1541,6 @@ bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.FCLASS = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -1392,16 +1579,10 @@ bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.FCLASS = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.FCLASS = false;
 
 			// End Function
 			return (false);
@@ -1409,9 +1590,6 @@ bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.FCLASS = false;
 
 		// End Function
 		return (false);
@@ -1423,9 +1601,6 @@ bool xE910_AT::K(const uint8_t _K) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.K = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -1464,16 +1639,10 @@ bool xE910_AT::K(const uint8_t _K) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.K = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.K = false;
 
 			// End Function
 			return (false);
@@ -1481,9 +1650,6 @@ bool xE910_AT::K(const uint8_t _K) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.K = false;
 
 		// End Function
 		return (false);
@@ -1495,9 +1661,6 @@ bool xE910_AT::CPIN(void) {
 
     // Declare Response Length
     uint8_t _Response_Length = 22;
-
-	// Set Control Variable
-	Command_Control.CPIN = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -1536,15 +1699,12 @@ bool xE910_AT::CPIN(void) {
 		if (strstr(_Response, "READY") != NULL) {
 
 			// Set Control Variable
-			Command_Control.CPIN = true;
+			SIM_PIN_Status = true;
 
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.CPIN = false;
 
 			// End Function
 			return (false);
@@ -1552,9 +1712,6 @@ bool xE910_AT::CPIN(void) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.CPIN = false;
 
 		// End Function
 		return (false);
@@ -1566,9 +1723,6 @@ bool xE910_AT::CGSN(void) {
 
     // Declare Response Length
     uint8_t _Response_Length = 25;
-
-	// Set Control Variable
-	Command_Control.CGSN = false;
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -1618,16 +1772,10 @@ bool xE910_AT::CGSN(void) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.CGSN = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.CGSN = false;
 
 			// End Function
 			return (false);
@@ -1635,9 +1783,6 @@ bool xE910_AT::CGSN(void) {
 		}
 
 	} else {
-
-		// Set Control Variable
-		Command_Control.CGSN = false;
 
 		// End Function
 		return (false);
@@ -1648,9 +1793,6 @@ bool xE910_AT::GSN(void) {
 
     // Declare Response Length
     uint8_t _Response_Length = 20;
-
-	// Set Control Variable
-	Command_Control.GSN = false;
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -1701,16 +1843,10 @@ bool xE910_AT::GSN(void) {
 		if (strstr(_Response, "OK") != NULL) {
 
 
-			// Set Control Variable
-			Command_Control.GSN = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.GSN = false;
 
 			// End Function
 			return (false);
@@ -1718,9 +1854,6 @@ bool xE910_AT::GSN(void) {
 		}
 
 	} else {
-
-		// Set Control Variable
-		Command_Control.GSN = false;
 
 		// End Function
 		return (false);
@@ -1730,13 +1863,10 @@ bool xE910_AT::GSN(void) {
 bool xE910_AT::CCID(void) {
 
 	// Control for SIM Module
-	if (Command_Control.CPIN) {
+	if (SIM_PIN_Status) {
 		
     	// Declare Response Length
     	uint8_t _Response_Length = 36;
-
-		// Set Control Variable
-		Command_Control.ICCID = false;
 
 		// Clear UART Buffer
 		_Clear_UART_Buffer();
@@ -1786,16 +1916,10 @@ bool xE910_AT::CCID(void) {
 			// Control for Response
 			if (strstr(_Response, "OK") != NULL) {
 
-				// Set Control Variable
-				Command_Control.ICCID = true;
-
 				// End Function
 				return (true);
 
 			} else {
-
-				// Set Control Variable
-				Command_Control.ICCID = false;
 
 				// End Function
 				return (false);
@@ -1804,9 +1928,6 @@ bool xE910_AT::CCID(void) {
 
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.ICCID = false;
 
 			// End Function
 			return (false);
@@ -1826,9 +1947,6 @@ bool xE910_AT::GMI(void) {
 
     // Declare Response Length
     uint8_t _Response_Length = 15;
-
-	// Set Control Variable
-	Command_Control.GMI = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -1869,9 +1987,6 @@ bool xE910_AT::GMI(void) {
 			// Set Manufacturer Variable
 			Manufacturer = 1;
 
-			// Set Control Variable
-			Command_Control.GMI = true;
-
 			// End Function
 			return (true);
 
@@ -1879,9 +1994,6 @@ bool xE910_AT::GMI(void) {
 
 			// Set Manufacturer Variable
 			Manufacturer = 0;
-
-			// Set Control Variable
-			Command_Control.GMI = false;
 
 			// End Function
 			return (false);
@@ -1893,9 +2005,6 @@ bool xE910_AT::GMI(void) {
 		// Set Manufacturer Variable
 		Manufacturer = 0;
 
-		// Set Control Variable
-		Command_Control.GMI = false;
-
 		// End Function
 		return (false);
 
@@ -1906,9 +2015,6 @@ bool xE910_AT::GMM(void) {
 
     // Declare Response Length
     uint8_t _Response_Length = 20;
-
-	// Set Control Variable
-	Command_Control.GMM = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -1949,9 +2055,6 @@ bool xE910_AT::GMM(void) {
 			// Set Model Variable
 			Model = 1;
 
-			// Set Control Variable
-			Command_Control.GMM = true;
-
 			// End Function
 			return (true);
 
@@ -1959,9 +2062,6 @@ bool xE910_AT::GMM(void) {
 
 			// Set Model Variable
 			Model = 0;
-
-			// Set Control Variable
-			Command_Control.GMM = false;
 
 			// End Function
 			return (false);
@@ -1973,9 +2073,6 @@ bool xE910_AT::GMM(void) {
 		// Set Model Variable
 		Model = 0;
 
-		// Set Control Variable
-		Command_Control.GMM = false;
-
 		// End Function
 		return (false);
 
@@ -1986,9 +2083,6 @@ bool xE910_AT::GMR(void) {
 
     // Declare Response Length
     uint8_t _Response_Length = 19;
-
-	// Set Control Variable
-	Command_Control.GMR = false;
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -2041,16 +2135,10 @@ bool xE910_AT::GMR(void) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.GMR = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.GMR = false;
 
 			// End Function
 			return (false);
@@ -2058,9 +2146,6 @@ bool xE910_AT::GMR(void) {
 		}
 
 	} else {
-
-		// Set Control Variable
-		Command_Control.GMR = false;
 
 		// End Function
 		return (false);
@@ -2070,14 +2155,8 @@ bool xE910_AT::GMR(void) {
 }
 bool xE910_AT::CSQ(void) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
    	// Declare Response Length
    	uint8_t _Response_Length = 19;
-
-	// Set Control Variable
-	Command_Control.CSQ = false;
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -2133,9 +2212,6 @@ bool xE910_AT::CSQ(void) {
 			// Set Signal Variable
 			Signal_RSSI = atoi(_CSQ);
 
-			// Set Control Variable
-			Command_Control.CSQ = true;
-
 			// End Function
 			return (true);
 
@@ -2143,9 +2219,6 @@ bool xE910_AT::CSQ(void) {
 
 			// Set Signal Variable
 			Signal_RSSI = 0;
-
-			// Set Control Variable
-			Command_Control.CSQ = false;
 
 			// End Function
 			return (false);
@@ -2158,9 +2231,6 @@ bool xE910_AT::CSQ(void) {
 		// Set Signal Variable
 		Signal_RSSI = 0;
 
-		// Set Control Variable
-		Command_Control.CSQ = false;
-
 		// End Function
 		return (false);
 		
@@ -2169,14 +2239,8 @@ bool xE910_AT::CSQ(void) {
 }
 bool xE910_AT::SERVINFO(void) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
    	// Declare Response Length
    	uint8_t _Response_Length = 60;
-
-	// Set Control Variable
-	Command_Control.SERVINFO = false;
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -2221,9 +2285,6 @@ bool xE910_AT::SERVINFO(void) {
 			if (strstr(_Response, "28603") != NULL) Operator = 28603;	// Turk Telecom
 			if (strstr(_Response, "28604") != NULL) Operator = 28604;	// Turk Telecom
 
-			// Set Control Variable
-			Command_Control.SERVINFO = true;
-
 			// End Function
 			return (true);
 
@@ -2231,9 +2292,6 @@ bool xE910_AT::SERVINFO(void) {
 
 			// Set Signal Variable
 			Operator = 0;
-
-			// Set Control Variable
-			Command_Control.SERVINFO = false;
 
 			// End Function
 			return (false);
@@ -2246,9 +2304,6 @@ bool xE910_AT::SERVINFO(void) {
 		// Set Signal Variable
 		Operator = 0;
 
-		// Set Control Variable
-		Command_Control.SERVINFO = false;
-
 		// End Function
 		return (false);
 		
@@ -2259,9 +2314,6 @@ bool xE910_AT::SLED(const uint8_t _SLED) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.SLED = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -2300,16 +2352,10 @@ bool xE910_AT::SLED(const uint8_t _SLED) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.SLED = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.SLED = false;
 
 			// End Function
 			return (false);
@@ -2317,9 +2363,6 @@ bool xE910_AT::SLED(const uint8_t _SLED) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.SLED = false;
 
 		// End Function
 		return (false);
@@ -2329,14 +2372,8 @@ bool xE910_AT::SLED(const uint8_t _SLED) {
 }
 bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.TXMONMODE = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -2375,16 +2412,10 @@ bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.TXMONMODE = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.TXMONMODE = false;
 
 			// End Function
 			return (false);
@@ -2392,9 +2423,6 @@ bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.TXMONMODE = false;
 
 		// End Function
 		return (false);
@@ -2404,14 +2432,8 @@ bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
 }
 bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.REGMODE = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -2450,16 +2472,10 @@ bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.REGMODE = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.REGMODE = false;
 
 			// End Function
 			return (false);
@@ -2468,19 +2484,13 @@ bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
 
     } else {
 
-		// Set Control Variable
-		Command_Control.REGMODE = false;
-
 		// End Function
 		return (false);
 
     }
 
 }
-bool xE910_AT::CREG(void) {
-
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
+bool xE910_AT::CREG(const bool _Mode) {
 
 	// Declare Function Variables
 	bool _Control = false;
@@ -2492,9 +2502,6 @@ bool xE910_AT::CREG(void) {
     // Declare Response Length
     uint8_t _Response_Length = 6;
 
-	// Set Control Variable
-	Command_Control.CREG = false;
-
 	// Send AT+CREG=1 Connection Command
 	while (!_Control) {
 
@@ -2502,7 +2509,8 @@ bool xE910_AT::CREG(void) {
     	_Clear_UART_Buffer();
 
 		// Send UART Command
-		GSM_Serial.print(F("AT+CREG=1"));
+		GSM_Serial.print(F("AT+CREG="));
+		GSM_Serial.print(_Mode);
 		GSM_Serial.print(F("\r\n"));
 
 		// Wait for UART Data Send
@@ -2549,9 +2557,6 @@ bool xE910_AT::CREG(void) {
 	_Error_WD = 0;
     _Response_Length = 12;
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
 	// Send CREG: 1 Connection Command
 	while (!_Control) {
 
@@ -2591,9 +2596,6 @@ bool xE910_AT::CREG(void) {
 					CREG_Status = NOT_REGISTERED;
 
 					// Set Control Variable
-					Command_Control.CREG = false;
-
-					// Set Control Variable
 					_Control = false;
 
 				} // Not Registered [0]
@@ -2602,20 +2604,14 @@ bool xE910_AT::CREG(void) {
 					// Set Variable
 					CREG_Status = HOME_REGISTERED;
 
-					// Set Control Variable
-					Command_Control.CREG = true;
-
-					// Set Control Variable
-					_Control = true;
+					// End Function
+					return (true);
 
 				} // Registered to Home Network [1]
 				if (_Stat == 50) {
 
 					// Set Variable
 					CREG_Status = SEARCHING;
-
-					// Set Control Variable
-					Command_Control.CREG = false;
 
 					// Set Control Variable
 					_Control = false;
@@ -2627,9 +2623,6 @@ bool xE910_AT::CREG(void) {
 					CREG_Status = DENIED;
 
 					// Set Control Variable
-					Command_Control.CREG = false;
-
-					// Set Control Variable
 					_Control = false;
 
 				} // Registration Denied [3]
@@ -2638,11 +2631,8 @@ bool xE910_AT::CREG(void) {
 					// Set Variable
 					CREG_Status = UNKNOWN;
 
-					// Set Control Variable
-					Command_Control.CREG = false;
-
 					// End Function
-					return (false);
+					return (true);
 
 				} // Unknown Error [4]
 				if (_Stat == 53) {
@@ -2650,11 +2640,8 @@ bool xE910_AT::CREG(void) {
 					// Set Variable
 					CREG_Status = ROAMING_REGISTERED;
 
-					// Set Control Variable
-					Command_Control.CREG = true;
-
-					// Set Control Variable
-					_Control = true;
+					// End Function
+					return (false);
 
 				} // Registered to Rooming Network [5]
 			
@@ -2677,14 +2664,11 @@ bool xE910_AT::CREG(void) {
 	return (false);
 
 }
-bool xE910_AT::CGREG(void) {
+bool xE910_AT::CGREG(const bool _Mode) {
 
 	// Control for CREG
 	if (CREG_Status == HOME_REGISTERED or CREG_Status == ROAMING_REGISTERED) {
 	
-		// Command Chain Delay (Advice by Telit)
-		delay(10);
-
 		// Declare Function Variables
 		bool _Control = false;
 		uint8_t _Error_WD = 0;
@@ -2695,17 +2679,15 @@ bool xE910_AT::CGREG(void) {
     	// Declare Response Length
     	uint8_t _Response_Length = 6;
 
-		// Set Control Variable
-		Command_Control.CGREG = false;
-
-		// Send AT+CREG=1 Connection Command
+		// Send AT+CGREG=1 Connection Command
 		while (!_Control) {
 
 			// Clear UART Buffer
     		_Clear_UART_Buffer();
 
 			// Send UART Command
-			GSM_Serial.print(F("AT+CGREG=1"));
+			GSM_Serial.print(F("AT+CGREG="));
+			GSM_Serial.print(_Mode);
 			GSM_Serial.print(F("\r\n"));
 
 			// Wait for UART Data Send
@@ -2752,10 +2734,7 @@ bool xE910_AT::CGREG(void) {
 		_Error_WD = 0;
     	_Response_Length = 13;
 
-		// Command Chain Delay (Advice by Telit)
-		delay(10);
-
-		// Send CREG: 1 Connection Command
+		// Send CGREG: 1 Connection Command
 		while (!_Control) {
 
 			// Handle Response
@@ -2794,9 +2773,6 @@ bool xE910_AT::CGREG(void) {
 						CGREG_Status = NOT_REGISTERED;
 
 						// Set Control Variable
-						Command_Control.CGREG = false;
-
-						// Set Control Variable
 						_Control = false;
 
 					} // Not Registered [0]
@@ -2805,20 +2781,14 @@ bool xE910_AT::CGREG(void) {
 						// Set Variable
 						CGREG_Status = HOME_REGISTERED;
 
-						// Set Control Variable
-						Command_Control.CGREG = true;
-
-						// Set Control Variable
-						_Control = true;
+						// End Function
+						return (true);
 
 					} // Registered to Home Network [1]
 					if (_Stat == 50) {
 
 						// Set Variable
 						CGREG_Status = SEARCHING;
-
-						// Set Control Variable
-						Command_Control.CGREG = false;
 
 						// Set Control Variable
 						_Control = false;
@@ -2830,9 +2800,6 @@ bool xE910_AT::CGREG(void) {
 						CGREG_Status = DENIED;
 
 						// Set Control Variable
-						Command_Control.CGREG = false;
-
-						// Set Control Variable
 						_Control = false;
 
 					} // Registration Denied [3]
@@ -2841,20 +2808,14 @@ bool xE910_AT::CGREG(void) {
 						// Set Variable
 						CGREG_Status = UNKNOWN;
 
-						// Set Control Variable
-						Command_Control.CGREG = false;
-
 						// End Function
-						return (false);
+						return (true);
 
 					} // Unknown Error [4]
 					if (_Stat == 53) {
 
 						// Set Variable
 						CGREG_Status = ROAMING_REGISTERED;
-
-						// Set Control Variable
-						Command_Control.CGREG = true;
 
 						// Set Control Variable
 						_Control = true;
@@ -2887,14 +2848,8 @@ bool xE910_AT::CGREG(void) {
 }
 bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.CGDCONT = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -2907,23 +2862,21 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 	GSM_Serial.print(F("\",\""));
 	GSM_Serial.print(String(_APN));
 	GSM_Serial.print(F("\""));
-	GSM_Serial.print(F("\r\n"));
 
-	/*
+	// Control for PDP Address
 	if (_PDP_Addr != "") {
-		GSM_Serial.print(F("\",\""));
+		GSM_Serial.print(F(",\""));
 		GSM_Serial.print(String(_PDP_Addr));
 		GSM_Serial.print(F("\","));
 	} else {
-		GSM_Serial.print(F("\","));
+		GSM_Serial.print(F(","));
 		GSM_Serial.print(F(","));
 	}
-	
+
 	GSM_Serial.print(String(_D_Comp));
 	GSM_Serial.print(F(","));
 	GSM_Serial.print(String(_H_Comp));
 	GSM_Serial.print(F("\r\n"));
-	*/
 
 	// Wait for UART Data Send
 	GSM_Serial.flush();
@@ -2954,16 +2907,10 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.CGDCONT = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.CGDCONT = false;
 
 			// End Function
 			return (false);
@@ -2971,9 +2918,6 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.CGDCONT = false;
 
 		// End Function
 		return (false);
@@ -2983,14 +2927,8 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 }
 bool xE910_AT::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _Pkt_Sz, const uint16_t _Max_To, const uint16_t _Conn_To, const uint8_t _TX_To) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.SCFG = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -3039,16 +2977,10 @@ bool xE910_AT::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.SCFG = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.SCFG = false;
 
 			// End Function
 			return (false);
@@ -3056,9 +2988,6 @@ bool xE910_AT::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.SCFG = false;
 
 		// End Function
 		return (false);
@@ -3068,14 +2997,8 @@ bool xE910_AT::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _
 }
 bool xE910_AT::SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uint8_t _Recv_Data_Mode, const uint8_t _Keep_Alive, const uint8_t _Listen_Auto_Rsp, const uint8_t _Send_Data_Mode) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.SCFGEXT = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -3124,16 +3047,10 @@ bool xE910_AT::SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uin
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.SCFGEXT = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.SCFGEXT = false;
 
 			// End Function
 			return (false);
@@ -3141,9 +3058,6 @@ bool xE910_AT::SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uin
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.SCFGEXT = false;
 
 		// End Function
 		return (false);
@@ -3153,14 +3067,8 @@ bool xE910_AT::SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uin
 }
 bool xE910_AT::SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, const uint8_t _Abort_Conn_Attempt, const uint8_t _SRing_Len, const uint8_t _SRing_To, const uint8_t _No_Carrier_Mode) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.SCFGEXT2 = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -3209,16 +3117,10 @@ bool xE910_AT::SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, con
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.SCFGEXT2 = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.SCFGEXT2 = false;
 
 			// End Function
 			return (false);
@@ -3226,9 +3128,6 @@ bool xE910_AT::SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, con
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.SCFGEXT2 = false;
 
 		// End Function
 		return (false);
@@ -3238,14 +3137,8 @@ bool xE910_AT::SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, con
 }
 bool xE910_AT::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const uint8_t _Closure_Type_Cmd_Mode_Enabling) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.SCFGEXT3 = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -3288,16 +3181,10 @@ bool xE910_AT::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const ui
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.SCFGEXT3 = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.SCFGEXT3 = false;
 
 			// End Function
 			return (false);
@@ -3305,9 +3192,6 @@ bool xE910_AT::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const ui
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.SCFGEXT3 = false;
 
 		// End Function
 		return (false);
@@ -3317,14 +3201,8 @@ bool xE910_AT::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const ui
 }
 bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID, const char *_Password) {
 
-	// Set Control Variable
-	Command_Control.SGACT = false;
-
 	// Deactivate the Context
 	if (!_Stat) {
-
-		// Command Chain Delay (Advice by Telit)
-		delay(10);
 
     	// Declare Response Length
     	uint8_t _Response_Length = 6;
@@ -3368,16 +3246,10 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 			// Control for Response
 			if (strstr(_Response, "OK") != NULL) {
 
-				// Set Control Variable
-				Command_Control.SGACT = true;
-
 				// End Function
 				return (true);
 
 			} else {
-
-				// Set Control Variable
-				Command_Control.SGACT = false;
 
 				// End Function
 				return (false);
@@ -3519,23 +3391,19 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 				if (strstr(_Response, "#SGACT:") != NULL) {
 
 					// Set Control Variable
-					Command_Control.SGACT = true;
-
-					// Set Control Variable
 					_Control = true;
 
 				} else if (strstr(_Response, "+CME ERROR: 553") != NULL) {
 
 					// Set Control Variable
-					Command_Control.SGACT = true;
-
-					// Set Control Variable
 					_Control = true;
 
-				} else {
+				} else if (strstr(_Response, "+CME ERROR: 567") != NULL) {
 
 					// Set Control Variable
-					Command_Control.SGACT = false;
+					_Control = false;
+
+				} else {
 
 					// Set Control Variable
 					_Control = false;
@@ -3579,14 +3447,8 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 }
 bool xE910_AT::CTZU(const bool _State) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.CTZU = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -3625,16 +3487,10 @@ bool xE910_AT::CTZU(const bool _State) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.CTZU = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.CTZU = false;
 
 			// End Function
 			return (false);
@@ -3642,9 +3498,6 @@ bool xE910_AT::CTZU(const bool _State) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.CTZU = false;
 
 		// End Function
 		return (false);
@@ -3654,14 +3507,8 @@ bool xE910_AT::CTZU(const bool _State) {
 }
 bool xE910_AT::NITZ(const bool _State) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 6;
-
-	// Set Control Variable
-	Command_Control.NITZ = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -3700,16 +3547,10 @@ bool xE910_AT::NITZ(const bool _State) {
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.NITZ = true;
-
 			// End Function
 			return (true);
 
 		} else {
-
-			// Set Control Variable
-			Command_Control.NITZ = false;
 
 			// End Function
 			return (false);
@@ -3717,9 +3558,6 @@ bool xE910_AT::NITZ(const bool _State) {
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.NITZ = false;
 
 		// End Function
 		return (false);
@@ -3729,14 +3567,8 @@ bool xE910_AT::NITZ(const bool _State) {
 }
 bool xE910_AT::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _Update_Module_Clock, const uint8_t _Time_Out) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 31;
-
-	// Set Control Variable
-	Command_Control.NTP = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -3781,9 +3613,6 @@ bool xE910_AT::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _U
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
 
-			// Set Control Variable
-			Command_Control.NTP = true;
-
 			// Declare Buffer
 			char _Buffer[2];
 
@@ -3827,18 +3656,12 @@ bool xE910_AT::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _U
 
 		} else {
 
-			// Set Control Variable
-			Command_Control.NTP = false;
-
 			// End Function
 			return (false);
 
 		}
 
     } else {
-
-		// Set Control Variable
-		Command_Control.NTP = false;
 
 		// End Function
 		return (false);
@@ -3848,14 +3671,8 @@ bool xE910_AT::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _U
 }
 bool xE910_AT::CCLK(void) {
 
-	// Command Chain Delay (Advice by Telit)
-	delay(10);
-
     // Declare Response Length
     uint8_t _Response_Length = 34;
-
-	// Set Control Variable
-	Command_Control.CCLK = false;
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -3892,9 +3709,6 @@ bool xE910_AT::CCLK(void) {
 
 		// Control for Response
 		if (strstr(_Response, "OK") != NULL) {
-
-			// Set Control Variable
-			Command_Control.CCLK = true;
 
 			// Declare Buffer
 			char _Buffer[2];
@@ -3939,9 +3753,6 @@ bool xE910_AT::CCLK(void) {
 
 		} else {
 
-			// Set Control Variable
-			Command_Control.CCLK = false;
-
 			// End Function
 			return (false);
 
@@ -3949,15 +3760,16 @@ bool xE910_AT::CCLK(void) {
 
     } else {
 
-		// Set Control Variable
-		Command_Control.CCLK = false;
-
 		// End Function
 		return (false);
 
     }
 
 }
+
+/**************************************************
+ * Private Functions
+ **************************************************/
 
 void xE910_AT::_Clear_UART_Buffer(void) {
 
@@ -3989,8 +3801,6 @@ bool xE910_AT::_Response_Wait(uint16_t _Length, uint32_t _TimeOut) {
 	return (true);
 
 }
-
-
 
 // Define Library Class
 xE910_GSM GSM;

@@ -124,4 +124,10 @@
 <-- OK // Response
 ```
 
+## 14- Get Operator Info
 
+```C++
+--> AT#SERVINFO // Command
+<-- #SERVINFO: 60,-89,"Turkcell","28601",23,855E,00,1,,"II",01,6 // Response
+<-- OK // Response
+```

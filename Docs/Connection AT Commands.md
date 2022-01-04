@@ -38,7 +38,7 @@
     Parameter "mgbs" : APN
 
 ```C++
---> AT+CGDCONT=1,"IP","mgbs" // Command
+--> AT+CGDCONT=1,"IP","mgbs","",1,1 // Command
 <-- OK // Response
 ```
 
