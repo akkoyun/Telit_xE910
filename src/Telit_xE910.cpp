@@ -1228,6 +1228,9 @@ bool xE910_GSM::Connect(void) {
 
 	}
 
+	// End Function
+	return(false);
+
 }
 bool xE910_GSM::Socket_Listen(void) {
 
@@ -1238,7 +1241,7 @@ bool xE910_GSM::RSSI_Refresh(void) {
 	bool _Response = false;
 
 	// **************************************************
-	// CPIN Command
+	// CSQ Command
 	// **************************************************
 
 	// Declare Watchdog Variable
@@ -1265,10 +1268,26 @@ bool xE910_GSM::RSSI_Refresh(void) {
 	}
 
 	// Print Command State
-	if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+	if (Debug_Mode) {
+
+		// Control for Response				
+		if (_Response) {
+			
+			Serial.println(F("..[OK]"));
+			
+		} else {
+			
+			Serial.println(F("[FAIL]"));
+			
+		}
+
+	}
 		
 	// End Function
 	if (!_Response) return (false);
+
+	// End Function
+	return (true);
 
 }
 
@@ -1278,12 +1297,28 @@ bool xE910_GSM::RSSI_Refresh(void) {
 
 String xE910_GSM::Manufacturer(void) {
 
-	if (GSM_AT.Manufacturer == 1) return("Telit");
+	if (GSM_AT.Manufacturer == 1) {
+
+		return("Telit");
+
+	} else {
+
+		return("Nan Defined");
+
+	}
 
 }
 String xE910_GSM::Model(void) {
 
-	if (GSM_AT.Model == 1) return("GE910 QUAD");
+	if (GSM_AT.Model == 1) {
+
+		return("TeGE910 QUADlit");
+
+	} else {
+
+		return("Nan Defined");
+
+	}
 
 }
 String xE910_GSM::Operator(void) {
@@ -1378,7 +1413,20 @@ bool xE910_RTC::Time_Update(void) {
 			}
 
 			// Print Command State
-			if (GSM.Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (GSM.Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1411,7 +1459,20 @@ bool xE910_RTC::Time_Update(void) {
 			}
 
 			// Print Command State
-			if (GSM.Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (GSM.Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1444,7 +1505,20 @@ bool xE910_RTC::Time_Update(void) {
 			}
 
 			// Print Command State
-			if (GSM.Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (GSM.Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
@@ -3137,7 +3211,7 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 	GSM_Serial.print(F("\""));
 
 	// Control for PDP Address
-	if (_PDP_Addr != "") {
+	if (_PDP_Addr != NULL) {
 		GSM_Serial.print(F(",\""));
 		GSM_Serial.print(String(_PDP_Addr));
 		GSM_Serial.print(F("\","));
@@ -3562,7 +3636,7 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 			GSM_Serial.print(String(_Stat));
 
 			// Check Username and Password
-			if (_User_ID != "" and _Password != "") {
+			if (_User_ID != NULL and _Password != NULL) {
 
 				// Send Username and Password		
 				GSM_Serial.print(F(",\""));
