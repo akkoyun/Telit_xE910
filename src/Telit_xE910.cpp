@@ -3211,7 +3211,7 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 	GSM_Serial.print(F("\""));
 
 	// Control for PDP Address
-	if (_PDP_Addr != "") {
+	if (_PDP_Addr != NULL) {
 		GSM_Serial.print(F(",\""));
 		GSM_Serial.print(String(_PDP_Addr));
 		GSM_Serial.print(F("\","));
@@ -3636,7 +3636,7 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 			GSM_Serial.print(String(_Stat));
 
 			// Check Username and Password
-			if (_User_ID != "" and _Password != "") {
+			if (_User_ID != NULL and _Password != NULL) {
 
 				// Send Username and Password		
 				GSM_Serial.print(F(",\""));
