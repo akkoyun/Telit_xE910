@@ -34,8 +34,8 @@ class xE910_GSM {
 		/**
 		* Library global variables declarations.
 		*/
-		const char 	Version[9] 					= "01.00.31";		/// Library Version
-		bool		Debug_Mode					= false;			/// Debug Mode Variable
+		const char 	Version[9] 					= "01.00.32";		// Library Version
+		bool		Debug_Mode					= false;			// Debug Mode Variable
 
 		/**
 		 * @brief Power ON procedure of GSM modem.
@@ -61,11 +61,60 @@ class xE910_GSM {
 		 * @param _Debug Enable debug mode 
 		 * @version 01.00.01
 		 */
-		bool Initialize(const bool _Debug);
+		bool Begin(const bool _Debug);
 
+		/**
+		 * @brief GSM Modem connection function
+		 * @version 01.00.00
+		 */
 		bool Connect(void);
+
+		/**
+		 * @brief Socket listen function
+		 * @version 01.00.00
+		 */
 		bool Socket_Listen(void);
+
+		/**
+		 * @brief RSSI function
+		 * @version 01.00.00
+		 */
 		bool RSSI_Refresh(void);
+
+		/**
+		 * @brief Returns GSM modem manufacturer name (string)
+		 */
+		String Manufacturer(void);
+		
+		/**
+		 * @brief Returns GSM modem Model name (string)
+		 */
+		String Model(void);
+
+		/**
+		 * @brief Returns GSM operator name (string)
+		 */
+		String Operator(void);
+
+		/**
+		 * @brief Returns GSM modem firmware name (string)
+		 */
+		String Firmware(void);
+
+		/**
+		 * @brief Returns GSM modem IMEI (string)
+		 */
+		String IMEI(void);
+
+		/**
+		 * @brief Returns GSM modem serial id (string)
+		 */
+		String Serial_ID(void);
+
+		/**
+		 * @brief Returns GSM modem ICCID (string)
+		 */
+		String ICCID(void);
 
 	private:
 	
@@ -145,22 +194,23 @@ class xE910_AT {
 		/**
  		* Library global variables declarations.
 		 */
-		char		IMEI[17]					= "";				/// IMEI Variable
-		char		Serial_Number[11]			= "";				/// Serial Number Variable
-		char		ICCID[21]					= "";				/// ICCID Variable
-		uint8_t 	Manufacturer 				= 0;				/// Modem Manufacturer Variable
-		uint8_t 	Model 						= 0;				/// Modem Model Variable
-		char		Modem_Firmware[10]			= "";				/// Modem Firmware Version Variable
-		bool		Initialization_Status		= false;			/// Initialization Status
+		char		IMEI[17]					= "";				// IMEI Variable
+		char		Serial_Number[11]			= "";				// Serial Number Variable
+		char		ICCID[21]					= "";				// ICCID Variable
+		uint8_t 	Manufacturer 				= 0;				// Modem Manufacturer Variable
+		uint8_t 	Model 						= 0;				// Modem Model Variable
+		char		Modem_Firmware[10]			= "";				// Modem Firmware Version Variable
+		bool		Initialization_Status		= false;			// Initialization Status
+		bool		SIM_PIN_Status				= false;			// SIM Pin Status
 
 		uint8_t		Connection_Time				= 0;				// CREG and CGREG time Variable
-		uint16_t 	Operator 					= 0;				/// Operator Variable
-		uint8_t 	Signal_RSSI 				= 0;				/// Signal Variable
-		uint8_t		CREG_Status					= 0;				/// CREG Status Variable
-		uint8_t		CGREG_Status				= 0;				/// CGREG Status Variable
-		uint8_t		SGACT_Status				= 0;				/// SGACT Status Variable
-		char		IP_Address[16]				= "";				/// IP Address Variable
-		bool		Connection_Status			= false;			/// Connection Status
+		uint16_t 	Operator 					= 0;				// Operator Variable
+		uint8_t 	Signal_RSSI 				= 0;				// Signal Variable
+		uint8_t		CREG_Status					= 0;				// CREG Status Variable
+		uint8_t		CGREG_Status				= 0;				// CGREG Status Variable
+		uint8_t		SGACT_Status				= 0;				// SGACT Status Variable
+		char		IP_Address[16]				= "";				// IP Address Variable
+		bool		Connection_Status			= false;			// Connection Status
 
 		uint8_t 	RTC_Day						= 29;				// Day Variable
 		uint8_t 	RTC_Month					= 10;				// Month Variable
@@ -168,11 +218,6 @@ class xE910_AT {
 		uint8_t 	RTC_Hour					= 0;				// Hour Variable
 		uint8_t 	RTC_Minute					= 0;				// Minute Variable
 		uint8_t 	RTC_Second					= 0;				// Second Variable
-
-		/**
-	 	* @brief Command control variable structure.
-	 	*/
-		Command_Control_Struct Command_Control {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 		/**
 		 * @brief AT Function
@@ -461,7 +506,9 @@ class xE910_AT {
 		 * @details AT Command : AT+CREG=[<mode>]\r\n (11 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
+		 * 
+		 * @param _Mode 
 		 * 
 		 * 0 - disable network registration unsolicited result code (factory default) 
 		 * 1 - enable network registration unsolicited result code
@@ -470,14 +517,16 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool CREG(void);
+		bool CREG(const bool _Mode);
 
 		/**
 		 * @brief Set command controls the presentation of an unsolicited result code
 		 * @details AT Command : AT+CGREG=[<mode>]\r\n (11 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
+		 * 
+		 * @param _Mode 
 		 * 
 		 * 0 - disable network registration unsolicited result code
 		 * 1 - enable network registration unsolicited result code; if there is a change in the
@@ -488,7 +537,7 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool CGREG(void);
+		bool CGREG(const bool _Mode);
 
 		/**
 		 * @brief Set command specifies PDP context parameter values for a 
@@ -644,6 +693,8 @@ class xE910_AT {
 		 * GSM context or the specified PDP context.
 		 * @details AT Command : AT#SGACT=<cid>,<stat>,[<userid>],[<password>]\r\n (20 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.01
 		 * 
 		 * @param _Cid PDP context identifier
 		 * 0 - specifies the GSM context
