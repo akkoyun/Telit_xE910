@@ -833,7 +833,20 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
@@ -871,7 +884,20 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
@@ -906,7 +932,20 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
@@ -958,7 +997,20 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1003,7 +1055,20 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1048,7 +1113,20 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1081,7 +1159,20 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1117,7 +1208,20 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) if (_Response) {Serial.println(F("..[OK]"));} else {Serial.println(F("[FAIL]"));}
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
 		
 			// End Function
 			if (!_Response) return (false);
