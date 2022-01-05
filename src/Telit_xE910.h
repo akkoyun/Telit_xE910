@@ -568,7 +568,7 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp);
+		bool CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN);
 		
 		/**
 		 * @brief Set command sets the socket configuration parameters.
@@ -708,7 +708,7 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID, const char *_Password);
+		bool SGACT(const uint8_t _Cid, const bool _Stat);
 
 		/**
 		 * @brief Execution command is used to enable or disable the automatic activation/reactivation of the 
@@ -810,7 +810,7 @@ class xE910_AT {
  		* @return true - Message recieved.
  		* @return false - Message can not recieved.
  		*/
-		bool _Response_Wait(uint16_t _Length, uint16_t _TimeOut);
+		bool _Response_Wait(uint16_t _Length, uint32_t _TimeOut);
 
 };
 

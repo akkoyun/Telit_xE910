@@ -777,31 +777,27 @@ bool xE910_GSM::Connect(void) {
 			// **************************************************
 
 			const bool 		_Parameter_TXMONMODE 			= 0;
-
 			const bool		_Parameter_CREG_Mode			= true;
-
 			const bool		_Parameter_CGREG_Mode			= true;
-
 			const uint8_t 	_Parameter_CDGCONT_Cid 			= 1;
 			const char 		*_Parameter_CGDCONT_PDP 		= "IP";
 			const char 		*_Parameter_CGDCONT_APN 		= "mgbs";
-			const char 		*_Parameter_CGDCONT_PDP_Addr 	= "";
-			const bool 		_Parameter_CGDCONT_D_Comp 		= true;
-			const bool 		_Parameter_CGDCONT_H_Comp 		= true;
-
 			const uint8_t 	_Parameter_SCFG_ConnID 			= 1;
 			const uint8_t 	_Parameter_SCFG_Cid 			= 1;
 			const uint16_t 	_Parameter_SCFG_Pkt_Sz 			= 0;
 			const uint16_t 	_Parameter_SCFG_Max_To 			= 0;
 			const uint16_t 	_Parameter_SCFG_Conn_To 		= 150;
 			const uint8_t 	_Parameter_SCFG_TX_To 			= 0;
-
 			const uint8_t	_Parameter_SCFGEXT_ConnID		= 2;
 			const uint8_t	_Parameter_SCFGEXT_SRing		= 1;
 			const uint8_t	_Parameter_SCFGEXT_RcvMode		= 0;
 			const uint8_t	_Parameter_SCFGEXT_KeepAlieve	= 0;
 			const uint8_t	_Parameter_SCFGEXT_ListerRcp	= 0;
 			const uint8_t	_Parameter_SCFGEXT_SendMode		= 0;
+			const uint8_t 	_Parameter_SGACTCFG_Cid			= 1;
+			const uint8_t 	_Parameter_SGACTCFG_Retry		= 5;
+			const uint8_t 	_Parameter_SGACTCFG_Delay		= 180;
+			const uint8_t 	_Parameter_SGACTCFG_UrcMode		= false;
 
 			// **************************************************
 			// TXMONMODE Command
@@ -974,19 +970,14 @@ bool xE910_GSM::Connect(void) {
 			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_PDP);
 			if (Debug_Mode) Serial.print(F("\",\""));
 			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_APN);
-			if (Debug_Mode) Serial.print(F("\",\""));
-			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_PDP_Addr);
-			if (Debug_Mode) Serial.print(F("\","));
-			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_D_Comp);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_H_Comp);
-			if (Debug_Mode) Serial.print(F("............."));
+			if (Debug_Mode) Serial.print(F("\""));
+			if (Debug_Mode) Serial.print(F("...................."));
 
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.CGDCONT(_Parameter_CDGCONT_Cid, _Parameter_CGDCONT_PDP, _Parameter_CGDCONT_APN, _Parameter_CGDCONT_PDP_Addr, _Parameter_CGDCONT_D_Comp, _Parameter_CGDCONT_H_Comp);
+				_Response = GSM_AT.CGDCONT(_Parameter_CDGCONT_Cid, _Parameter_CGDCONT_PDP, _Parameter_CGDCONT_APN);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1178,6 +1169,60 @@ bool xE910_GSM::Connect(void) {
 			if (!_Response) return (false);
 
 			// **************************************************
+			// SGACTCFG Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT#SGACTCFG="));
+			if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_Cid);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_Retry);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_Delay);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_UrcMode);
+			if (Debug_Mode) Serial.print(F("......................."));
+
+			// Process Command
+			while (!_Response) {
+
+				// Process Command
+				_Response = GSM_AT.SGACTCFG(_Parameter_SGACTCFG_Cid, _Parameter_SGACTCFG_Retry, _Parameter_SGACTCFG_Delay, _Parameter_SGACTCFG_UrcMode);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+			// **************************************************
 			// SGACT Command
 			// **************************************************
 
@@ -1194,10 +1239,10 @@ bool xE910_GSM::Connect(void) {
 			while (!_Response) {
 
 				// Release IP if Exits
-				GSM_AT.SGACT(1, false, "", "");
+				GSM_AT.SGACT(1, false);
 
 				// Get IP Address
-				_Response = GSM_AT.SGACT(1, true, "", "");
+				_Response = GSM_AT.SGACT(1, true);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1705,7 +1750,7 @@ bool xE910_AT::AT(void) {
     }
 
 }
-bool xE910_AT::ATE(const bool _ECHO) {
+bool xE910_AT::ATE(const bool _ECHO = false) {
 
     // Declare Response Length
     uint8_t _Response_Length = 12;
@@ -1824,7 +1869,7 @@ bool xE910_AT::SHDN(void) {
     }
 
 }
-bool xE910_AT::CMEE(const uint8_t _CMEE) {
+bool xE910_AT::CMEE(const uint8_t _CMEE = 1) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
@@ -1884,7 +1929,7 @@ bool xE910_AT::CMEE(const uint8_t _CMEE) {
     }
 
 }
-bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
+bool xE910_AT::FCLASS(const uint8_t _FCLASS = 0) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
@@ -1944,7 +1989,7 @@ bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
     }
 
 }
-bool xE910_AT::K(const uint8_t _K) {
+bool xE910_AT::K(const uint8_t _K = 0) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
@@ -2657,7 +2702,7 @@ bool xE910_AT::SERVINFO(void) {
 	}
 
 }
-bool xE910_AT::SLED(const uint8_t _SLED) {
+bool xE910_AT::SLED(const uint8_t _SLED = 2) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
@@ -2717,7 +2762,7 @@ bool xE910_AT::SLED(const uint8_t _SLED) {
     }
 
 }
-bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
+bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE = 0) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
@@ -2837,7 +2882,7 @@ bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
     }
 
 }
-bool xE910_AT::CREG(const bool _Mode) {
+bool xE910_AT::CREG(const bool _Mode = true) {
 
 	// Declare Function Variables
 	bool _Control = false;
@@ -3011,7 +3056,7 @@ bool xE910_AT::CREG(const bool _Mode) {
 	return (false);
 
 }
-bool xE910_AT::CGREG(const bool _Mode) {
+bool xE910_AT::CGREG(const bool _Mode = true) {
 
 	// Control for CREG
 	if (CREG_Status == HOME_REGISTERED or CREG_Status == ROAMING_REGISTERED) {
@@ -3193,7 +3238,7 @@ bool xE910_AT::CGREG(const bool _Mode) {
 	return (false);
 
 }
-bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp) {
+bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
@@ -3209,20 +3254,6 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 	GSM_Serial.print(F("\",\""));
 	GSM_Serial.print(String(_APN));
 	GSM_Serial.print(F("\""));
-
-	// Control for PDP Address
-	if (_PDP_Addr != NULL) {
-		GSM_Serial.print(F(",\""));
-		GSM_Serial.print(String(_PDP_Addr));
-		GSM_Serial.print(F("\","));
-	} else {
-		GSM_Serial.print(F(","));
-		GSM_Serial.print(F(","));
-	}
-
-	GSM_Serial.print(String(_D_Comp));
-	GSM_Serial.print(F(","));
-	GSM_Serial.print(String(_H_Comp));
 	GSM_Serial.print(F("\r\n"));
 
 	// Wait for UART Data Send
@@ -3257,6 +3288,11 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 			// End Function
 			return (true);
 
+		} else if (strstr(_Response, "+CME") != NULL) {
+
+			// End Function
+			return (false);
+	
 		} else {
 
 			// End Function
@@ -3546,7 +3582,7 @@ bool xE910_AT::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const ui
     }
 
 }
-bool xE910_AT::SGACT(const uint8_t _Cid = 1, const bool _Stat = true, const char *_User_ID = NULL, const char *_Password = NULL) {
+bool xE910_AT::SGACT(const uint8_t _Cid = 1, const bool _Stat = true) {
 
 	// Deactivate the Context
 	if (!_Stat) {
@@ -3634,20 +3670,6 @@ bool xE910_AT::SGACT(const uint8_t _Cid = 1, const bool _Stat = true, const char
 			GSM_Serial.print(String(_Cid));
 			GSM_Serial.print(F(","));
 			GSM_Serial.print(String(_Stat));
-
-			// Check Username and Password
-			if (_User_ID != NULL and _Password != NULL) {
-
-				// Send Username and Password		
-				GSM_Serial.print(F(",\""));
-				GSM_Serial.print(String(_User_ID));
-				GSM_Serial.print(F("\",\""));
-				GSM_Serial.print(String(_Password));
-				GSM_Serial.print(F("\""));
-
-			}
-
-			// Send Command Termination
 			GSM_Serial.print(F("\r\n"));
 
 			// Wait for UART Data Send
@@ -3700,7 +3722,7 @@ bool xE910_AT::SGACT(const uint8_t _Cid = 1, const bool _Stat = true, const char
 		while (!_Control) {
 
 			// Handle Response
-			if (_Response_Wait(_Response_Length, 150000)) {
+			if (_Response_Wait(_Response_Length, 150)) {
 
 				// Declare Read Order Variable
 				uint8_t _Read_Order = 0;
@@ -4195,7 +4217,7 @@ void xE910_AT::_Clear_UART_Buffer(void) {
     }
 
 }
-bool xE910_AT::_Response_Wait(uint16_t _Length, uint16_t _TimeOut) {
+bool xE910_AT::_Response_Wait(uint16_t _Length, uint32_t _TimeOut) {
 
 	// Read Current Time
 	uint32_t _Time = millis();
@@ -4222,3 +4244,4 @@ xE910_HARDWARE GSM_HARDWARE;
 xE910_AT GSM_AT;
 xE910_RTC GSM_RTC;
 
+// 1903
