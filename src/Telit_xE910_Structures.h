@@ -9,6 +9,8 @@
 #define		GSM_Serial					Serial3				/// GSM Serial communication defination.
 #define		GSM_Serial_Baud				115200				/// GSM Serial terminal connection speed defination.
 
+#define		Command_Delay				10
+
 /**
  * @brief Command control structure.
  */

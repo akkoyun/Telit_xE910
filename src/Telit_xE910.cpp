@@ -1700,8 +1700,7 @@ bool xE910_AT::AT(void) {
     _Clear_UART_Buffer();
 
 	// Send UART Command
-	GSM_Serial.print(F("AT"));
-	GSM_Serial.print(F("\r\n"));
+	GSM_Serial.print(F("AT\r\n"));
 
 	// Wait for UART Data Send
 	GSM_Serial.flush();
@@ -1713,24 +1712,24 @@ bool xE910_AT::AT(void) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -1773,24 +1772,24 @@ bool xE910_AT::ATE(const bool _ECHO) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -1832,24 +1831,24 @@ bool xE910_AT::SHDN(void) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -1892,24 +1891,24 @@ bool xE910_AT::CMEE(const uint8_t _CMEE) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -1952,24 +1951,24 @@ bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -2012,24 +2011,24 @@ bool xE910_AT::K(const uint8_t _K) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -2071,24 +2070,24 @@ bool xE910_AT::CPIN(void) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "READY") != NULL) {
+		if (strstr(_Serial_Buffer, "READY") != NULL) {
 
 			// Set Control Variable
 			SIM_PIN_Status = true;
@@ -2134,19 +2133,19 @@ bool xE910_AT::CGSN(void) {
 		uint8_t _Data_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Handle Data
-			if (_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) {
+			if (_Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) {
 
 				// Get Data
-				IMEI[_Data_Order] = _Response[_Read_Order];
+				IMEI[_Data_Order] = _Serial_Buffer[_Read_Order];
 
 				// Increase Data Order
 				_Data_Order++;
@@ -2157,12 +2156,12 @@ bool xE910_AT::CGSN(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -2204,19 +2203,19 @@ bool xE910_AT::GSN(void) {
 		uint8_t _Data_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Handle Data
-			if (_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) {
+			if (_Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) {
 
 				// Get Data
-				Serial_Number[_Data_Order] = _Response[_Read_Order];
+				Serial_Number[_Data_Order] = _Serial_Buffer[_Read_Order];
 
 				// Increase Data Order
 				_Data_Order++;
@@ -2227,13 +2226,12 @@ bool xE910_AT::GSN(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
-
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -2278,19 +2276,19 @@ bool xE910_AT::CCID(void) {
 			uint8_t _Data_Order = 0;
 
 			// Declare Response Variable
-			char _Response[_Response_Length];
+			char _Serial_Buffer[_Response_Length];
 
 			// Read UART Response
 			while (GSM_Serial.available() > 0) {
 
 				// Read Serial Char
-				_Response[_Read_Order] = GSM_Serial.read();
+				_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 				// Handle Data
-				if (_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) {
+				if (_Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) {
 
 					// Get Data
-					ICCID[_Data_Order] = _Response[_Read_Order];
+					ICCID[_Data_Order] = _Serial_Buffer[_Read_Order];
 
 					// Increase Data Order
 					_Data_Order++;
@@ -2301,12 +2299,12 @@ bool xE910_AT::CCID(void) {
 				_Read_Order++;
 
 				// Stream Delay
-				delay(3);
+				delay(1);
 
 			}
 
 			// Control for Response
-			if (strstr(_Response, "OK") != NULL) {
+			if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 				// End Function
 				return (true);
@@ -2357,24 +2355,24 @@ bool xE910_AT::GMI(void) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "Telit") != NULL) {
+		if (strstr(_Serial_Buffer, "Telit") != NULL) {
 
 			// Set Manufacturer Variable
 			Manufacturer = 1;
@@ -2425,24 +2423,24 @@ bool xE910_AT::GMM(void) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "GE910-QUAD") != NULL) {
+		if (strstr(_Serial_Buffer, "GE910-QUAD") != NULL) {
 
 			// Set Model Variable
 			Model = 1;
@@ -2497,19 +2495,19 @@ bool xE910_AT::GMR(void) {
 		uint8_t _Data_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Handle Data
-			if ((_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) or _Response[_Read_Order] == 46) {
+			if ((_Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) or _Serial_Buffer[_Read_Order] == 46) {
 
 				// Get Data
-				Modem_Firmware[_Data_Order] = _Response[_Read_Order];
+				Modem_Firmware[_Data_Order] = _Serial_Buffer[_Read_Order];
 
 				// Increase Data Order
 				_Data_Order++;
@@ -2520,12 +2518,12 @@ bool xE910_AT::GMR(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -2568,7 +2566,7 @@ bool xE910_AT::CSQ(void) {
 		uint8_t _Data_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Declare Response Data
 		char _CSQ[2]; 
@@ -2577,13 +2575,13 @@ bool xE910_AT::CSQ(void) {
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Handle Data
-			if (_Response[_Read_Order] < 58 and _Response[_Read_Order] > 47) {
+			if (_Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) {
 
 				// Get Data
-				_CSQ[_Data_Order] = _Response[_Read_Order];
+				_CSQ[_Data_Order] = _Serial_Buffer[_Read_Order];
 
 				// Increase Data Order
 				_Data_Order++;
@@ -2594,12 +2592,12 @@ bool xE910_AT::CSQ(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// Set Signal Variable
 			Signal_RSSI = atoi(_CSQ);
@@ -2651,31 +2649,31 @@ bool xE910_AT::SERVINFO(void) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "#SERVINFO:") != NULL) {
+		if (strstr(_Serial_Buffer, "#SERVINFO:") != NULL) {
 
 			// Control Operator ID
 			Operator = 99;												// Unknown Operator
-			if (strstr(_Response, "28601") != NULL) Operator = 28601;	// Turkcell
-			if (strstr(_Response, "28602") != NULL) Operator = 28602;	// Vodafone
-			if (strstr(_Response, "28603") != NULL) Operator = 28603;	// Turk Telecom
-			if (strstr(_Response, "28604") != NULL) Operator = 28604;	// Turk Telecom
+			if (strstr(_Serial_Buffer, "28601") != NULL) Operator = 28601;	// Turkcell
+			if (strstr(_Serial_Buffer, "28602") != NULL) Operator = 28602;	// Vodafone
+			if (strstr(_Serial_Buffer, "28603") != NULL) Operator = 28603;	// Turk Telecom
+			if (strstr(_Serial_Buffer, "28604") != NULL) Operator = 28604;	// Turk Telecom
 
 			// End Function
 			return (true);
@@ -2725,24 +2723,24 @@ bool xE910_AT::SLED(const uint8_t _SLED) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -2785,24 +2783,24 @@ bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -2845,24 +2843,24 @@ bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
-		char _Response[_Response_Length];
+		char _Serial_Buffer[_Response_Length];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
 
 			// Read Serial Char
-			_Response[_Read_Order] = GSM_Serial.read();
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Increase Read Order
 			_Read_Order++;
 
 			// Stream Delay
-			delay(3);
+			delay(1);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
 			// End Function
 			return (true);
@@ -2915,13 +2913,13 @@ bool xE910_AT::CREG(const bool _Mode) {
 			uint8_t _Read_Order = 0;
 
 			// Declare Response Variable
-			char _Response[_Response_Length];
+			char _Serial_Buffer[_Response_Length];
 
 			// Read UART Response
 			while (GSM_Serial.available() > 0) {
 
 				// Read Serial Char
-				_Response[_Read_Order] = GSM_Serial.read();
+				_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 				// Increase Read Order
 				_Read_Order++;
@@ -2932,7 +2930,7 @@ bool xE910_AT::CREG(const bool _Mode) {
 			}
 
 			// Control for Response
-			if (strstr(_Response, "OK") != NULL) _Control = true;
+			if (strstr(_Serial_Buffer, "OK") != NULL) _Control = true;
 
 	    } 
 
@@ -2959,13 +2957,13 @@ bool xE910_AT::CREG(const bool _Mode) {
 			uint8_t _Read_Order = 0;
 
 			// Declare Response Variable
-			char _Response[_Response_Length];
+			char _Serial_Buffer[_Response_Length];
 
 			// Read UART Response
 			while (GSM_Serial.available() > 0) {
 
 				// Read Serial Char
-				_Response[_Read_Order] = GSM_Serial.read();
+				_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 				// Increase Read Order
 				_Read_Order++;
@@ -2976,10 +2974,10 @@ bool xE910_AT::CREG(const bool _Mode) {
 			}
 
 			// Control for Response
-			if (strstr(_Response, "+CREG:") != NULL) {
+			if (strstr(_Serial_Buffer, "+CREG:") != NULL) {
 
 				// Read Stat
-				_Stat = _Response[9];
+				_Stat = _Serial_Buffer[9];
 
 				// Handle Stat Variable
 				if (_Stat == 48) {
@@ -3092,13 +3090,13 @@ bool xE910_AT::CGREG(const bool _Mode) {
 				uint8_t _Read_Order = 0;
 
 				// Declare Response Variable
-				char _Response[_Response_Length];
+				char _Serial_Buffer[_Response_Length];
 
 				// Read UART Response
 				while (GSM_Serial.available() > 0) {
 
 					// Read Serial Char
-					_Response[_Read_Order] = GSM_Serial.read();
+					_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 					// Increase Read Order
 					_Read_Order++;
@@ -3109,7 +3107,7 @@ bool xE910_AT::CGREG(const bool _Mode) {
 				}
 
 				// Control for Response
-				if (strstr(_Response, "OK") != NULL) _Control = true;
+				if (strstr(_Serial_Buffer, "OK") != NULL) _Control = true;
 
 			} 
 
@@ -3136,13 +3134,13 @@ bool xE910_AT::CGREG(const bool _Mode) {
 				uint8_t _Read_Order = 0;
 
 				// Declare Response Variable
-				char _Response[_Response_Length];
+				char _Serial_Buffer[_Response_Length];
 
 				// Read UART Response
 				while (GSM_Serial.available() > 0) {
 
 					// Read Serial Char
-					_Response[_Read_Order] = GSM_Serial.read();
+					_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 					// Increase Read Order
 					_Read_Order++;
@@ -3153,10 +3151,10 @@ bool xE910_AT::CGREG(const bool _Mode) {
 				}
 
 				// Control for Response
-				if (strstr(_Response, "+CGREG:") != NULL) {
+				if (strstr(_Serial_Buffer, "+CGREG:") != NULL) {
 
 					// Read Stat
-					_Stat = _Response[10];
+					_Stat = _Serial_Buffer[10];
 
 					// Handle Stat Variable
 					if (_Stat == 48) {
@@ -4207,6 +4205,9 @@ void xE910_AT::_Clear_UART_Buffer(void) {
         delay(3);
 
     }
+
+	// Command Chain Delay (Advice by Telit)
+	delay(Command_Delay);
 
 }
 bool xE910_AT::_Response_Wait(uint16_t _Length, uint32_t _TimeOut) {
