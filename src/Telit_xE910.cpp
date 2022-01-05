@@ -777,31 +777,27 @@ bool xE910_GSM::Connect(void) {
 			// **************************************************
 
 			const bool 		_Parameter_TXMONMODE 			= 0;
-
 			const bool		_Parameter_CREG_Mode			= true;
-
 			const bool		_Parameter_CGREG_Mode			= true;
-
 			const uint8_t 	_Parameter_CDGCONT_Cid 			= 1;
 			const char 		*_Parameter_CGDCONT_PDP 		= "IP";
 			const char 		*_Parameter_CGDCONT_APN 		= "mgbs";
-			const char 		*_Parameter_CGDCONT_PDP_Addr 	= "";
-			const bool 		_Parameter_CGDCONT_D_Comp 		= true;
-			const bool 		_Parameter_CGDCONT_H_Comp 		= true;
-
 			const uint8_t 	_Parameter_SCFG_ConnID 			= 1;
 			const uint8_t 	_Parameter_SCFG_Cid 			= 1;
 			const uint16_t 	_Parameter_SCFG_Pkt_Sz 			= 0;
 			const uint16_t 	_Parameter_SCFG_Max_To 			= 0;
 			const uint16_t 	_Parameter_SCFG_Conn_To 		= 150;
 			const uint8_t 	_Parameter_SCFG_TX_To 			= 0;
-
 			const uint8_t	_Parameter_SCFGEXT_ConnID		= 2;
 			const uint8_t	_Parameter_SCFGEXT_SRing		= 1;
 			const uint8_t	_Parameter_SCFGEXT_RcvMode		= 0;
 			const uint8_t	_Parameter_SCFGEXT_KeepAlieve	= 0;
 			const uint8_t	_Parameter_SCFGEXT_ListerRcp	= 0;
 			const uint8_t	_Parameter_SCFGEXT_SendMode		= 0;
+			const uint8_t 	_Parameter_SGACTCFG_Cid			= 1;
+			const uint8_t 	_Parameter_SGACTCFG_Retry		= 5;
+			const uint8_t 	_Parameter_SGACTCFG_Delay		= 180;
+			const uint8_t 	_Parameter_SGACTCFG_UrcMode		= false;
 
 			// **************************************************
 			// TXMONMODE Command
@@ -974,19 +970,14 @@ bool xE910_GSM::Connect(void) {
 			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_PDP);
 			if (Debug_Mode) Serial.print(F("\",\""));
 			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_APN);
-			if (Debug_Mode) Serial.print(F("\",\""));
-			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_PDP_Addr);
-			if (Debug_Mode) Serial.print(F("\","));
-			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_D_Comp);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_CGDCONT_H_Comp);
-			if (Debug_Mode) Serial.print(F("............."));
+			if (Debug_Mode) Serial.print(F("\""));
+			if (Debug_Mode) Serial.print(F("...................."));
 
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.CGDCONT(_Parameter_CDGCONT_Cid, _Parameter_CGDCONT_PDP, _Parameter_CGDCONT_APN, _Parameter_CGDCONT_PDP_Addr, _Parameter_CGDCONT_D_Comp, _Parameter_CGDCONT_H_Comp);
+				_Response = GSM_AT.CGDCONT(_Parameter_CDGCONT_Cid, _Parameter_CGDCONT_PDP, _Parameter_CGDCONT_APN);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1178,6 +1169,60 @@ bool xE910_GSM::Connect(void) {
 			if (!_Response) return (false);
 
 			// **************************************************
+			// SGACTCFG Command
+			// **************************************************
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT#SGACTCFG="));
+			if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_Cid);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_Retry);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_Delay);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_UrcMode);
+			if (Debug_Mode) Serial.print(F("......................."));
+
+			// Process Command
+			while (!_Response) {
+
+				// Process Command
+				_Response = GSM_AT.SGACTCFG(_Parameter_SGACTCFG_Cid, _Parameter_SGACTCFG_Retry, _Parameter_SGACTCFG_Delay, _Parameter_SGACTCFG_UrcMode);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+			// **************************************************
 			// SGACT Command
 			// **************************************************
 
@@ -1194,10 +1239,10 @@ bool xE910_GSM::Connect(void) {
 			while (!_Response) {
 
 				// Release IP if Exits
-				GSM_AT.SGACT(1, false, "", "");
+				GSM_AT.SGACT(1, false);
 
 				// Get IP Address
-				_Response = GSM_AT.SGACT(1, true, "", "");
+				_Response = GSM_AT.SGACT(1, true);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1662,7 +1707,7 @@ bool xE910_AT::AT(void) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -1680,7 +1725,7 @@ bool xE910_AT::AT(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -1722,7 +1767,7 @@ bool xE910_AT::ATE(const bool _ECHO) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -1740,7 +1785,7 @@ bool xE910_AT::ATE(const bool _ECHO) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -1781,7 +1826,7 @@ bool xE910_AT::SHDN(void) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -1799,7 +1844,7 @@ bool xE910_AT::SHDN(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -1841,7 +1886,7 @@ bool xE910_AT::CMEE(const uint8_t _CMEE) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -1859,7 +1904,7 @@ bool xE910_AT::CMEE(const uint8_t _CMEE) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -1901,7 +1946,7 @@ bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -1919,7 +1964,7 @@ bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -1961,7 +2006,7 @@ bool xE910_AT::K(const uint8_t _K) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -1979,7 +2024,7 @@ bool xE910_AT::K(const uint8_t _K) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2020,7 +2065,7 @@ bool xE910_AT::CPIN(void) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 5000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -2038,7 +2083,7 @@ bool xE910_AT::CPIN(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2082,7 +2127,7 @@ bool xE910_AT::CGSN(void) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -2112,7 +2157,7 @@ bool xE910_AT::CGSN(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2152,7 +2197,7 @@ bool xE910_AT::GSN(void) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -2182,7 +2227,7 @@ bool xE910_AT::GSN(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2226,7 +2271,7 @@ bool xE910_AT::CCID(void) {
 		GSM_Serial.flush();
 
 		// Handle Response
-		if (_Response_Wait(_Response_Length, 500)) {
+		if (_Response_Wait(_Response_Length, 5000)) {
 
 			// Declare Read Order Variable
 			uint8_t _Read_Order = 0;
@@ -2256,7 +2301,7 @@ bool xE910_AT::CCID(void) {
 				_Read_Order++;
 
 				// Stream Delay
-				delayMicroseconds(500);
+				delay(3);
 
 			}
 
@@ -2306,7 +2351,7 @@ bool xE910_AT::GMI(void) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -2324,7 +2369,7 @@ bool xE910_AT::GMI(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2374,7 +2419,7 @@ bool xE910_AT::GMM(void) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -2392,7 +2437,7 @@ bool xE910_AT::GMM(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2442,7 +2487,7 @@ bool xE910_AT::GMR(void) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Clear Variable Array
 		memset(Modem_Firmware, 0, 10);
@@ -2475,7 +2520,7 @@ bool xE910_AT::GMR(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2549,7 +2594,7 @@ bool xE910_AT::CSQ(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2618,7 +2663,7 @@ bool xE910_AT::SERVINFO(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2674,7 +2719,7 @@ bool xE910_AT::SLED(const uint8_t _SLED) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -2692,7 +2737,7 @@ bool xE910_AT::SLED(const uint8_t _SLED) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2734,7 +2779,7 @@ bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -2752,7 +2797,7 @@ bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2794,7 +2839,7 @@ bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -2812,7 +2857,7 @@ bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -2864,7 +2909,7 @@ bool xE910_AT::CREG(const bool _Mode) {
 		GSM_Serial.flush();
 
 		// Handle Response
-		if (_Response_Wait(_Response_Length, 500)) {
+		if (_Response_Wait(_Response_Length, 500000)) {
 
 			// Declare Read Order Variable
 			uint8_t _Read_Order = 0;
@@ -2882,7 +2927,7 @@ bool xE910_AT::CREG(const bool _Mode) {
 				_Read_Order++;
 
 				// Stream Delay
-				delayMicroseconds(500);
+				delay(3);
 
 			}
 
@@ -2908,7 +2953,7 @@ bool xE910_AT::CREG(const bool _Mode) {
 	while (!_Control) {
 
 		// Handle Response
-		if (_Response_Wait(_Response_Length, (uint32_t)300000)) {
+		if (_Response_Wait(_Response_Length, 300000)) {
 
 			// Declare Read Order Variable
 			uint8_t _Read_Order = 0;
@@ -2926,7 +2971,7 @@ bool xE910_AT::CREG(const bool _Mode) {
 				_Read_Order++;
 
 				// Stream Delay
-				delayMicroseconds(500);
+				delay(3);
 
 			}
 
@@ -3041,7 +3086,7 @@ bool xE910_AT::CGREG(const bool _Mode) {
 			GSM_Serial.flush();
 
 			// Handle Response
-			if (_Response_Wait(_Response_Length, 500)) {
+			if (_Response_Wait(_Response_Length, 500000)) {
 
 				// Declare Read Order Variable
 				uint8_t _Read_Order = 0;
@@ -3059,7 +3104,7 @@ bool xE910_AT::CGREG(const bool _Mode) {
 					_Read_Order++;
 
 					// Stream Delay
-					delayMicroseconds(500);
+					delay(3);
 
 				}
 
@@ -3085,7 +3130,7 @@ bool xE910_AT::CGREG(const bool _Mode) {
 		while (!_Control) {
 
 			// Handle Response
-			if (_Response_Wait(_Response_Length, (uint32_t)300000)) {
+			if (_Response_Wait(_Response_Length, 300000)) {
 
 				// Declare Read Order Variable
 				uint8_t _Read_Order = 0;
@@ -3103,7 +3148,7 @@ bool xE910_AT::CGREG(const bool _Mode) {
 					_Read_Order++;
 
 					// Stream Delay
-					delayMicroseconds(500);
+					delay(3);
 
 				}
 
@@ -3193,7 +3238,7 @@ bool xE910_AT::CGREG(const bool _Mode) {
 	return (false);
 
 }
-bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp) {
+bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
@@ -3209,33 +3254,22 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 	GSM_Serial.print(F("\",\""));
 	GSM_Serial.print(String(_APN));
 	GSM_Serial.print(F("\""));
-
-	// Control for PDP Address
-	if (_PDP_Addr != NULL) {
-		GSM_Serial.print(F(",\""));
-		GSM_Serial.print(String(_PDP_Addr));
-		GSM_Serial.print(F("\","));
-	} else {
-		GSM_Serial.print(F(","));
-		GSM_Serial.print(F(","));
-	}
-
-	GSM_Serial.print(String(_D_Comp));
-	GSM_Serial.print(F(","));
-	GSM_Serial.print(String(_H_Comp));
 	GSM_Serial.print(F("\r\n"));
 
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 10000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
 
 		// Declare Response Variable
 		char _Response[_Response_Length];
+
+		// Clear Variable Array
+		memset(_Response, 0, _Response_Length);
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
@@ -3247,22 +3281,16 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
 		// Control for Response
-		if (strstr(_Response, "OK") != NULL) {
+		if (strstr(_Response, "+CME") != NULL) return (false);
+		if (strstr(_Response, "OK") != NULL) return (true);
 
-			// End Function
-			return (true);
-
-		} else {
-
-			// End Function
-			return (false);
-
-		}
+		// End Function
+		return (false);
 
     } else {
 
@@ -3299,7 +3327,7 @@ bool xE910_AT::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -3317,7 +3345,7 @@ bool xE910_AT::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -3369,7 +3397,7 @@ bool xE910_AT::SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uin
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -3387,7 +3415,7 @@ bool xE910_AT::SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uin
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -3439,7 +3467,7 @@ bool xE910_AT::SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, con
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -3457,7 +3485,7 @@ bool xE910_AT::SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, con
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -3503,7 +3531,7 @@ bool xE910_AT::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const ui
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -3521,7 +3549,7 @@ bool xE910_AT::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const ui
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -3546,7 +3574,7 @@ bool xE910_AT::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const ui
     }
 
 }
-bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID, const char *_Password) {
+bool xE910_AT::SGACT(const uint8_t _Cid = 1, const bool _Stat = true) {
 
 	// Deactivate the Context
 	if (!_Stat) {
@@ -3568,7 +3596,7 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 		GSM_Serial.flush();
 
 		// Handle Response
-		if (_Response_Wait(_Response_Length, 1000)) {
+		if (_Response_Wait(_Response_Length, 150000)) {
 
 			// Declare Read Order Variable
 			uint8_t _Read_Order = 0;
@@ -3586,7 +3614,7 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 				_Read_Order++;
 
 				// Stream Delay
-				delayMicroseconds(500);
+				delay(3);
 
 			}
 
@@ -3634,27 +3662,13 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 			GSM_Serial.print(String(_Cid));
 			GSM_Serial.print(F(","));
 			GSM_Serial.print(String(_Stat));
-
-			// Check Username and Password
-			if (_User_ID != NULL and _Password != NULL) {
-
-				// Send Username and Password		
-				GSM_Serial.print(F(",\""));
-				GSM_Serial.print(String(_User_ID));
-				GSM_Serial.print(F("\",\""));
-				GSM_Serial.print(String(_Password));
-				GSM_Serial.print(F("\""));
-
-			}
-
-			// Send Command Termination
 			GSM_Serial.print(F("\r\n"));
 
 			// Wait for UART Data Send
 			GSM_Serial.flush();
 
 			// Handle Response
-			if (_Response_Wait(_Response_Length, 1000)) {
+			if (_Response_Wait(_Response_Length, 150000)) {
 
 				// Declare Read Order Variable
 				uint8_t _Read_Order = 0;
@@ -3672,7 +3686,7 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 					_Read_Order++;
 
 					// Stream Delay
-					delayMicroseconds(500);
+					delay(3);
 
 				}
 
@@ -3730,7 +3744,7 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 					_Read_Order++;
 
 					// Stream Delay
-					delayMicroseconds(500);
+					delay(3);
 
 				}
 
@@ -3792,7 +3806,7 @@ bool xE910_AT::SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID,
 	return (false);
 
 }
-bool xE910_AT::CTZU(const bool _State) {
+bool xE910_AT::SGACTCFG(const uint8_t _Cid = 1, const uint8_t _Retry = 0, const uint16_t _Delay = 180, const bool _UrcMode = 0) {
 
     // Declare Response Length
     uint8_t _Response_Length = 6;
@@ -3801,15 +3815,21 @@ bool xE910_AT::CTZU(const bool _State) {
     _Clear_UART_Buffer();
 
 	// Send UART Command
-	GSM_Serial.print(F("AT+CTZU="));
-	GSM_Serial.print(String(_State));
+	GSM_Serial.print(F("AT#SGACTCFG="));
+	GSM_Serial.print(String(_Cid));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Retry));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Delay));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_UrcMode));
 	GSM_Serial.print(F("\r\n"));
 
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -3827,7 +3847,68 @@ bool xE910_AT::CTZU(const bool _State) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
+
+		}
+
+		// Control for Response
+		if (strstr(_Response, "OK") != NULL) {
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// End Function
+			return (false);
+
+		}
+
+    } else {
+
+		// End Function
+		return (false);
+
+    }
+
+
+}
+bool xE910_AT::CTZU(const bool _State) {
+
+    // Declare Response Length
+    uint8_t _Response_Length = 6;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT+CTZU="));
+	GSM_Serial.print(String(_State));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Handle Response
+	if (_Response_Wait(_Response_Length, 1000)) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Response[_Response_Length];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Response[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Stream Delay
+			delay(3);
 
 		}
 
@@ -3869,7 +3950,7 @@ bool xE910_AT::NITZ(const bool _State) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -3887,7 +3968,7 @@ bool xE910_AT::NITZ(const bool _State) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -3935,7 +4016,7 @@ bool xE910_AT::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _U
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 10000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -3953,7 +4034,7 @@ bool xE910_AT::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _U
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -4032,7 +4113,7 @@ bool xE910_AT::CCLK(void) {
 	GSM_Serial.flush();
 
 	// Handle Response
-	if (_Response_Wait(_Response_Length, 500)) {
+	if (_Response_Wait(_Response_Length, 1000)) {
 
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
@@ -4050,7 +4131,7 @@ bool xE910_AT::CCLK(void) {
 			_Read_Order++;
 
 			// Stream Delay
-			delayMicroseconds(500);
+			delay(3);
 
 		}
 
@@ -4155,3 +4236,4 @@ xE910_HARDWARE GSM_HARDWARE;
 xE910_AT GSM_AT;
 xE910_RTC GSM_RTC;
 
+// 1903

@@ -68,7 +68,19 @@
 <-- OK // Response
 ```
 
-## 7- Release IP
+## 7- SGACT Configuration
+
+    Parameter 1 : Connection identifier
+    Parameter 5 : numeric parameter which specifies the maximum number of context activation attempts in case of activation failure.
+    Parameter 180 : numeric parameter which specifies the delay in seconds between an attempt and the next one.
+    Parameter 0 : disable unsolicited result code
+
+```C++
+--> AT#SGACTCFG=1,5,180,0 // Command
+<-- OK // Response
+```
+
+## 8- Release IP
 
     Parameter 1 : Connection identifier
     Parameter 0 : Stat mode (disable)
@@ -78,7 +90,7 @@
 <-- OK // Response
 ```
 
-## 8- Get IP
+## 9- Get IP
 
     Parameter 1 : Connection identifier
     Parameter 1 : Stat mode (enable)
