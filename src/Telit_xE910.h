@@ -34,7 +34,7 @@ class xE910_GSM {
 		/**
 		* Library global variables declarations.
 		*/
-		const char 	Version[9] 					= "01.00.32";		// Library Version
+		const char 	Version[9] 					= "01.01.03";		// Library Version
 		bool		Debug_Mode					= false;			// Debug Mode Variable
 
 		/**
@@ -711,6 +711,32 @@ class xE910_AT {
 		bool SGACT(const uint8_t _Cid, const bool _Stat, const char *_User_ID, const char *_Password);
 
 		/**
+		 * @brief Execution command is used to enable or disable the automatic activation/reactivation of the 
+		 * context for the specified PDP context, to set the maximum number of attempts and to set the delay 
+		 * between an attempt and the next one. The context is activated automatically after every GPRS Attach 
+		 * or after a NW PDP CONTEXT deactivation if at least one IPEasy socket is configured to this context.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Cid PDP context identifier
+		 * 0 - specifies the GSM context
+		 * 1..5 - numeric parameter which specifies a particular PDP context definition
+		 * @param _Retry numeric parameter which specifies the maximum number of context activation attempts 
+		 * in case of activation failure. The value belongs to the following range: 0 - 15
+		 * 0 - disable the automatic activation/reactivation of the context (default)
+		 * @param _Delay numeric parameter which specifies the delay in seconds between an attempt 
+		 * and the next one. The value belongs to the following range: 180 - 3600
+		 * @param _UrcMode URC presentation mode
+		 * 0 - disable unsolicited result code (default)
+		 * 1 - enable unsolicited result code, after an automatic activation/reactivation, 
+		 * of the local IP address obtained from the network.
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SGACTCFG(const uint8_t _Cid, const uint8_t _Retry, const uint16_t _Delay, const bool _UrcMode);
+
+		/**
 		 * @brief This command enables and disables automatic time zone update via NITZ.
 		 * @details AT Command : AT+CTZU=[<state>]\r\n (9 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
@@ -784,7 +810,7 @@ class xE910_AT {
  		* @return true - Message recieved.
  		* @return false - Message can not recieved.
  		*/
-		bool _Response_Wait(uint16_t _Length, uint32_t _TimeOut);
+		bool _Response_Wait(uint16_t _Length, uint16_t _TimeOut);
 
 };
 
