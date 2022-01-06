@@ -99,8 +99,9 @@
 ## 11- Get Modem Molde Name
 
 ```C++
---> GMM // Command
-<-- // Response
+--> AT+GMM // Command
+<-- GE910-QUAD// Response
+<-- OK // Response
 ```
 
     Get modem model name and convert to (Model) numeric variable.
@@ -109,8 +110,9 @@
 ## 12- Get Modem Firmware Release
 
 ```C++
---> GMR // Command
-<-- // Response
+--> AT+GMR // Command
+<-- 13.00.007// Response
+<-- OK // Response
 ```
 
     Get modem firmware version to (Modem_Firmware) variable.
@@ -121,13 +123,5 @@
 
 ```C++
 --> AT#SLED=2 // Command
-<-- OK // Response
-```
-
-## 14- Get Operator Info
-
-```C++
---> AT#SERVINFO // Command
-<-- #SERVINFO: 60,-89,"Turkcell","28601",23,855E,00,1,,"II",01,6 // Response
 <-- OK // Response
 ```

@@ -34,7 +34,7 @@ class xE910_GSM {
 		/**
 		* Library global variables declarations.
 		*/
-		const char 	Version[9] 					= "01.01.03";		// Library Version
+		const char 	Version[9] 					= "01.01.08";		// Library Version
 		bool		Debug_Mode					= false;			// Debug Mode Variable
 
 		/**
@@ -224,7 +224,7 @@ class xE910_AT {
 		 * @details AT Command : AT\r\n (4 Byte)
 		 * @details AT Response : AT\r\n\r\nOK\r\n (10 Byte)
 		 * 
-		 * @version 01.00.01
+		 * @version 01.00.02
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -236,7 +236,7 @@ class xE910_AT {
 		 * @details AT Command : ATE[<n>]\r\n (6 Byte)
 		 * @details AT Response : ATE[<n>]\r\n\r\nOK\r\n (12 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @param _ECHO Command echo state
 		 * TRUE : Echo ON [Factory Default]
@@ -248,24 +248,11 @@ class xE910_AT {
 		bool ATE(const bool _ECHO);
 
 		/**
-		 * @brief Execution command causes device detach from the network and shut down. 
-		 * Before definitive shut down an OK response is returned.
-		 * @details AT Command : AT#SHDN\r\n (9 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SHDN(void);
-
-		/**
 		 * @brief Set command enables/disables the report of result code.
 		 * @details AT Command : AT+CMEE[<n>]\r\n (10 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @param _CMEE Enable flag
 		 * 0 - disable +CME ERROR:<err> reports, use only ERROR report.
@@ -284,7 +271,7 @@ class xE910_AT {
 		 * @details AT Command : AT+FCLASS[<n>]\r\n (12 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 *  
 		 * @param _FCLASS Parameter flag
 		 * 0 - data
@@ -301,7 +288,7 @@ class xE910_AT {
 		 * @details AT Command : AT&K[<n>]\r\n (7 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @param _K Parameter flag
 		 * 0 - no flow control
@@ -328,7 +315,7 @@ class xE910_AT {
 		 * @details AT Command : AT+CPIN?\r\n (10 Byte)
 		 * @details AT Response : \r\n+CPIN: READY\r\n\r\nOK\r\n (22 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 *  
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -341,7 +328,7 @@ class xE910_AT {
 		 * @details AT Command : AT+CGSN\r\n (9 Byte)
 		 * @details AT Response : \r\n351732055366390\r\n\r\nOK\r\n (25 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -353,7 +340,7 @@ class xE910_AT {
 		 * @details AT Command : AT+GSN\r\n (8 Byte)
 		 * @details AT Response : \r\n0000328245\r\n\r\nOK\r\n (20 Byte)
 		 * 
-		 * @version 01.00.02
+		 * @version 01.00.03
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -366,7 +353,7 @@ class xE910_AT {
 		 * @details AT Command : AT#CCID\r\n (9 Byte)
 		 * @details AT Response : \r\n#CCID: 8990011916180288209\r\n\r\nOK\r\n (36 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -381,7 +368,7 @@ class xE910_AT {
 		 * 0 - No manufacturer 
 		 * 1 - "Telit"
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -396,7 +383,7 @@ class xE910_AT {
 		 * 0 - No model
 		 * 1 - "GE910-QUAD"
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -408,7 +395,7 @@ class xE910_AT {
 		 * @details AT Command : AT+GMR\r\n (8 Byte)
 		 * @details AT Response : \r\n13.00.007\r\n\r\nOK\r\n (19 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -432,7 +419,7 @@ class xE910_AT {
 		 * @details AT Command : AT#SERVINFO\r\n (13 Byte)
 		 * @details AT Response : \r\n#SERVINFO: 3,-81,"Turkcell","28601",52,855E,04,1,,"II",01,6\r\n\r\nOK\r\n (69 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @return true - Command successful
 		 * @return false - Command fails
@@ -444,7 +431,7 @@ class xE910_AT {
 		 * @details AT Command : AT#SLED=[<n>]\r\n (11 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @param _SLED Enable flag
 		 * 0 - GPIO tied Low
@@ -462,7 +449,7 @@ class xE910_AT {
 		 * @details AT Command : AT#TXMONMODE=[<n>]\r\n (16 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * @param _TXMONMODE Enable flag
 		 * 0 - TXMON pin goes high when a call is started and it drops down when
@@ -490,7 +477,7 @@ class xE910_AT {
 		 * @details AT Command : AT#REGMODE=[<mode>]\r\n (14 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.00
+		 * @version 01.00.01
 		 * 
 		 * 0 - basic operation mode
 		 * 1 - enhanced operation mode
@@ -506,7 +493,7 @@ class xE910_AT {
 		 * @details AT Command : AT+CREG=[<mode>]\r\n (11 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.01
+		 * @version 02.00.01
 		 * 
 		 * @param _Mode 
 		 * 
@@ -524,7 +511,7 @@ class xE910_AT {
 		 * @details AT Command : AT+CGREG=[<mode>]\r\n (11 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.01
+		 * @version 02.00.01
 		 * 
 		 * @param _Mode 
 		 * 
@@ -794,6 +781,19 @@ class xE910_AT {
 		 */
 		bool CCLK(void);
 
+		/**
+		 * @brief Execution command causes device detach from the network and shut down. 
+		 * Before definitive shut down an OK response is returned.
+		 * @details AT Command : AT#SHDN\r\n (9 Byte)
+		 * @details AT Response : \r\nOK\r\n (6 Byte)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SHDN(void);
+		
 	private:
 
 		/**
