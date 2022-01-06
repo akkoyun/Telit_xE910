@@ -2639,9 +2639,6 @@ bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
 }
 bool xE910_AT::CREG(const bool _Mode) {
 
-	// Declare Stat Variable
-	uint8_t _Stat = NOT_REGISTERED;
-
 	// Declare Read Order Variable
 	uint8_t _Read_Order = 0;
 
@@ -2763,9 +2760,6 @@ bool xE910_AT::CGREG(const bool _Mode) {
 	// Control for CREG
 	if (CREG_Status == HOME_REGISTERED or CREG_Status == ROAMING_REGISTERED) {
 	
-		// Declare Stat Variable
-		uint8_t _Stat = NOT_REGISTERED;
-
 		// Declare Read Order Variable
 		uint8_t _Read_Order = 0;
 
@@ -2883,6 +2877,9 @@ bool xE910_AT::CGREG(const bool _Mode) {
 	
 	}
 
+	// End Function
+	return (false);
+
 }
 bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN) {
 
@@ -2925,6 +2922,9 @@ bool xE910_AT::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_A
 	// Control for Response
 	if (strstr(_Serial_Buffer, "+CME") != NULL) return (false);
 	if (strstr(_Serial_Buffer, "OK") != NULL) return (true);
+
+	// End Function
+	return (false);
 
 }
 bool xE910_AT::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _Pkt_Sz, const uint16_t _Max_To, const uint16_t _Conn_To, const uint8_t _TX_To) {
