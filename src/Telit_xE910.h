@@ -493,7 +493,7 @@ class xE910_AT {
 		 * @details AT Command : AT+CREG=[<mode>]\r\n (11 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.01
+		 * @version 02.00.01
 		 * 
 		 * @param _Mode 
 		 * 
@@ -511,7 +511,7 @@ class xE910_AT {
 		 * @details AT Command : AT+CGREG=[<mode>]\r\n (11 Byte)
 		 * @details AT Response : \r\nOK\r\n (6 Byte)
 		 * 
-		 * @version 01.00.01
+		 * @version 02.00.01
 		 * 
 		 * @param _Mode 
 		 * 
@@ -793,7 +793,7 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool SHDN(void);
-
+		
 	private:
 
 		/**
