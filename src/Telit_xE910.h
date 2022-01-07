@@ -117,6 +117,7 @@ class xE910_GSM {
 		String ICCID(void);
 
 		String IP(void);
+		uint8_t Signal_Strength(void);
 
 	private:
 	

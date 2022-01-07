@@ -31,6 +31,16 @@ void setup() {
 
         }
 
+        GSM.RSSI_Refresh();
+
+        if (GSM.Debug_Mode) {
+
+            Serial.println(F("--------------------------------------------------"));
+            Serial.print(F("GSM RSS Signal    : ")); Serial.println(GSM.Signal_Strength());
+            Serial.println(F("--------------------------------------------------"));
+
+        }
+
         GSM_RTC.Time_Update();
 
         if (GSM.Debug_Mode) {
