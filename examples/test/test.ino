@@ -26,6 +26,7 @@ void setup() {
 
             Serial.println(F("--------------------------------------------------"));
             Serial.print(F("Operator          : ")); Serial.println(GSM.Operator());
+            Serial.print(F("IP Address        : ")); Serial.println(GSM.IP());
             Serial.println(F("--------------------------------------------------"));
 
         }

@@ -116,6 +116,8 @@ class xE910_GSM {
 		 */
 		String ICCID(void);
 
+		String IP(void);
+
 	private:
 	
 	
@@ -555,7 +557,7 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN);
+		bool CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp);
 		
 		/**
 		 * @brief Set command sets the socket configuration parameters.
@@ -695,7 +697,7 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool SGACT(const uint8_t _Cid, const bool _Stat);
+		bool SGACT(const uint8_t _Cid);
 
 		/**
 		 * @brief Execution command is used to enable or disable the automatic activation/reactivation of the 
@@ -722,6 +724,9 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool SGACTCFG(const uint8_t _Cid, const uint8_t _Retry, const uint16_t _Delay, const bool _UrcMode);
+
+	bool CGACT(const uint8_t _State, const bool _Cid);
+	bool CGPADDR(const uint8_t _Cid);
 
 		/**
 		 * @brief This command enables and disables automatic time zone update via NITZ.
