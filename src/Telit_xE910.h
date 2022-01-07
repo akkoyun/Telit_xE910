@@ -829,6 +829,14 @@ class xE910_RTC {
 
 		bool Time_Update(void);
 
+		uint16_t Year(void);
+		uint8_t Month(void);
+		uint8_t Day(void);
+		uint8_t Hour(void);
+		uint8_t Minute(void);
+		uint8_t Second(void);
+
+
 	private:
 
 };
