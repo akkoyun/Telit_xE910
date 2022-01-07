@@ -1087,75 +1087,6 @@ bool xE910_GSM::Connect(void) {
 		if (!_Response) return (false);
 
 		// **************************************************
-		// SCFGEXT Command
-		// **************************************************
-
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
-
-		// Declare Parameters
-		const uint8_t _Parameter_SCFGEXT_ConnID	= 2;
-		const uint8_t _Parameter_SCFGEXT_SRing = 1;
-		const uint8_t _Parameter_SCFGEXT_RcvMode = 0;
-		const uint8_t _Parameter_SCFGEXT_KeepAlieve = 0;
-		const uint8_t _Parameter_SCFGEXT_ListerRcp = 0;
-		const uint8_t _Parameter_SCFGEXT_SendMode = 0;
-
-		// Declare Watchdog Variable
-		_Error_WD = 0;
-
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT#SCFGEXT="));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_ConnID);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_SRing);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_RcvMode);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_KeepAlieve);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_ListerRcp);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_SendMode);
-		if (Debug_Mode) Serial.print(F("......................"));
-
-		// Process Command
-		while (!_Response) {
-
-			// Process Command
-			_Response = GSM_AT.SCFGEXT(_Parameter_SCFGEXT_ConnID, _Parameter_SCFGEXT_SRing, _Parameter_SCFGEXT_RcvMode, _Parameter_SCFGEXT_KeepAlieve, _Parameter_SCFGEXT_ListerRcp, _Parameter_SCFGEXT_SendMode);
-
-			// Set WD Variable
-			_Error_WD++;
-
-			// Control for WD
-			if (_Error_WD > 5) break;
-
-		}
-
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
-			}
-
-		}
-	
-		// End Function
-		if (!_Response) return (false);
-
-		// **************************************************
 		// SERVINFO Command
 		// **************************************************
 
@@ -1418,11 +1349,11 @@ bool xE910_GSM::RSSI_Refresh(void) {
 	// CSQ Command
 	// **************************************************
 
+	// Command Chain Delay (Advice by Telit)
+	delay(20);
+
 	// Declare Watchdog Variable
 	uint8_t _Error_WD = 0;
-
-	// Set Response Variable
-	_Response = false;
 
 	// Command Debug
 	if (Debug_Mode) Serial.print(F("AT+CSQ......................................"));
@@ -1456,12 +1387,10 @@ bool xE910_GSM::RSSI_Refresh(void) {
 		}
 
 	}
-		
+
 	// End Function
 	if (!_Response) return (false);
 
-	// End Function
-	return (true);
 
 }
 
@@ -1543,6 +1472,28 @@ String xE910_GSM::ICCID(void) {
 String xE910_GSM::IP(void) {
 
 	return(GSM_AT.IP_Address);
+
+}
+uint8_t xE910_GSM::Signal_Strength(void) {
+
+	// Declare RSSI Variable
+	int16_t _RSSI = 0;
+
+	// Calculate RSSI
+	if (GSM_AT.Signal_RSSI == 0) _RSSI = -113;
+	if (GSM_AT.Signal_RSSI == 1) _RSSI = -111;
+	if (GSM_AT.Signal_RSSI >= 2 and GSM_AT.Signal_RSSI <= 30) _RSSI = -109 + ((GSM_AT.Signal_RSSI - 2) * 2);
+	if (GSM_AT.Signal_RSSI >= 31) _RSSI = -51;
+	
+	// Calculate Signal Strength
+	if (_RSSI >= -70) return(4);
+	if (_RSSI < -70 and _RSSI >= -85) return(3);
+	if (_RSSI < -85 and _RSSI >= -100) return(2);
+	if (_RSSI < -100) return(1);
+	if (_RSSI < -110) return(0);
+
+	// End Function
+	return(0);
 
 }
 
@@ -2574,17 +2525,6 @@ bool xE910_AT::CSQ(void) {
 		// Read Serial Char
 		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
-		// Handle Data
-		if (_Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) {
-
-			// Get Data
-			_CSQ[_Data_Order] = _Serial_Buffer[_Read_Order];
-
-			// Increase Data Order
-			_Data_Order++;
-
-		}
-
 		// Increase Read Order
 		_Read_Order++;
 
@@ -2593,6 +2533,10 @@ bool xE910_AT::CSQ(void) {
 	// Control for Response
 	if (strstr(_Serial_Buffer, "OK") != NULL) {
 
+		// Handle RSSI
+		if (_Serial_Buffer[8] > 47 and _Serial_Buffer[8] < 58) _CSQ[0] = _Serial_Buffer[8];
+		if (_Serial_Buffer[9] > 47 and _Serial_Buffer[9] < 58) _CSQ[1] = _Serial_Buffer[9];
+		
 		// Set Signal Variable
 		Signal_RSSI = atoi(_CSQ);
 
@@ -2608,6 +2552,9 @@ bool xE910_AT::CSQ(void) {
 		return (false);
 
 	}
+
+	// End Function
+	return(false);
 
 }
 bool xE910_AT::SERVINFO(void) {
