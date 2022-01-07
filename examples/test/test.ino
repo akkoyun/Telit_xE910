@@ -36,7 +36,8 @@ void setup() {
         if (GSM.Debug_Mode) {
 
             Serial.println(F("--------------------------------------------------"));
-            Serial.print(F("GSM RSS Signal    : ")); Serial.println(GSM.Signal_Strength());
+            Serial.print(F("GSM RSS Level     : ")); Serial.println(GSM_AT.Signal_RSSI);
+            Serial.print(F("Signal Strength   : ")); Serial.println(GSM.Signal_Strength());
             Serial.println(F("--------------------------------------------------"));
 
         }
@@ -45,14 +46,21 @@ void setup() {
 
         if (GSM.Debug_Mode) {
 
-            Serial.println(F("--------------------------------------------------"));
             char buffer[40];
             sprintf(buffer, "Time              : %d/%d/%d  %d:%d:%d", GSM_AT.RTC_Day, GSM_AT.RTC_Month, GSM_AT.RTC_Year, GSM_AT.RTC_Hour, GSM_AT.RTC_Minute, GSM_AT.RTC_Second);
+
+            Serial.println(F("--------------------------------------------------"));
             Serial.println(buffer);
             Serial.println(F("--------------------------------------------------"));
 
         }
 
+GSM_AT.SD(1,0,80,"54.216.226.171");
+GSM_Serial.print("{\"Device\":{\"Type\":\"402-P02\",\"ID\":\"70A11D1D01000026\"},\"Power\":{\"Battery\": {\"IV\":4.115156,\"T\":25.5,\"AC\":-49.6875,\"SOC\":98.99609,\"FB\":1519,\"IB\":1503,\"CYC\":38}},\"IoT\":{\"GSM\":{\"Operator\":{\"RSSI\":12}}},\"Data\":{\"DeviceStatus\":240,\"FaultStatus\": 500,\"TimeStamp\":\"2000-01-01  23:46:51\"}}");
+delay(2000);
+GSM_Serial.print("+++");
+GSM_Serial.flush();
+delay(2000);
 
     }
     

@@ -15,7 +15,7 @@
 bool xE910_GSM::Power_ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch) {
 
 	// Send Shut Down Signal
-	GSM_HARDWARE.ShutDown(200);
+	GSM_HARDWARE.ShutDown(500);
 
 	// Serial communication activate
 	GSM_Serial.begin(GSM_Serial_Baud);
@@ -4011,6 +4011,83 @@ bool xE910_AT::SHDN(void) {
 		return (false);
 
     }
+
+}
+bool xE910_AT::SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const char *_IP) {
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Declare Connection Variable
+	bool _Connected = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#SD="));
+	GSM_Serial.print(String(_Cid));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Pro));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Port));
+	GSM_Serial.print(F(",\""));
+	GSM_Serial.print(String(_IP));
+	GSM_Serial.print(F("\""));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Command Work Delay
+	delay(5);
+
+	// Declare Watchdog Variables
+	uint8_t _Error_WD = 0;
+
+	// Control Loop
+	while (!_Connected) {
+
+		// Handle for Error
+		if (_Error_WD >= 60) return (false);
+
+		// Declare Response Variable
+		char _Serial_Buffer[GSM_Serial.available()];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+		}
+
+		// Control for Response
+		if (strstr(_Serial_Buffer, "CONNECT") != NULL) {
+
+			// Set Control Variable
+			_Connected = true;
+
+		} else {
+
+			// Connection Delay
+			delay(500);
+
+			// Set Control Variable
+			_Connected = false;
+
+			// Count for Error
+			_Error_WD++;
+
+		}
+
+	}
+
+	// End Function
+	return(true);
 
 }
 
