@@ -1568,6 +1568,12 @@ bool xE910_RTC::Time_Update(void) {
 			// NITZ Command
 			// **************************************************
 
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			const bool _Parameter_NITZ_State = true;
+
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
@@ -1575,13 +1581,15 @@ bool xE910_RTC::Time_Update(void) {
 			_Response = false;
 
 			// Command Debug
-			if (GSM.Debug_Mode) Serial.print(F("AT+NITZ....................................."));
+			if (GSM.Debug_Mode) Serial.print(F("AT#NITZ="));
+			if (GSM.Debug_Mode) Serial.print(_Parameter_NITZ_State);
+			if (GSM.Debug_Mode) Serial.print(F("..................................."));
 
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.NITZ(true);
+				_Response = GSM_AT.NITZ(_Parameter_NITZ_State);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1614,6 +1622,12 @@ bool xE910_RTC::Time_Update(void) {
 			// CTZU Command
 			// **************************************************
 
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			const bool _Parameter_CTZU_State = true;
+
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
@@ -1621,13 +1635,15 @@ bool xE910_RTC::Time_Update(void) {
 			_Response = false;
 
 			// Command Debug
-			if (GSM.Debug_Mode) Serial.print(F("AT+CTZU....................................."));
+			if (GSM.Debug_Mode) Serial.print(F("AT+CTZU="));
+			if (GSM.Debug_Mode) Serial.print(_Parameter_CTZU_State);
+			if (GSM.Debug_Mode) Serial.print(F("..................................."));
 
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.CTZU(true);
+				_Response = GSM_AT.CTZU(_Parameter_CTZU_State);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1660,6 +1676,15 @@ bool xE910_RTC::Time_Update(void) {
 			// NTP Command
 			// **************************************************
 
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			const char _Parameter_NTP_Addr[14] = "85.199.214.98";
+			const uint16_t _Parameter_NTP_Port = 123;
+			const bool _Parameter_NTP_Update = true;
+			const uint8_t _Parameter_NTP_TimeOut = 3;
+
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
@@ -1667,13 +1692,21 @@ bool xE910_RTC::Time_Update(void) {
 			_Response = false;
 
 			// Command Debug
-			if (GSM.Debug_Mode) Serial.print(F("AT+NTP......................................"));
+			if (GSM.Debug_Mode) Serial.print(F("AT#NTP=\""));
+			if (GSM.Debug_Mode) Serial.print(_Parameter_NTP_Addr);
+			if (GSM.Debug_Mode) Serial.print(F("\","));
+			if (GSM.Debug_Mode) Serial.print(_Parameter_NTP_Port);
+			if (GSM.Debug_Mode) Serial.print(F(","));
+			if (GSM.Debug_Mode) Serial.print(_Parameter_NTP_Update);
+			if (GSM.Debug_Mode) Serial.print(F(","));
+			if (GSM.Debug_Mode) Serial.print(_Parameter_NTP_TimeOut);
+			if (GSM.Debug_Mode) Serial.print(F(".............."));
 
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.NTP("85.199.214.98", 123, 1, 3);
+				_Response = GSM_AT.NTP(_Parameter_NTP_Addr, _Parameter_NTP_Port, _Parameter_NTP_Update, _Parameter_NTP_TimeOut);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1718,6 +1751,36 @@ bool xE910_RTC::Time_Update(void) {
 
 	// End Function
 	return(false);
+
+}
+uint16_t xE910_RTC::Year(void) {
+
+	return(GSM_AT.RTC_Year);
+
+}
+uint8_t xE910_RTC::Month(void) {
+
+	return(GSM_AT.RTC_Month);
+
+}
+uint8_t xE910_RTC::Day(void) {
+
+	return(GSM_AT.RTC_Day);
+
+}
+uint8_t xE910_RTC::Hour(void) {
+
+	return(GSM_AT.RTC_Hour);
+
+}
+uint8_t xE910_RTC::Minute(void) {
+
+	return(GSM_AT.RTC_Minute);
+
+}
+uint8_t xE910_RTC::Second(void) {
+
+	return(GSM_AT.RTC_Second);
 
 }
 
@@ -2132,6 +2195,10 @@ bool xE910_AT::CGSN(void) {
 	// Declare Response Variable
 	char _Serial_Buffer[GSM_Serial.available()];
 
+	// Clear Variables
+	memset(_Serial_Buffer, 0, GSM_Serial.available());
+	memset(IMEI, 0, 17);
+
 	// Read UART Response
 	while (GSM_Serial.available() > 0) {
 
@@ -2191,6 +2258,10 @@ bool xE910_AT::GSN(void) {
 
 	// Declare Response Variable
 	char _Serial_Buffer[GSM_Serial.available()];
+
+	// Clear Variables
+	memset(_Serial_Buffer, 0, GSM_Serial.available());
+	memset(Serial_Number, 0, 11);
 
 	// Read UART Response
 	while (GSM_Serial.available() > 0) {
@@ -2254,6 +2325,10 @@ bool xE910_AT::CCID(void) {
 
 		// Declare Response Variable
 		char _Serial_Buffer[GSM_Serial.available()];
+
+		// Clear Variables
+		memset(_Serial_Buffer, 0, GSM_Serial.available());
+		memset(ICCID, 0, 21);
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
@@ -2319,6 +2394,9 @@ bool xE910_AT::GMI(void) {
 	// Declare Response Variable
 	char _Serial_Buffer[GSM_Serial.available()];
 
+	// Clear Variables
+	memset(_Serial_Buffer, 0, GSM_Serial.available());
+
 	// Read UART Response
 	while (GSM_Serial.available() > 0) {
 
@@ -2367,6 +2445,9 @@ bool xE910_AT::GMM(void) {
 
 	// Declare Response Variable
 	char _Serial_Buffer[GSM_Serial.available()];
+
+	// Clear Variables
+	memset(_Serial_Buffer, 0, GSM_Serial.available());
 
 	// Read UART Response
 	while (GSM_Serial.available() > 0) {
@@ -2419,6 +2500,10 @@ bool xE910_AT::GMR(void) {
 
 	// Declare Response Variable
 	char _Serial_Buffer[GSM_Serial.available()];
+
+	// Clear Variables
+	memset(_Serial_Buffer, 0, GSM_Serial.available());
+	memset(Modem_Firmware, 0, 10);
 
 	// Read UART Response
 	while (GSM_Serial.available() > 0) {

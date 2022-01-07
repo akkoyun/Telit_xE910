@@ -31,6 +31,19 @@ void setup() {
 
         }
 
+        GSM_RTC.Time_Update();
+
+        if (GSM.Debug_Mode) {
+
+            Serial.println(F("--------------------------------------------------"));
+            char buffer[40];
+            sprintf(buffer, "Time              : %d/%d/%d  %d:%d:%d", GSM_AT.RTC_Day, GSM_AT.RTC_Month, GSM_AT.RTC_Year, GSM_AT.RTC_Hour, GSM_AT.RTC_Minute, GSM_AT.RTC_Second);
+            Serial.println(buffer);
+            Serial.println(F("--------------------------------------------------"));
+
+        }
+
+
     }
     
 }
