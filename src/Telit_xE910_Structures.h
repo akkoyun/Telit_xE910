@@ -12,42 +12,6 @@
 #define		Command_Delay				10
 
 /**
- * @brief Command control structure.
- */
-struct Command_Control_Struct {
-	bool								AT;					/// AT Command Control Variable
-	bool								ATE;				/// ATE Command Control Variable
-	bool								CMEE;				/// CMEE Command Control Variable
-	bool								FCLASS;				/// FCLASS Command Control Variable
-	bool								K;					/// K Command Control Variable
-	bool								CPIN;				/// CPIN Command Control Variable
-	bool								CGSN;				/// CGSN Command Control Variable
-	bool								GSN;				/// GSN Command Control Variable
-	bool								ICCID;				/// ICCID Command Control Variable
-	bool								GMI;				/// GMI Command Control Variable
-	bool								GMM;				/// GMM Command Control Variable
-	bool								GMR;				/// GMR Command Control Variable
-	bool								SLED;				/// SLED Command Control Variable
-	bool								TXMONMODE;			/// TXMONMODE Command Control Variable
-	bool								REGMODE;			/// REGMODE Command Control Variable
-	bool								CREG;				/// CREG Command Control Variable
-	bool								CGREG;				/// CGREG Command Control Variable
-	bool								CGDCONT;			/// CGDCONT Command Control Variable
-	bool								SCFG;				/// SCFG Command Control Variable
-	bool								SCFGEXT;			/// SCFGEXT Command Control Variable
-	bool								SCFGEXT2;			/// SCFGEXT2 Command Control Variable
-	bool								SCFGEXT3;			/// SCFGEXT3 Command Control Variable
-	bool								SGACT;				/// SGACT Command Control Variable
-	bool								CSQ;				/// CSQ Command Control Variable
-	bool								SERVINFO;			/// SERVINFO Command Control Variable
-	bool								CTZU;				/// CTZU Command Control Variable
-	bool								NITZ;				/// NITZ Command Control Variable
-	bool								NTP;				/// NTP Command Control Variable
-	bool								CCLK;				/// CCLK Command Control Variable
-	bool								SHDN;				/// SHDN Command Control Variable
-};
-
-/**
  * @brief CREG and CGREG status defination structure
  */
 enum GSM_Stat {
