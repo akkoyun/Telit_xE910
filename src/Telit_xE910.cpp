@@ -4238,6 +4238,64 @@ bool xE910_AT::SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, c
 	return(true);
 
 }
+uint8_t xE910_AT::SS(const uint8_t _ConnID) {
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#SS="));
+	GSM_Serial.print(String(_ConnID));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Command Work Delay
+	delay(20);
+
+	// Declare Response Variable
+	char _Serial_Buffer[GSM_Serial.available()];
+
+	// Read UART Response
+	while (GSM_Serial.available() > 0) {
+
+		// Read Serial Char
+		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Increase Read Order
+		_Read_Order++;
+
+	}
+
+	// Control for Response
+	if (strstr(_Serial_Buffer, "OK") != NULL) {
+
+		// End Function
+		if (_Serial_Buffer[9] == 48) return(0);
+		if (_Serial_Buffer[9] == 49) return(1);
+		if (_Serial_Buffer[9] == 50) return(2);
+		if (_Serial_Buffer[9] == 51) return(3);
+		if (_Serial_Buffer[9] == 52) return(4);
+		if (_Serial_Buffer[9] == 53) return(5);
+		if (_Serial_Buffer[9] == 54) return(6);
+		if (_Serial_Buffer[9] == 55) return(7);
+		return (99);
+
+	} else {
+
+		// End Function
+		return (99);
+
+	}
+
+	// End Function
+	return(99);
+
+}
 bool xE910_AT::HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const uint8_t _Port, const uint8_t _AuthType, const char *_Username, const char *_Password, const uint8_t _SSL, const uint8_t _TimeOut, const uint8_t _Cid) {
 
 	// Declare Read Order Variable
@@ -4334,7 +4392,7 @@ bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char
 		delay(10);
 
 		// Handle for timeout
-		if (millis() - _Time >= 2000) return (false);
+		if (millis() - _Time >= 20000) return (false);
 
 	}
 
@@ -4431,7 +4489,7 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 		delay(10);
 
 		// Handle for timeout
-		if (millis() - _Time >= 2000) return (false);
+		if (millis() - _Time >= 20000) return (false);
 
 	}
 
@@ -4470,7 +4528,7 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 		GSM_Serial.flush();
 
 		// Command Work Delay
-		delay(15);
+		delay(1000);
 
 		// Clear Variables
 		memset(_Serial_Buffer, 0, GSM_Serial.available());
