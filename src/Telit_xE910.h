@@ -803,6 +803,7 @@ class xE910_AT {
 		bool SHDN(void);
 		
 		bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const char *_IP);
+		uint8_t SS(const uint8_t _ConnID);
 	
 		/**
 		 * @brief This command sets the parameters needed to the HTTP connection.

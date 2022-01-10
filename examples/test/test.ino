@@ -57,6 +57,7 @@ void setup() {
 
 GSM.Send_Data_Pack("1234567890");
 
+//Serial.println(GSM_AT.SS(1));
 
     }
     
