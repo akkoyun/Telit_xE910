@@ -4153,6 +4153,118 @@ bool xE910_AT::HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const ui
 	}
 
 }
+bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const char *_Data) {
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#HTTPSND="));
+	GSM_Serial.print(_ProfID);
+	GSM_Serial.print(F(",")); 
+	GSM_Serial.print(_Command);
+	GSM_Serial.print(F(",\"")); 
+	GSM_Serial.print(String(_URL));
+	GSM_Serial.print(F("\","));
+	GSM_Serial.print(sizeof(_Data));
+	GSM_Serial.print(F(",\"application/json\""));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Wait for UART Available
+	while ((uint16_t)GSM_Serial.available() < 5) {
+
+		// Wait delay
+		delay(10);
+
+		// Handle for timeout
+		if (millis() - _Time >= 2000) return (false);
+
+	}
+
+	// Declare Response Variable
+	char _Serial_Buffer[GSM_Serial.available()];
+
+	// Read UART Response
+	while (GSM_Serial.available() > 0) {
+
+		// Read Serial Char
+		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Increase Read Order
+		_Read_Order++;
+
+	}
+
+	// Control for Response
+	if (strstr(_Serial_Buffer, ">>>") != NULL) {
+
+		// Send Delay
+		delay(50);
+
+		// Print Data
+		GSM_Serial.print(String(_Data));
+
+		// Send Delay
+		delay(50);
+
+		// Wait for UART Available
+		while ((uint16_t)GSM_Serial.available() < 6) {
+
+			// Wait delay
+			delay(50);
+
+			// Handle for timeout
+			if (millis() - _Time >= _TimeOut) return (false);
+
+		}
+
+		// Clear Variable
+		memset(_Serial_Buffer, 0, 6);
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+		}
+
+		// Control for Response
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// End Function
+			return (false);
+
+		}
+
+	} else {
+
+		// End Function
+		return (false);
+
+	}
+
+	// End Function
+	return (false);
+
+}
 
 /**************************************************
  * Private Functions 
