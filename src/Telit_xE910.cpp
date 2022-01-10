@@ -1476,6 +1476,18 @@ bool xE910_GSM::Connect(void) {
 	return(false);
 
 }
+bool xE910_GSM::Send_Data_Pack(const char *_Data) {
+
+	// Send Data
+	GSM_AT.HTTPSND(1, 0, "/api/v1.1/p402",20, _Data);
+	
+	// Get Response
+	GSM_AT.HTTPRCV(1);
+
+	// End Function
+	return(true);
+
+}
 bool xE910_GSM::Socket_Listen(void) {
 
 }
@@ -4305,7 +4317,7 @@ bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char
 	GSM_Serial.print(F(",\"")); 
 	GSM_Serial.print(String(_URL));
 	GSM_Serial.print(F("\","));
-	GSM_Serial.print(sizeof(_Data));
+	GSM_Serial.print(strlen(_Data));
 	GSM_Serial.print(F(",\"application/json\""));
 	GSM_Serial.print(F("\r\n"));
 
@@ -4349,9 +4361,6 @@ bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char
 		// Print Data
 		GSM_Serial.print(String(_Data));
 
-		// Send Delay
-		delay(50);
-
 		// Wait for UART Available
 		while ((uint16_t)GSM_Serial.available() < 6) {
 
@@ -4359,7 +4368,7 @@ bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char
 			delay(50);
 
 			// Handle for timeout
-			if (millis() - _Time >= _TimeOut) return (false);
+			if (millis() - _Time >= (_TimeOut * 1000)) return (false);
 
 		}
 
@@ -4399,6 +4408,118 @@ bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char
 
 	// End Function
 	return (false);
+
+}
+bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Declare Data Order Variable
+	uint8_t _Data_Order = 0;
+
+	// Handle Variable Defination
+	bool _Handle = false;
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Wait for UART Available
+	while ((uint16_t)GSM_Serial.available() < 14) {
+
+		// Wait delay
+		delay(10);
+
+		// Handle for timeout
+		if (millis() - _Time >= 2000) return (false);
+
+	}
+
+	// Wait delay
+	delay(20);
+
+	// Declare Response Variable
+	char _Serial_Buffer[GSM_Serial.available()];
+
+	// Read UART Response
+	while (GSM_Serial.available() > 0) {
+
+		// Read Serial Char
+		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Increase Read Order
+		_Read_Order++;
+
+	}
+
+	// Control for Response
+	if (strstr(_Serial_Buffer, "HTTPRING") != NULL) {
+
+		// Command Work Delay
+		delay(15);
+
+		// Clear UART Buffer
+		_Clear_UART_Buffer();
+
+		// Send UART Command
+		GSM_Serial.print(F("AT#HTTPRCV="));
+		GSM_Serial.print(String(_ProfID));
+		GSM_Serial.print(F("\r\n"));
+
+		// Wait for UART Data Send
+		GSM_Serial.flush();
+
+		// Command Work Delay
+		delay(15);
+
+		// Clear Variables
+		memset(_Serial_Buffer, 0, GSM_Serial.available());
+
+		// Declare Server Response Variable
+		char Server_Response[255] = "";
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+			// Handle Response
+			if (_Serial_Buffer[_Read_Order] == 123) _Handle = true;
+
+			// Response String
+			if (_Handle) Server_Response[_Data_Order] += _Serial_Buffer[_Read_Order];
+
+			// Increase Read Order
+			_Data_Order++;
+
+			// Handle Response
+			if (_Serial_Buffer[_Read_Order] == 125) _Handle = false;
+
+			// Increase Read Order
+			_Read_Order++;
+
+		}
+
+		// Control for Command
+		if (strstr(Server_Response, "500") != NULL) {
+
+			// End Function
+			return (true);
+
+		} else {
+
+			// End Function
+			return (false);
+
+		}
+
+	} else {
+
+		// End Function
+		return (false);
+
+	}
 
 }
 bool xE910_AT::E2SLRI(const uint16_t _Pulse_Duration) {

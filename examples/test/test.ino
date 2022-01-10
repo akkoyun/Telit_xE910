@@ -55,10 +55,8 @@ void setup() {
 
         }
 
+GSM.Send_Data_Pack("1234567890");
 
-char *Data1 = "test";
-
-GSM_AT.HTTPSND(1, 0, "/api/v1.1/p402",20, Data1);
 
     }
     
