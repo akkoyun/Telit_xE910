@@ -1542,6 +1542,8 @@ bool xE910_GSM::RSSI_Refresh(void) {
 	// End Function
 	if (!_Response) return (false);
 
+	// End Function
+	return(false);
 
 }
 
@@ -3752,7 +3754,7 @@ bool xE910_AT::CGPADDR(const uint8_t _Cid) {
 		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 		// Handle Data
-		if (_Read_Order >= 13 and (_Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) or _Serial_Buffer[_Read_Order] == 46) {
+		if (_Read_Order >= 13 && (_Serial_Buffer[_Read_Order] < 58 && _Serial_Buffer[_Read_Order] > 47) || _Serial_Buffer[_Read_Order] == 46) {
 
 			// Get Data
 			IP_Address[_Data_Order] = _Serial_Buffer[_Read_Order];

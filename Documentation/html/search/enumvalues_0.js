@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['denied_0',['DENIED',['../_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fba08f1ea1cb5cac34a4f4237e5259fcabb',1,'Telit_xE910_Structures.h']]]
+  ['connected_0',['CONNECTED',['../_telit__x_e910___structures_8h.html#adf2aabc29b5b1c9818d5f161090d35dea7a691a2430ec26878897b5fbc9c22a4c',1,'Telit_xE910_Structures.h']]]
 ];

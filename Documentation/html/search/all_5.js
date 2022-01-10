@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['home_5fregistered_0',['HOME_REGISTERED',['../_telit__x_e910___structures_8h.html#a0a2904db130377cfcacfba8f3e2b86fbae6685e8f52c8bbbdf3b8627b8eb56d35',1,'Telit_xE910_Structures.h']]]
+  ['fclass_0',['FCLASS',['../classx_e910___a_t.html#a50156f9a5d4315df37d817a634881058',1,'xE910_AT']]],
+  ['firmware_1',['Firmware',['../classx_e910___g_s_m.html#a1637a5c7f2a95b6e043cbc162ef45415',1,'xE910_GSM']]],
+  ['function_5fstate_2',['Function_State',['../_telit__x_e910___structures_8h.html#aacd591a1ff2d1b3abd6a788bbfe7d335',1,'Telit_xE910_Structures.h']]]
 ];
