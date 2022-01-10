@@ -845,6 +845,8 @@ class xE910_AT {
 		 */
 		bool HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const char *_Data);
 
+		bool E2SLRI(const uint16_t _Pulse_Duration);
+
 	private:
 
 		/**

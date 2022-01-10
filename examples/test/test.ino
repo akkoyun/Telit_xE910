@@ -55,7 +55,6 @@ void setup() {
 
         }
 
-GSM_AT.HTTPCFG(1, "54.216.226.171", 80, 0, "", "", 0, 20, 1);
 
 char *Data1 = "test";
 
