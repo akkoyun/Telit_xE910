@@ -828,6 +828,23 @@ class xE910_AT {
 		 */
 		bool HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const uint8_t _Port, const uint8_t _AuthType, const char *_Username, const char *_Password, const uint8_t _SSL, const uint8_t _TimeOut, const uint8_t _Cid);
 		
+		/**
+		 * @brief Execution command performs a POST or PUT request to HTTP server and starts sending data to the server.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _ProfID Numeric parameter indicating the profile identifier. Range: 0-2
+		 * @param _Command Numeric parameter indicating the command requested to HTTP server:
+		 * 0 – POST
+		 * 1 – PUT
+		 * @param _URL String parameter indicating the HTTP resource (uri), object of the request.
+		 * @param Data Post container.
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const char *_Data);
+
 	private:
 
 		/**
