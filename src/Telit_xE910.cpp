@@ -4090,6 +4090,69 @@ bool xE910_AT::SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, c
 	return(true);
 
 }
+bool xE910_AT::HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const uint8_t _Port, const uint8_t _AuthType, const char *_Username, const char *_Password, const uint8_t _SSL, const uint8_t _TimeOut, const uint8_t _Cid) {
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#HTTPCFG="));
+	GSM_Serial.print(String(_ProfID));
+	GSM_Serial.print(F(",\""));
+	GSM_Serial.print(String(_HTTP_Server));
+	GSM_Serial.print(F("\","));
+	GSM_Serial.print(String(_Port));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_AuthType));
+	GSM_Serial.print(F(",\""));
+	GSM_Serial.print(String(_Username));
+	GSM_Serial.print(F("\",\""));
+	GSM_Serial.print(String(_Password));
+	GSM_Serial.print(F("\","));
+	GSM_Serial.print(String(_SSL));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_TimeOut));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_Cid));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Command Work Delay
+	delay(20);
+
+	// Declare Response Variable
+	char _Serial_Buffer[GSM_Serial.available()];
+
+	// Read UART Response
+	while (GSM_Serial.available() > 0) {
+
+		// Read Serial Char
+		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Increase Read Order
+		_Read_Order++;
+
+	}
+
+	// Control for Response
+	if (strstr(_Serial_Buffer, "OK") != NULL) {
+
+		// End Function
+		return (true);
+
+	} else {
+
+		// End Function
+		return (false);
+
+	}
+
+}
 
 /**************************************************
  * Private Functions 

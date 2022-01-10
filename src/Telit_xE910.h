@@ -800,8 +800,34 @@ class xE910_AT {
 		 */
 		bool SHDN(void);
 		
-	bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const char *_IP);
-
+		bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const char *_IP);
+	
+		/**
+		 * @brief This command sets the parameters needed to the HTTP connection.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _ProfID Numeric parameter indicating the profile identifier.
+		 * @param _HTTP_Server String parameter indicating the IP address of the HTTP server.
+		 * @param _Port Numeric parameter indicating the TCP remote port of the HTTP server to connect to.
+		 * @param _AuthType Numeric parameter indicating the HTTP authentication type.
+		 * 0 – no authentication (default) 
+		 * 1 – basic authentication
+		 * @param _Username String parameter indicating authentication user identification string for HTTP.
+		 * @param _Password String parameter indicating authentication password for HTTP.
+		 * @param _SSL Numeric parameter indicating if the SSL encryption is enabled.
+		 * 0 – SSL encryption disabled (default) 
+		 * 1 – SSL encryption enabled
+		 * @param _TimeOut Numeric parameter indicating the time interval in seconds to wait for receiving data from HTTP server.
+		 * Range: (1- 65535). Default: 120.
+		 * @param _Cid Numeric parameter indicating the PDP Context Identifier.
+		 * Range: (1-5). Default: 1
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const uint8_t _Port, const uint8_t _AuthType, const char *_Username, const char *_Password, const uint8_t _SSL, const uint8_t _TimeOut, const uint8_t _Cid);
+		
 	private:
 
 		/**
