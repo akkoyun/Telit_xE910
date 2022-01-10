@@ -1310,6 +1310,145 @@ bool xE910_GSM::Connect(void) {
 		if (!_Response) return (false);
 
 		// **************************************************
+		// HTTPCFG Command
+		// **************************************************
+
+		// Command Chain Delay (Advice by Telit)
+		delay(20);
+
+		// Declare Parameters
+		const uint8_t _Parameter_HTTPCFG_ProfID = 1;
+		const char *_Parameter_HTTPCFG_Server = "54.216.226.171";
+		const uint8_t _Parameter_HTTPCFG_Port = 80;
+		const uint8_t _Parameter_HTTPCFG_AuthType = 0;
+		const char *_Parameter_HTTPCFG_Username = "";
+		const char *_Parameter_HTTPCFG_Password = "";
+		const uint8_t _Parameter_HTTPCFG_SSL = 0;
+		const uint8_t _Parameter_HTTPCFG_TimeOut = 20;
+		const uint8_t _Parameter_HTTPCFG_Cid = 1;
+
+		// Declare Watchdog Variable
+		_Error_WD = 0;
+
+		// Set Response Variable
+		_Response = false;
+
+		// Command Debug
+		if (Debug_Mode) {
+			Serial.print(F("AT#HTTPCFG="));
+			Serial.print(_Parameter_HTTPCFG_ProfID);
+			Serial.print(F(",\""));
+			Serial.print(F("*****"));
+			Serial.print(F("\","));
+			Serial.print(_Parameter_HTTPCFG_Port);
+			Serial.print(F(","));
+			Serial.print(_Parameter_HTTPCFG_AuthType);
+			Serial.print(F(",\""));
+			Serial.print(_Parameter_HTTPCFG_Username);
+			Serial.print(F("\",\""));
+			Serial.print(_Parameter_HTTPCFG_Password);
+			Serial.print(F("\","));
+			Serial.print(_Parameter_HTTPCFG_SSL);
+			Serial.print(F(","));
+			Serial.print(_Parameter_HTTPCFG_TimeOut);
+			Serial.print(F(","));
+			Serial.print(_Parameter_HTTPCFG_Cid);
+			Serial.print(F("......"));
+		}
+
+		// Process Command
+		while (!_Response) {
+
+			// Set HTTP Configuration
+			_Response = GSM_AT.HTTPCFG(_Parameter_HTTPCFG_ProfID, _Parameter_HTTPCFG_Server, _Parameter_HTTPCFG_Port, _Parameter_HTTPCFG_AuthType, _Parameter_HTTPCFG_Username, _Parameter_HTTPCFG_Password, _Parameter_HTTPCFG_SSL, _Parameter_HTTPCFG_TimeOut, _Parameter_HTTPCFG_Cid);
+
+			// Set WD Variable
+			_Error_WD++;
+
+			// Control for WD
+			if (_Error_WD > 1) break;
+
+		}
+
+		// Print Command State
+		if (Debug_Mode) {
+
+			// Control for Response				
+			if (_Response) {
+				
+				Serial.println(F("..[OK]"));
+				
+			} else {
+				
+				Serial.println(F("[FAIL]"));
+				
+			}
+
+		}
+	
+		// End Function
+		if (!_Response) return (false);
+
+		// **************************************************
+		// E2SLRI Command
+		// **************************************************
+
+		// Command Chain Delay (Advice by Telit)
+		delay(20);
+
+		// Declare Parameters
+		uint16_t _Parameter_E2SLRI_Pulse = 50;
+
+		// Declare Watchdog Variable
+		_Error_WD = 0;
+
+		// Set Response Variable
+		_Response = false;
+
+		// Command Debug
+		if (Debug_Mode) Serial.print(F("AT#E2SLRI="));
+		if (Debug_Mode) Serial.print(_Parameter_E2SLRI_Pulse);
+		if (Debug_Mode) Serial.print(F("................................"));
+
+		// Process Command
+		while (!_Response) {
+
+			// Process Command
+			_Response = GSM_AT.E2SLRI(_Parameter_E2SLRI_Pulse);
+
+			// Set WD Variable
+			_Error_WD++;
+
+			// Control for WD
+			if (_Error_WD > 5) break;
+
+		}
+
+		// Print Command State
+		if (Debug_Mode) {
+
+			// Control for Response				
+			if (_Response) {
+				
+				Serial.println(F("..[OK]"));
+				
+			} else {
+				
+				Serial.println(F("[FAIL]"));
+				
+			}
+
+		}
+	
+		// End Function
+		if (!_Response) return (false);
+
+
+
+
+
+
+		// **************************************************
 		// Control for IP Address
 		// **************************************************
 
@@ -2496,9 +2635,6 @@ bool xE910_AT::CSQ(void) {
 
 	// Declare Read Order Variable
 	uint8_t _Read_Order = 0;
-
-	// Declare Data Order Variable
-	uint8_t _Data_Order = 0;
 
 	// Declare Response Data
 	char _CSQ[2]; 
@@ -4263,6 +4399,53 @@ bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char
 
 	// End Function
 	return (false);
+
+}
+bool xE910_AT::E2SLRI(const uint16_t _Pulse_Duration) {
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#E2SLRI="));
+	GSM_Serial.print(String(_Pulse_Duration));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Command Work Delay
+	delay(15);
+
+	// Declare Response Variable
+	char _Serial_Buffer[GSM_Serial.available()];
+
+	// Read UART Response
+	while (GSM_Serial.available() > 0) {
+
+		// Read Serial Char
+		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Increase Read Order
+		_Read_Order++;
+
+	}
+
+	// Control for Response
+	if (strstr(_Serial_Buffer, "OK") != NULL) {
+
+		// End Function
+		return (true);
+
+	} else {
+
+		// End Function
+		return (false);
+
+	}
 
 }
 
