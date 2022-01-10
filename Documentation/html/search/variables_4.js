@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['iccid_0',['ICCID',['../struct_command___control___struct.html#a7b3bf43b1ef458581ff2e6fd44a3fca8',1,'Command_Control_Struct::ICCID()'],['../_telit__x_e910___structures_8h.html#a787e545ed664f229e255624be87746c4',1,'ICCID():&#160;Telit_xE910_Structures.h']]],
-  ['imei_1',['IMEI',['../_telit__x_e910___structures_8h.html#aef9231643ad774bb7653c559a1d8d9ef',1,'Telit_xE910_Structures.h']]]
+  ['manufacturer_0',['Manufacturer',['../classx_e910___a_t.html#aab6eedc3f3011ca1da946dc3cf02f0f4',1,'xE910_AT']]],
+  ['model_1',['Model',['../classx_e910___a_t.html#a65bfdb67889998675fa80df79b0cb6f2',1,'xE910_AT']]],
+  ['modem_5ffirmware_2',['Modem_Firmware',['../classx_e910___a_t.html#a4ee534310833540b48d9f157b8ed6610',1,'xE910_AT']]]
 ];

@@ -34,7 +34,7 @@ class xE910_GSM {
 		/**
 		* Library global variables declarations.
 		*/
-		const char 	Version[9] 					= "01.01.08";		// Library Version
+		const char 	Version[9] 					= "01.03.10";		// Library Version
 		bool		Debug_Mode					= false;			// Debug Mode Variable
 
 		/**
