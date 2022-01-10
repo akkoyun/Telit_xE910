@@ -728,8 +728,32 @@ class xE910_AT {
 		 */
 		bool SGACTCFG(const uint8_t _Cid, const uint8_t _Retry, const uint16_t _Delay, const bool _UrcMode);
 
-	bool CGACT(const uint8_t _State, const bool _Cid);
-	bool CGPADDR(const uint8_t _Cid);
+		/**
+		 * @brief Execution command is used to activate or deactivate the specified PDP context(s)
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _State indicates the state of PDP context activation
+		 * 0 - deactivated
+		 * 1 - activated
+		 * @param _Cid a numeric parameter which specifies a particular PDP context definition
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CGACT(const uint8_t _State, const bool _Cid);
+
+		/**
+		 * @brief Execution command returns a list of PDP addresses for the specified context identifiers.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Cid a numeric parameter which specifies a particular PDP context
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool CGPADDR(const uint8_t _Cid);
 
 		/**
 		 * @brief This command enables and disables automatic time zone update via NITZ.
@@ -801,8 +825,41 @@ class xE910_AT {
 		 * @return false - Command fails
 		 */
 		bool SHDN(void);
-		
+
+		/**
+		 * @brief Execution command opens a remote connection via socket.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Cid socket connection identifier 1..6
+		 * @param _Pro transmission protocol
+		 * 0 - TCP
+		 * 1 - UDP
+		 * @param _Port remote host port to contact 1..65535
+		 * @param _IP ddress of the remote host, string type.
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
 		bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const char *_IP);
+
+		/**
+		 * @brief Execution command reports the current status of the socket
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _ConnID socket connection identifier 1..6
+		 * 
+		 * @return uint8_t actual state of the socket:
+		 * 0 - Socket Closed.
+		 * 1 - Socket with an active data transfer connection.
+		 * 2 - Socket suspended.
+		 * 3 - Socket suspended with pending data.
+		 * 4 - Socket listening.
+		 * 5 - Socket with an incoming connection. Waiting for the user accept or shutdown command.
+		 * 6 - Socket resolving DNS
+		 * 7 - Socket connecting
+		 */
 		uint8_t SS(const uint8_t _ConnID);
 	
 		/**
@@ -848,7 +905,29 @@ class xE910_AT {
 		 */
 		bool HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const char *_Data);
 
+		/**
+		 * @brief Execution command permits the user to read data from HTTP server in response to a previous HTTP module request.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _ProfID Numeric parameter indicating the profile identifier.
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
 		bool HTTPRCV(const uint8_t _ProfID);
+
+		/**
+		 * @brief Set command enables/disables the Ring Indicator pin response to a Socket Listen connect and, 
+		 * if enabled, the duration of the negative going pulse generated on receipt of connect.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Pulse_Duration duration in ms of this pulse 50..1150 mS
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
 		bool E2SLRI(const uint16_t _Pulse_Duration);
 
 	private:

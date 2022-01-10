@@ -4361,77 +4361,122 @@ bool xE910_AT::HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const ui
 }
 bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const char *_Data) {
 
-	// Declare Read Order Variable
-	uint8_t _Read_Order = 0;
+	// Declare Loop Variable
+	bool _Command_Loop_Control = false;
 
-	// Clear UART Buffer
-    _Clear_UART_Buffer();
+	// Declare Watchdog Variables
+	uint8_t _Error_WD = 0;
 
-	// Send UART Command
-	GSM_Serial.print(F("AT#HTTPSND="));
-	GSM_Serial.print(_ProfID);
-	GSM_Serial.print(F(",")); 
-	GSM_Serial.print(_Command);
-	GSM_Serial.print(F(",\"")); 
-	GSM_Serial.print(String(_URL));
-	GSM_Serial.print(F("\","));
-	GSM_Serial.print(strlen(_Data));
-	GSM_Serial.print(F(",\"application/json\""));
-	GSM_Serial.print(F("\r\n"));
+	// Command Send Loop
+	while (!_Command_Loop_Control) {
 
-	// Wait for UART Data Send
-	GSM_Serial.flush();
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
 
-	// Read Current Time
-	uint32_t _Time = millis();
+		// Clear UART Buffer
+		_Clear_UART_Buffer();
 
-	// Wait for UART Available
-	while ((uint16_t)GSM_Serial.available() < 5) {
+		// Send UART Command
+		GSM_Serial.print(F("AT#HTTPSND="));
+		GSM_Serial.print(_ProfID);
+		GSM_Serial.print(F(",")); 
+		GSM_Serial.print(_Command);
+		GSM_Serial.print(F(",\"")); 
+		GSM_Serial.print(String(_URL));
+		GSM_Serial.print(F("\","));
+		GSM_Serial.print(strlen(_Data));
+		GSM_Serial.print(F(",\"application/json\""));
+		GSM_Serial.print(F("\r\n"));
 
-		// Wait delay
-		delay(10);
+		// Wait for UART Data Send
+		GSM_Serial.flush();
 
-		// Handle for timeout
-		if (millis() - _Time >= 20000) return (false);
-
-	}
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
-	// Control for Response
-	if (strstr(_Serial_Buffer, ">>>") != NULL) {
-
-		// Send Delay
-		delay(50);
-
-		// Print Data
-		GSM_Serial.print(String(_Data));
+		// Read Current Time
+		uint32_t _Time = millis();
 
 		// Wait for UART Available
-		while ((uint16_t)GSM_Serial.available() < 6) {
+		while ((uint16_t)GSM_Serial.available() < 5) {
 
 			// Wait delay
-			delay(50);
+			delay(10);
 
 			// Handle for timeout
-			if (millis() - _Time >= (_TimeOut * 1000)) return (false);
+			if (millis() - _Time >= 20000) return (false);
 
 		}
 
-		// Clear Variable
-		memset(_Serial_Buffer, 0, 6);
+		// Declare Response Variable
+		char _Serial_Buffer[GSM_Serial.available()];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+		}
+
+		// Control for Response
+		if (strstr(_Serial_Buffer, ">>>") != NULL) {
+
+			// Set Loop Variable
+			_Command_Loop_Control = true;
+
+		} else {
+
+			// Handle for Error
+			if (_Error_WD > 5) return (false);
+
+			// Command Resend Delay
+			delay(1000);
+
+		}
+
+		// Count for Error
+		_Error_WD++;
+
+	}
+	
+	// Send Delay
+	delay(50);
+
+	// Reset Loop Variable
+	_Command_Loop_Control = false;
+
+	// Print Data
+	GSM_Serial.print(String(_Data));
+
+	// Send Delay
+	delay(50);
+
+	// Reset Watchdog Variables
+	_Error_WD = 0;
+
+	// Command Send Loop
+	while (!_Command_Loop_Control) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Read Current Time
+		uint32_t _Time = millis();
+
+		// Wait for UART Available
+		while ((uint16_t)GSM_Serial.available() < 5) {
+
+			// Wait delay
+			delay(10);
+
+			// Handle for timeout
+			if (millis() - _Time >= 20000) return (false);
+
+		}
+
+		// Declare Response Variable
+		char _Serial_Buffer[GSM_Serial.available()];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
@@ -4447,94 +4492,51 @@ bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char
 		// Control for Response
 		if (strstr(_Serial_Buffer, "OK") != NULL) {
 
-			// End Function
-			return (true);
+			// Set Loop Variable
+			_Command_Loop_Control = true;
 
 		} else {
 
-			// End Function
-			return (false);
+			// Handle for Error
+			if (_Error_WD > 5) return (false);
+
+			// Command Resend Delay
+			delay(500);
 
 		}
 
-	} else {
-
-		// End Function
-		return (false);
+		// Count for Error
+		_Error_WD++;
 
 	}
 
 	// End Function
-	return (false);
+	return (true);
+
+
+
+
 
 }
 bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 
-	// Declare Read Order Variable
-	uint8_t _Read_Order = 0;
+	// Declare Loop Variable
+	bool _Command_Loop_Control = false;
 
-	// Declare Data Order Variable
-	uint8_t _Data_Order = 0;
+	// Declare Watchdog Variables
+	uint8_t _Error_WD = 0;
 
-	// Handle Variable Defination
-	bool _Handle = false;
+	// Command Send Loop
+	while (!_Command_Loop_Control) {
 
-	// Read Current Time
-	uint32_t _Time = millis();
-
-	// Wait for UART Available
-	while ((uint16_t)GSM_Serial.available() < 14) {
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
 
 		// Wait delay
-		delay(10);
+		delay(20);
 
-		// Handle for timeout
-		if (millis() - _Time >= 20000) return (false);
-
-	}
-
-	// Wait delay
-	delay(20);
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
-	// Control for Response
-	if (strstr(_Serial_Buffer, "HTTPRING") != NULL) {
-
-		// Command Work Delay
-		delay(15);
-
-		// Clear UART Buffer
-		_Clear_UART_Buffer();
-
-		// Send UART Command
-		GSM_Serial.print(F("AT#HTTPRCV="));
-		GSM_Serial.print(String(_ProfID));
-		GSM_Serial.print(F("\r\n"));
-
-		// Wait for UART Data Send
-		GSM_Serial.flush();
-
-		// Command Work Delay
-		delay(1000);
-
-		// Clear Variables
-		memset(_Serial_Buffer, 0, GSM_Serial.available());
-
-		// Declare Server Response Variable
-		char Server_Response[255] = "";
+		// Declare Response Variable
+		char _Serial_Buffer[50];
 
 		// Read UART Response
 		while (GSM_Serial.available() > 0) {
@@ -4542,42 +4544,112 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 			// Read Serial Char
 			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
-			// Handle Response
-			if (_Serial_Buffer[_Read_Order] == 123) _Handle = true;
-
-			// Response String
-			if (_Handle) Server_Response[_Data_Order] += _Serial_Buffer[_Read_Order];
-
-			// Increase Read Order
-			_Data_Order++;
-
-			// Handle Response
-			if (_Serial_Buffer[_Read_Order] == 125) _Handle = false;
-
 			// Increase Read Order
 			_Read_Order++;
 
+			// Wait delay
+			delay(2);
+
 		}
 
-		// Control for Command
-		if (strstr(Server_Response, "500") != NULL) {
+		// Control for Response
+		if (strstr(_Serial_Buffer, "HTTPRING") != NULL) {
 
-			// End Function
-			return (true);
+			// Command Work Delay
+			delay(15);
 
-		} else {
+			// Clear UART Buffer
+			_Clear_UART_Buffer();
+
+			// Send UART Command
+			GSM_Serial.print(F("AT#HTTPRCV="));
+			GSM_Serial.print(String(_ProfID));
+			GSM_Serial.print(F("\r\n"));
+
+			// Wait for UART Data Send
+			GSM_Serial.flush();
+
+			// Declare Loop Variable
+			bool _Response_Loop_Control = false;
+
+			// Reset Read Order Variable
+			_Read_Order = 0;
+
+			// Declare Data Order Variable
+			uint8_t _Data_Order = 0;
+
+			// Handle Variable Defination
+			bool _Handle = false;
+
+			// Command Send Loop
+			while (!_Response_Loop_Control) {
+
+				// Handle for Error
+				if (_Error_WD > 50) return (false);
+
+				// Control for Response Length
+				if (GSM_Serial.available() > 20) _Response_Loop_Control = true;
+				
+				// Wait delay
+				delay(100);
+
+				// Count for Error
+				_Error_WD++;
+
+			}
+
+			// Declare Response Variable
+			char _Response_Buffer[50];
+
+			// Declare Response Variable
+			char _Response[20];
+
+			// Read UART Response
+			while (GSM_Serial.available() > 0) {
+
+				// Read Serial Char
+				_Response_Buffer[_Read_Order] = GSM_Serial.read();
+
+				// Handle Response
+				if (_Response_Buffer[_Read_Order] == 123) _Handle = true;
+
+				// Response String
+				if (_Handle) _Response[_Data_Order] += _Serial_Buffer[_Read_Order];
+
+				// Increase Read Order
+				_Data_Order++;
+
+				// Handle Response
+				if (_Response_Buffer[_Read_Order] == 125) _Handle = false;
+
+				// Increase Read Order
+				_Read_Order++;
+
+			}
+
+			// Control for Command
+			if (strstr(_Response, "500") != NULL) return (true);
 
 			// End Function
 			return (false);
 
+		} else {
+
+			// Handle for Error
+			if (_Error_WD > 10) return (false);
+
+			// Command Resend Delay
+			delay(500);
+
 		}
 
-	} else {
-
-		// End Function
-		return (false);
+		// Count for Error
+		_Error_WD++;
 
 	}
+
+	// End Function
+	return (false);
 
 }
 bool xE910_AT::E2SLRI(const uint16_t _Pulse_Duration) {
