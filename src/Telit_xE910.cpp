@@ -1478,14 +1478,24 @@ bool xE910_GSM::Connect(void) {
 }
 bool xE910_GSM::Send_Data_Pack(const char *_Data) {
 
+	// Declare Variables
+	const bool _Protocol = 0;						// TCP Protocol
+	const char _Service[15] = "/api/v1.1/p402";		// Service URL
+	const uint8_t _TimeOut = 20;					// Time Out
+
 	// Send Data
-	GSM_AT.HTTPSND(1, 0, "/api/v1.1/p402",20, _Data);
-	
-	// Get Response
-	GSM_AT.HTTPRCV(1);
+	if (GSM_AT.HTTPSND(1, _Protocol, _Service, _TimeOut, _Data) == true) {
+		
+		// Get Response
+		bool _Response = GSM_AT.HTTPRCV(1);
+
+		// End Function
+		return(_Response);
+		
+	}
 
 	// End Function
-	return(true);
+	return(false);
 
 }
 bool xE910_GSM::Socket_Listen(void) {
@@ -1553,51 +1563,84 @@ bool xE910_GSM::RSSI_Refresh(void) {
 
 String xE910_GSM::Manufacturer(void) {
 
-	if (GSM_AT.Manufacturer == 1) {
+	// Manufacturer Selection
+	switch (GSM_AT.Manufacturer) {
+	case 1:
 
+		// End Function
 		return("Telit");
 
-	} else {
+		break;
 
-		return("Nan Defined");
+	default:
+
+		// End Function
+		return("Nan");
+
+		break;
 
 	}
 
 }
 String xE910_GSM::Model(void) {
 
-	if (GSM_AT.Model == 1) {
+	// Manufacturer Selection
+	switch (GSM_AT.Model) {
+	case 1:
 
-		return("TeGE910 QUADlit");
+		// End Function
+		return("GE910-QUAD");
 
-	} else {
+		break;
 
-		return("Nan Defined");
+	default:
+
+		// End Function
+		return("Nan");
+
+		break;
 
 	}
 
 }
 String xE910_GSM::Operator(void) {
 
-	if (GSM_AT.Operator == 28601) {
+	// Manufacturer Selection
+	switch (GSM_AT.Operator) {
+	case 28601:
 
+		// End Function
 		return("Turkcell");
 
-	} else if (GSM_AT.Operator == 28602) {
+		break;
 
+	case 28602:
+
+		// End Function
 		return("Vodafone");
 
-	} else if (GSM_AT.Operator == 28603) {
+		break;
 
+	case 28603:
+
+		// End Function
 		return("Turk Telekom");
 
-	} else if (GSM_AT.Operator == 28604) {
+		break;
 
+	case 28604:
+
+		// End Function
 		return("Turk Telekom");
 
-	} else {
+		break;
 
-		return("Nan Turkish Operator");
+	default:
+
+		// End Function
+		return("Nan");
+
+		break;
 
 	}
 
@@ -4577,12 +4620,6 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 			// Reset Read Order Variable
 			_Read_Order = 0;
 
-			// Declare Data Order Variable
-			uint8_t _Data_Order = 0;
-
-			// Handle Variable Defination
-			bool _Handle = false;
-
 			// Command Send Loop
 			while (!_Response_Loop_Control) {
 
@@ -4602,9 +4639,7 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 
 			// Declare Response Variable
 			char _Response_Buffer[50];
-
-			// Declare Response Variable
-			char _Response[20];
+			memset(_Response_Buffer, 0, 50);
 
 			// Read UART Response
 			while (GSM_Serial.available() > 0) {
@@ -4612,25 +4647,13 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 				// Read Serial Char
 				_Response_Buffer[_Read_Order] = GSM_Serial.read();
 
-				// Handle Response
-				if (_Response_Buffer[_Read_Order] == 123) _Handle = true;
-
-				// Response String
-				if (_Handle) _Response[_Data_Order] += _Serial_Buffer[_Read_Order];
-
-				// Increase Read Order
-				_Data_Order++;
-
-				// Handle Response
-				if (_Response_Buffer[_Read_Order] == 125) _Handle = false;
-
 				// Increase Read Order
 				_Read_Order++;
 
 			}
 
 			// Control for Command
-			if (strstr(_Response, "500") != NULL) return (true);
+			if (strstr(_Response_Buffer, "{\"Event\":500}") != NULL) return (true);
 
 			// End Function
 			return (false);
