@@ -4463,6 +4463,100 @@ bool xE910_AT::SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_
 	}
 
 }
+uint16_t xE910_AT::SA(const uint8_t _ConnID, const uint8_t _ConnMode) {
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+	uint8_t _Data_Order = 0;
+	bool _Comma = false;
+
+	// Declare Connection Variable
+	bool _SRING = false;
+
+	// Declare Incomming Message Length Variable
+	char _Incomming_Length[4];
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#SA="));
+	GSM_Serial.print(String(_ConnID));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_ConnMode));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Command Work Delay
+	delay(20);
+
+	// Declare Watchdog Variables
+	uint8_t _Error_WD = 0;
+
+	// Control Loop
+	while (!_SRING) {
+
+		// Handle for Error
+		if (_Error_WD >= 10) return (false);
+
+		// Declare Response Variable
+		char _Serial_Buffer[GSM_Serial.available()];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+			// Handle ,
+			if (_Serial_Buffer[_Read_Order] == 44) _Comma = true;
+
+			// Handle Data
+			if (_Comma == true and _Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) {
+
+				// Get Data
+				_Incomming_Length[_Data_Order] = _Serial_Buffer[_Read_Order];
+
+				// Increase Data Order
+				_Data_Order++;
+
+			}
+
+			// Increase Read Order
+			_Read_Order++;
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Control for Response
+		if (strstr(_Serial_Buffer, "SRING:") != NULL) {
+
+			// Set Control Variable
+			_SRING = true;
+
+		} else {
+
+			// Connection Delay
+			delay(50);
+
+			// Set Control Variable
+			_SRING = false;
+
+			// Count for Error
+			_Error_WD++;
+
+		}
+
+	}
+
+	// End Function
+	return(atoi(_Incomming_Length));
+
+}
 bool xE910_AT::FRWL(const uint8_t _Action, const char *_IP_Addr, const char *_Net_Mask) {
 
 	// Declare Read Order Variable

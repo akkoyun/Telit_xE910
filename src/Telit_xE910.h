@@ -896,6 +896,8 @@ class xE910_AT {
 		 */
 		bool SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_t _Listen_Port, const uint8_t _Closure_Type);
 
+		uint16_t SA(const uint8_t _ConnID, const uint8_t _ConnMode);
+
 		/**
 		 * @brief Execution command controls the internal firewall settings.
 		 * 
