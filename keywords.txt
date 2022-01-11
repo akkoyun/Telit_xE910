@@ -9,7 +9,75 @@
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-										
+
+Power_ON                        KEYWORD2
+Power_OFF                       KEYWORD2
+Begin                           KEYWORD2
+Connect                         KEYWORD2
+Socket_Listen                   KEYWORD2
+RSSI_Refresh                    KEYWORD2
+Manufacturer                    KEYWORD2
+Model                           KEYWORD2
+Operator                        KEYWORD2
+Firmware                        KEYWORD2
+IMEI                            KEYWORD2
+Serial_ID                       KEYWORD2
+ICCID                           KEYWORD2
+Signal_Strength                 KEYWORD2
+Send_Data_Pack                  KEYWORD2
+Communication                   KEYWORD2
+PowerMonitor                    KEYWORD2
+OnOff                           KEYWORD2
+ShutDown                        KEYWORD2
+Power_Switch                    KEYWORD2
+LED                             KEYWORD2
+AT                              KEYWORD2
+ATE                             KEYWORD2
+CMEE                            KEYWORD2
+FCLASS                          KEYWORD2
+K                               KEYWORD2
+CPIN                            KEYWORD2
+CGSN                            KEYWORD2
+GSN                             KEYWORD2
+CCID                            KEYWORD2
+GMI                             KEYWORD2
+GMM                             KEYWORD2
+GMR                             KEYWORD2
+CSQ                             KEYWORD2
+SERVINFO                        KEYWORD2
+SLED                            KEYWORD2
+TXMONMODE                       KEYWORD2
+REGMODE                         KEYWORD2
+CREG                            KEYWORD2
+CGREG                           KEYWORD2
+CGDCONT                         KEYWORD2
+SCFG                            KEYWORD2
+SCFGEXT                         KEYWORD2
+SCFGEXT2                        KEYWORD2
+SCFGEXT3                        KEYWORD2
+SGACT                           KEYWORD2
+SGACTCFG                        KEYWORD2
+CGACT                           KEYWORD2
+CGPADDR                         KEYWORD2
+CTZU                            KEYWORD2
+NITZ                            KEYWORD2
+NTP                             KEYWORD2
+CCLK                            KEYWORD2
+SHDN                            KEYWORD2
+SD                              KEYWORD2
+SS                              KEYWORD2
+HTTPCFG                         KEYWORD2
+HTTPSND                         KEYWORD2
+HTTPRCV                         KEYWORD2
+E2SLRI                          KEYWORD2
+Time_Update                     KEYWORD2
+Year                            KEYWORD2
+Month                           KEYWORD2
+Day                             KEYWORD2
+Hour                            KEYWORD2
+Minute                          KEYWORD2
+Second                          KEYWORD2
+
 #######################################
 # Constants (LITERAL1)
 #######################################

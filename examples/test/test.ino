@@ -57,7 +57,13 @@ void setup() {
 
 char *DD = "{\"Device\":{\"Type\":\"402-P02\",\"ID\":\"70A11D1D01000026\"},\"Power\":{\"Battery\": {\"IV\":4.115156,\"T\":25.5,\"AC\":-49.6875,\"SOC\":98.99609,\"FB\":1519,\"IB\":1503,\"CYC\":38}},\"IoT\":{\"GSM\":{\"Operator\":{\"RSSI\":12}}},\"Data\":{\"DeviceStatus\":240,\"FaultStatus\": 500,\"TimeStamp\":\"2000-01-01  23:46:51\"}}";
 
-GSM.Send_Data_Pack(DD);
+
+if (GSM.Send_Data_Pack(DD) == true) {
+    Serial.print(F("Data Send Test    : OK")); Serial.println("");
+}
+
+
+
 
 //Serial.println(GSM_AT.SS(1));
 

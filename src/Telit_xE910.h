@@ -83,16 +83,19 @@ class xE910_GSM {
 
 		/**
 		 * @brief Returns GSM modem manufacturer name (string)
+		 * @version 01.00.01
 		 */
 		String Manufacturer(void);
 		
 		/**
 		 * @brief Returns GSM modem Model name (string)
+		 * @version 01.00.01
 		 */
 		String Model(void);
 
 		/**
 		 * @brief Returns GSM operator name (string)
+		 * @version 01.00.01
 		 */
 		String Operator(void);
 
@@ -116,13 +119,25 @@ class xE910_GSM {
 		 */
 		String ICCID(void);
 
+		/**
+		 * @brief IP Variable
+		 * @version 01.00.01
+		 */
 		String IP(void);
+
+		/**
+		 * @brief Signal Strength x/4
+		 * @version 01.00.01
+		 */
 		uint8_t Signal_Strength(void);
 
+		/**
+		 * @brief Data send procedure.
+		 * @version 01.00.01
+		 */
 		bool Send_Data_Pack(const char *_Data);
 
 	private:
-	
 	
 };
 
