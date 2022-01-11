@@ -878,6 +878,42 @@ class xE910_AT {
 		uint8_t SS(const uint8_t _ConnID);
 	
 		/**
+		 * @brief This command opens/closes a socket listening for an incoming TCP connection on a specified port.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _ConnID socket connection identifier 1..6
+		 * @param _Listen_State 
+		 * 0 - closes socket listening
+		 * 1 - starts socket listening
+		 * @param _Listen_Port local listening port 1..65535
+		 * @param _Closure_Type socket closure behaviour for TCP when remote host has closed
+		 * 0 - local host closes immediately (default)
+		 * 255 - local host closes after an AT#SH or immediately in case of an abortive disconnect from remote.
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_t _Listen_Port, const uint8_t _Closure_Type);
+
+		/**
+		 * @brief Execution command controls the internal firewall settings.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Action command action
+		 * 0 - remove selected chain
+		 * 1 - add an ACCEPT chain
+		 * 2 - remove all chains
+		 * @param _IP_Addr remote address to be added into the ACCEPT chain.
+		 * @param _Net_Mask mask to be applied on the <ip_addr>
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool FRWL(const uint8_t _Action, const char *_IP_Addr, const char *_Net_Mask);
+
+		/**
 		 * @brief This command sets the parameters needed to the HTTP connection.
 		 * 
 		 * @version 01.00.00
