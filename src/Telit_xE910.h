@@ -73,7 +73,7 @@ class xE910_GSM {
 		 * @brief Socket listen function
 		 * @version 01.00.00
 		 */
-		bool Socket_Listen(void);
+		bool Socket_Answer(void);
 
 		/**
 		 * @brief RSSI function
@@ -231,6 +231,7 @@ class xE910_AT {
 		uint8_t		SGACT_Status				= 0;				// SGACT Status Variable
 		char		IP_Address[16]				= "";				// IP Address Variable
 		bool		Connection_Status			= false;			// Connection Status
+		uint16_t	Remote_Command				= 0;				// Remote Server Command
 
 		uint8_t 	RTC_Day						= 29;				// Day Variable
 		uint8_t 	RTC_Month					= 10;				// Month Variable
@@ -896,7 +897,46 @@ class xE910_AT {
 		 */
 		bool SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_t _Listen_Port, const uint8_t _Closure_Type);
 
+		/**
+		 * @brief Execution command accepts an incoming socket connection after an URC
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _ConnID socket connection identifier 1..6
+		 * @param _ConnMode Connection mode, as for command #SD.
+		 * 0 - online mode connection (default) 
+		 * 1 - command mode connection
+
+		 * @return uint16_t Recieved byt count
+		 */
 		uint16_t SA(const uint8_t _ConnID, const uint8_t _ConnMode);
+
+		/**
+		 * @brief This command is used to close a socket.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _ConnID socket connection identifier 1..6
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool SH(const uint8_t _ConnID);
+
+		/**
+		 * @brief Execution command permits the user to read data arrived through a 
+		 * connected socket, but buffered and not yet read because the module entered 
+		 * command mode before reading them; the module is notified of these data by a 
+		 * SRING URC, whose presentation format depends on the last #SCFGEXT setting.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _ConnID socket connection identifier 1..6
+		 * @param _MaxByte max number of bytes to read 1..1500
+		 * 
+		 * @return uint16_t 
+		 */
+		uint16_t SRECV(const uint8_t _ConnID, const uint16_t _MaxByte);
 
 		/**
 		 * @brief Execution command controls the internal firewall settings.
@@ -1001,6 +1041,7 @@ class xE910_AT {
  		*/
 		bool _Response_Wait(uint16_t _Length, uint32_t _TimeOut);
 
+		bool _AT_Response(const char *_Response, uint16_t _Time_Out);
 };
 
 /**

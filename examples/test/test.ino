@@ -1,9 +1,13 @@
 // Define Ovoo Libraries
 #include "Telit_xE910.h"
 
+bool Interrupt = false;
+
 void setup() {
 
     Serial.begin(115200);
+
+	DDRJ	&= 0b11111011;	PORTJ	|= 0b00000100;	// PJ2 - Input / Pull Down [GSM Ring]
 
     if (GSM.Begin(true)) {
         
@@ -55,15 +59,21 @@ void setup() {
 
         }
 
+/*
 char *DD = "{\"Device\":{\"Type\":\"402-P02\",\"ID\":\"70A11D1D01000026\"},\"Power\":{\"Battery\": {\"IV\":4.115156,\"T\":25.5,\"AC\":-49.6875,\"SOC\":98.99609,\"FB\":1519,\"IB\":1503,\"CYC\":38}},\"IoT\":{\"GSM\":{\"Operator\":{\"RSSI\":12}}},\"Data\":{\"DeviceStatus\":240,\"FaultStatus\": 500,\"TimeStamp\":\"2000-01-01  23:46:51\"}}";
-
 
 if (GSM.Send_Data_Pack(DD) == true) {
     Serial.print(F("Data Send Test    : OK")); Serial.println("");
 }
+*/
 
 GSM_AT.FRWL(1,"213.14.250.214", "255.255.255.0");
 GSM_AT.SL(2,1,80,0);
+
+	cli();
+	PCICR	|= 0b00000111;	// Set All Interrupt
+	PCMSK1	|= 0b00001000;	// GM Ring Interrupt Defination
+	sei();
 
 
 //Serial.println(GSM_AT.SS(1));
@@ -75,6 +85,27 @@ GSM_AT.SL(2,1,80,0);
 void loop() {
 
 
-    delay(10000);
+    if (Interrupt == true) {
+
+        delay(100);
+        
+       	// Set Interrupt Variable
+        GSM.Socket_Answer();
+
+        Serial.println(GSM_AT.Remote_Command);
+
+        Interrupt = false;
+
+    }
+    
+
+}
+
+ISR(PCINT1_vect) {	// GSM Ring Interrupt
+
+	//**************************************************
+	// Control GSM Ring Interrupt [PJ2]
+	//**************************************************
+    Interrupt = true;
 
 }

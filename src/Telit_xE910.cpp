@@ -741,6 +741,60 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			if (!_Response) return (false);
 
 			// **************************************************
+			// E2SLRI Command
+			// **************************************************
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			uint16_t _Parameter_E2SLRI_Pulse = 50;
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT#E2SLRI="));
+			if (Debug_Mode) Serial.print(_Parameter_E2SLRI_Pulse);
+			if (Debug_Mode) Serial.print(F("................................"));
+
+			// Process Command
+			while (!_Response) {
+
+				// Process Command
+				_Response = GSM_AT.E2SLRI(_Parameter_E2SLRI_Pulse);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+			// **************************************************
 			// Initialize Complate
 			// **************************************************
 
@@ -772,750 +826,701 @@ bool xE910_GSM::Connect(void) {
 	// Control for Initialization Monitor
 	if (GSM_AT.Initialization_Status) {
 
-		// **************************************************
+		// Command Set
+		const bool _TXMONMODE = true;
+		const bool _CREG = true;
+		const bool _CGREG = true;
+		const bool _SCFG1 = true;
+		const bool _SCFG2 = true;
+		const bool _SCFGEXT1 = true;
+		const bool _SCFGEXT2 = true;
+		const bool _CGDCONT = true;
+		const bool _SERVINFO = true;
+		const bool _CGACT = true;
+		const bool _CGPADDR = true;
+		const bool _HTTPCFG = true;
+
 		// TXMONMODE Command
-		// **************************************************
+		if (_TXMONMODE) {
 
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
 
-		// Declare Parameters
-		bool _Parameter_TXMONMODE = 1;
+			// Declare Parameters
+			bool _Parameter_TXMONMODE = 1;
 
-		// Declare Watchdog Variable
-		_Error_WD = 0;
+			// Declare Watchdog Variable
+			_Error_WD = 0;
 
-		// Set Response Variable
-		_Response = false;
+			// Set Response Variable
+			_Response = false;
 
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT#TXMONMODE="));
-		if (Debug_Mode) Serial.print(_Parameter_TXMONMODE);
-		if (Debug_Mode) Serial.print(F(".............................."));
-
-		// Process Command
-		while (!_Response) {
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT#TXMONMODE="));
+			if (Debug_Mode) Serial.print(_Parameter_TXMONMODE);
+			if (Debug_Mode) Serial.print(F(".............................."));
 
 			// Process Command
-			_Response = GSM_AT.TXMONMODE(_Parameter_TXMONMODE);
+			while (!_Response) {
 
-			// Set WD Variable
-			_Error_WD++;
+				// Process Command
+				_Response = GSM_AT.TXMONMODE(_Parameter_TXMONMODE);
 
-			// Control for WD
-			if (_Error_WD > 5) break;
+				// Set WD Variable
+				_Error_WD++;
 
-		}
+				// Control for WD
+				if (_Error_WD > 5) break;
 
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
 			}
 
-		}
-	
-		// End Function
-		if (!_Response) return (false);
+			// Print Command State
+			if (Debug_Mode) {
 
-		// **************************************************
-		// CREG Command
-		// **************************************************
+				// Control for Response				
+				if (_Response) Serial.println(F("..[OK]"));
+				if (!_Response) Serial.println(F("[FAIL]"));
 
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
-
-		// Declare Parameters
-		bool _Parameter_CREG_Mode = 0;
-
-		// Read Current Time
-		uint32_t _CTime = millis();
-
-		// Declare Watchdog Variable
-		_Error_WD = 0;
-
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT+CREG="));
-		if (Debug_Mode) Serial.print(_Parameter_CREG_Mode);
-		if (Debug_Mode) Serial.print(F("..................................."));
-
-		// Process Command
-		while (!_Response) {
-
-			// Process Command
-			_Response = GSM_AT.CREG(_Parameter_CREG_Mode);
-
-			// Set WD Variable
-			_Error_WD++;
-
-			// Control for WD
-			if (_Error_WD > 5) break;
-
-		}
-
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
 			}
-
-		}
-	
-		// End Function
-		if (!_Response) return (false);
-
-		// **************************************************
-		// CGREG Command
-		// **************************************************
-
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
-
-		// Declare Parameters
-		bool _Parameter_CGREG_Mode = 0;
-
-		// Declare Watchdog Variable
-		_Error_WD = 0;
-
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT+CGREG="));
-		if (Debug_Mode) Serial.print(_Parameter_CGREG_Mode);
-		if (Debug_Mode) Serial.print(F(".................................."));
-
-		// Process Command
-		while (!_Response) {
-
-			// Process Command
-			_Response = GSM_AT.CGREG(_Parameter_CGREG_Mode);
-
-			// Set WD Variable
-			_Error_WD++;
-
-			// Control for WD
-			if (_Error_WD > 5) break;
-
-		}
-
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
-			}
-
-		}
-	
-		// End Function
-		if (!_Response) return (false);
-
-		// Read Current Time
-		uint32_t _CRTime = millis() - _CTime;
-		GSM_AT.Connection_Time = uint8_t(_CRTime / 1000);
-
-		// Print GSM Command
-		if (Debug_Mode) {Serial.print(F("GSM Connection Time...........................[")); Serial.print(GSM_AT.Connection_Time); Serial.println(F("]"));}
-
-		// **************************************************
-		// SCFG Command
-		// **************************************************
-
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
-
-		// Declare Parameters
-		const uint8_t _Parameter_SCFG_ConnID = 1;
-		const uint8_t _Parameter_SCFG_Cid = 1;
-		const uint16_t _Parameter_SCFG_Pkt_Sz = 300;
-		const uint16_t _Parameter_SCFG_Max_To = 90;
-		const uint16_t _Parameter_SCFG_Conn_To = 600;
-		const uint8_t _Parameter_SCFG_TX_To = 50;
-
-		// Declare Watchdog Variable
-		_Error_WD = 0;
-
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT#SCFG="));
-		if (Debug_Mode) Serial.print(_Parameter_SCFG_ConnID);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFG_Cid);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFG_Pkt_Sz);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFG_Max_To);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFG_Conn_To);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFG_TX_To);
-		if (Debug_Mode) Serial.print(F("..................."));
-
-		// Process Command
-		while (!_Response) {
-
-			// Process Command
-			_Response = GSM_AT.SCFG(_Parameter_SCFG_ConnID, _Parameter_SCFG_Cid, _Parameter_SCFG_Pkt_Sz, _Parameter_SCFG_Max_To, _Parameter_SCFG_Conn_To, _Parameter_SCFG_TX_To);
-
-			// Set WD Variable
-			_Error_WD++;
-
-			// Control for WD
-			if (_Error_WD > 5) break;
-
-		}
-
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
-			}
-
-		}
-	
-		// End Function
-		if (!_Response) return (false);
 		
-		// **************************************************
-		// SCFGEXT Command
-		// **************************************************
-
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
-
-		// Declare Parameters
-		const uint8_t _Parameter_SCFGEXT_ConnID = 2;
-		const uint8_t _Parameter_SCFGEXT_SrMode = 1;
-		const bool _Parameter_SCFGEXT_Recv_Data_Mode = false;
-		const uint8_t _Parameter_SCFGEXT_Keep_Alieve = 0;
-		const bool _Parameter_SCFGEXT_Listen_Auto_Response = false;
-		const bool _Parameter_SCFGEXT_Send_Data_Mode = false;
-
-		// Declare Watchdog Variable
-		_Error_WD = 0;
-
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT#SCFGEXT="));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_ConnID);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_SrMode);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Recv_Data_Mode);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Keep_Alieve);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Listen_Auto_Response);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Send_Data_Mode);
-		if (Debug_Mode) Serial.print(F("..................."));
-
-		// Process Command
-		while (!_Response) {
-
-			// Process Command
-			_Response = GSM_AT.SCFGEXT(_Parameter_SCFGEXT_ConnID, _Parameter_SCFGEXT_SrMode, _Parameter_SCFGEXT_Recv_Data_Mode, _Parameter_SCFGEXT_Keep_Alieve, _Parameter_SCFGEXT_Listen_Auto_Response, _Parameter_SCFGEXT_Send_Data_Mode);
-
-			// Set WD Variable
-			_Error_WD++;
-
-			// Control for WD
-			if (_Error_WD > 5) break;
-
-		}
-
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
-			}
-
-		}
-	
-		// End Function
-		if (!_Response) return (false);
-
-		// **************************************************
-		// CGDCONT Command
-		// **************************************************
-
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
-
-		// Declare Parameters
-		const uint8_t _Parameter_CDGCONT_Cid = 1;
-		const char _Parameter_CGDCONT_PDP[3] = "IP";
-		const char _Parameter_CGDCONT_APN[5] = "mgbs";
-		const char _Parameter_CDGCONT_PDP_Addr[8] = "0.0.0.0";
-		const bool _Parameter_CDGCONT_D_Comp = false;
-		const bool _Parameter_CDGCONT_H_Comp = false;
-
-		// Declare Watchdog Variable
-		_Error_WD = 0;
-
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) {
-
-			Serial.print(F("AT+CGDCONT="));
-			Serial.print(_Parameter_CDGCONT_Cid);
-			Serial.print(F(",\""));
-			Serial.print(_Parameter_CGDCONT_PDP);
-			Serial.print(F("\",\""));
-			Serial.print(_Parameter_CGDCONT_APN);
-			Serial.print(F("\",\""));
-			Serial.print(_Parameter_CDGCONT_PDP_Addr);
-			Serial.print(F("\","));
-			Serial.print(_Parameter_CDGCONT_D_Comp);
-			Serial.print(F(","));
-			Serial.print(_Parameter_CDGCONT_H_Comp);
-			Serial.print(F("......"));
+			// End Function
+			if (!_Response) return (false);
 			
 		}
 		
-		// Process Command
-		while (!_Response) {
+		// Read Current Time
+		uint32_t _CTime = millis();
+
+		// CREG Command
+		if (_CREG) {
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			bool _Parameter_CREG_Mode = 0;
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+CREG="));
+			if (Debug_Mode) Serial.print(_Parameter_CREG_Mode);
+			if (Debug_Mode) Serial.print(F("..................................."));
 
 			// Process Command
-			_Response = GSM_AT.CGDCONT(_Parameter_CDGCONT_Cid, _Parameter_CGDCONT_PDP, _Parameter_CGDCONT_APN, _Parameter_CDGCONT_PDP_Addr, _Parameter_CDGCONT_D_Comp, _Parameter_CDGCONT_H_Comp);
+			while (!_Response) {
 
-			// Set WD Variable
-			_Error_WD++;
+				// Process Command
+				_Response = GSM_AT.CREG(_Parameter_CREG_Mode);
 
-			// Control for WD
-			if (_Error_WD > 5) break;
+				// Set WD Variable
+				_Error_WD++;
 
-		}
+				// Control for WD
+				if (_Error_WD > 5) break;
 
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
 			}
 
-		}
-	
-		// End Function
-		if (!_Response) return (false);
+			// Print Command State
+			if (Debug_Mode) {
 
-		// **************************************************
+				// Control for Response				
+				if (_Response) Serial.println(F("..[OK]"));
+				if (!_Response) Serial.println(F("[FAIL]"));
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+		}
+
+		// CGREG Command
+		if (_CGREG) {
+		
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			bool _Parameter_CGREG_Mode = 0;
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+CGREG="));
+			if (Debug_Mode) Serial.print(_Parameter_CGREG_Mode);
+			if (Debug_Mode) Serial.print(F(".................................."));
+
+			// Process Command
+			while (!_Response) {
+
+				// Process Command
+				_Response = GSM_AT.CGREG(_Parameter_CGREG_Mode);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) Serial.println(F("..[OK]"));
+				if (!_Response) Serial.println(F("[FAIL]"));
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+			// Read Current Time
+			uint32_t _CRTime = millis() - _CTime;
+			GSM_AT.Connection_Time = uint8_t(_CRTime / 1000);
+
+			// Print GSM Command
+			if (Debug_Mode) {Serial.print(F("GSM Connection Time...........................[")); Serial.print(GSM_AT.Connection_Time); Serial.println(F("]"));}
+
+		}
+
+		// SCFG Command Socket 1
+		if (_SCFG1) {
+			
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			const uint8_t _Parameter_SCFG_ConnID = 1;
+			const uint8_t _Parameter_SCFG_Cid = 1;
+			const uint16_t _Parameter_SCFG_Pkt_Sz = 1500;
+			const uint16_t _Parameter_SCFG_Max_To = 90;
+			const uint16_t _Parameter_SCFG_Conn_To = 600;
+			const uint8_t _Parameter_SCFG_TX_To = 50;
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT#SCFG="));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_ConnID);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Cid);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Pkt_Sz);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Max_To);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Conn_To);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_TX_To);
+			if (Debug_Mode) Serial.print(F(".................."));
+
+			// Process Command
+			while (!_Response) {
+
+				// Process Command
+				_Response = GSM_AT.SCFG(_Parameter_SCFG_ConnID, _Parameter_SCFG_Cid, _Parameter_SCFG_Pkt_Sz, _Parameter_SCFG_Max_To, _Parameter_SCFG_Conn_To, _Parameter_SCFG_TX_To);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+		}
+
+		// SCFG Command Socket 2
+		if (_SCFG2) {
+			
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			const uint8_t _Parameter_SCFG_ConnID = 2;
+			const uint8_t _Parameter_SCFG_Cid = 1;
+			const uint16_t _Parameter_SCFG_Pkt_Sz = 1500;
+			const uint16_t _Parameter_SCFG_Max_To = 90;
+			const uint16_t _Parameter_SCFG_Conn_To = 600;
+			const uint8_t _Parameter_SCFG_TX_To = 50;
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT#SCFG="));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_ConnID);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Cid);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Pkt_Sz);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Max_To);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_Conn_To);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFG_TX_To);
+			if (Debug_Mode) Serial.print(F(".................."));
+
+			// Process Command
+			while (!_Response) {
+
+				// Process Command
+				_Response = GSM_AT.SCFG(_Parameter_SCFG_ConnID, _Parameter_SCFG_Cid, _Parameter_SCFG_Pkt_Sz, _Parameter_SCFG_Max_To, _Parameter_SCFG_Conn_To, _Parameter_SCFG_TX_To);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+		}
+
+		// SCFGEXT Command Socket 2
+		if (_SCFGEXT2) {
+		
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			const uint8_t _Parameter_SCFGEXT_ConnID = 2;
+			const uint8_t _Parameter_SCFGEXT_SrMode = 1;
+			const bool _Parameter_SCFGEXT_Recv_Data_Mode = false;
+			const uint8_t _Parameter_SCFGEXT_Keep_Alieve = 1;
+			const bool _Parameter_SCFGEXT_Listen_Auto_Response = false;
+			const bool _Parameter_SCFGEXT_Send_Data_Mode = false;
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT#SCFGEXT="));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_ConnID);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_SrMode);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Recv_Data_Mode);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Keep_Alieve);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Listen_Auto_Response);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Send_Data_Mode);
+			if (Debug_Mode) Serial.print(F("......................"));
+
+			// Process Command
+			while (!_Response) {
+
+				// Process Command
+				_Response = GSM_AT.SCFGEXT(_Parameter_SCFGEXT_ConnID, _Parameter_SCFGEXT_SrMode, _Parameter_SCFGEXT_Recv_Data_Mode, _Parameter_SCFGEXT_Keep_Alieve, _Parameter_SCFGEXT_Listen_Auto_Response, _Parameter_SCFGEXT_Send_Data_Mode);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+		}
+
+		// CGDCONT Command
+		if (_CGDCONT) {
+		
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			const uint8_t _Parameter_CDGCONT_Cid = 1;
+			const char _Parameter_CGDCONT_PDP[3] = "IP";
+			const char _Parameter_CGDCONT_APN[5] = "mgbs";
+			const char _Parameter_CDGCONT_PDP_Addr[8] = "0.0.0.0";
+			const bool _Parameter_CDGCONT_D_Comp = false;
+			const bool _Parameter_CDGCONT_H_Comp = false;
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) {
+
+				Serial.print(F("AT+CGDCONT="));
+				Serial.print(_Parameter_CDGCONT_Cid);
+				Serial.print(F(",\""));
+				Serial.print(_Parameter_CGDCONT_PDP);
+				Serial.print(F("\",\""));
+				Serial.print(_Parameter_CGDCONT_APN);
+				Serial.print(F("\",\""));
+				Serial.print(_Parameter_CDGCONT_PDP_Addr);
+				Serial.print(F("\","));
+				Serial.print(_Parameter_CDGCONT_D_Comp);
+				Serial.print(F(","));
+				Serial.print(_Parameter_CDGCONT_H_Comp);
+				Serial.print(F("......"));
+				
+			}
+			
+			// Process Command
+			while (!_Response) {
+
+				// Process Command
+				_Response = GSM_AT.CGDCONT(_Parameter_CDGCONT_Cid, _Parameter_CGDCONT_PDP, _Parameter_CGDCONT_APN, _Parameter_CDGCONT_PDP_Addr, _Parameter_CDGCONT_D_Comp, _Parameter_CDGCONT_H_Comp);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+		}
+
 		// SERVINFO Command
-		// **************************************************
+		if (_SERVINFO) {
+		
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
 
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
+			// Declare Watchdog Variable
+			_Error_WD = 0;
 
-		// Declare Watchdog Variable
-		_Error_WD = 0;
+			// Set Response Variable
+			_Response = false;
 
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT#SERVIFO.................................."));
-
-		// Process Command
-		while (!_Response) {
-
-			// Send Command
-			_Response = GSM_AT.SERVINFO();
-
-			// Set WD Variable
-			_Error_WD++;
-
-			// Control for WD
-			if (_Error_WD > 5) break;
-
-		}
-
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
-			}
-
-		}
-	
-		// End Function
-		if (!_Response) return (false);
-
-		// **************************************************
-		// SGACTCFG Command
-		// **************************************************
-
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
-
-		// Declare Parameters
-		const uint8_t _Parameter_SGACTCFG_Cid = 1;
-		const uint8_t _Parameter_SGACTCFG_Retry = 5;
-		const uint8_t _Parameter_SGACTCFG_Delay = 180;
-		const uint8_t _Parameter_SGACTCFG_UrcMode = false;
-
-		// Declare Watchdog Variable
-		_Error_WD = 0;
-
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT#SGACTCFG="));
-		if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_Cid);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_Retry);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_Delay);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_SGACTCFG_UrcMode);
-		if (Debug_Mode) Serial.print(F("......................."));
-
-		// Process Command
-		while (!_Response) {
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT#SERVIFO.................................."));
 
 			// Process Command
-			_Response = GSM_AT.SGACTCFG(_Parameter_SGACTCFG_Cid, _Parameter_SGACTCFG_Retry, _Parameter_SGACTCFG_Delay, _Parameter_SGACTCFG_UrcMode);
+			while (!_Response) {
 
-			// Set WD Variable
-			_Error_WD++;
+				// Send Command
+				_Response = GSM_AT.SERVINFO();
 
-			// Control for WD
-			if (_Error_WD > 5) break;
+				// Set WD Variable
+				_Error_WD++;
 
-		}
+				// Control for WD
+				if (_Error_WD > 5) break;
 
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
 			}
 
-		}
-	
-		// End Function
-		if (!_Response) return (false);
+			// Print Command State
+			if (Debug_Mode) {
 
-		// **************************************************
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+		}
+
 		// CGACT Command
-		// **************************************************
+		if (_CGACT) {
+		
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
 
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
+			// Declare Parameters
+			const bool _Parameter_CGACT_State = true;
+			const uint8_t _Parameter_CGACT_Cid = 1;
 
-		// Declare Parameters
-		const bool _Parameter_CGACT_State = true;
-		const uint8_t _Parameter_CGACT_Cid = 1;
+			// Declare Watchdog Variable
+			_Error_WD = 0;
 
-		// Declare Watchdog Variable
-		_Error_WD = 0;
+			// Set Response Variable
+			_Response = false;
 
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT+CGACT="));
-		if (Debug_Mode) Serial.print(_Parameter_CGACT_State);
-		if (Debug_Mode) Serial.print(F(","));
-		if (Debug_Mode) Serial.print(_Parameter_CGACT_Cid);
-		if (Debug_Mode) Serial.print(F("................................"));
-
-		// Process Command
-		while (!_Response) {
-
-			// Get IP Address
-			_Response = GSM_AT.CGACT(_Parameter_CGACT_State, _Parameter_CGACT_Cid);
-
-			// Set WD Variable
-			_Error_WD++;
-
-			// Control for WD
-			if (_Error_WD > 1) break;
-
-		}
-
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
-			}
-
-		}
-	
-		// End Function
-		if (!_Response) return (false);
-
-		// **************************************************
-		// CGPADDR Command
-		// **************************************************
-
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
-
-		// Declare Parameters
-		const uint8_t _Parameter_CGPADDR_Cid = 1;
-
-		// Declare Watchdog Variable
-		_Error_WD = 0;
-
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT+CGPADDR="));
-		if (Debug_Mode) Serial.print(_Parameter_CGPADDR_Cid);
-		if (Debug_Mode) Serial.print(F("................................"));
-
-		// Process Command
-		while (!_Response) {
-
-			// Get IP Address
-			_Response = GSM_AT.CGPADDR(_Parameter_CGPADDR_Cid);
-
-			// Set WD Variable
-			_Error_WD++;
-
-			// Control for WD
-			if (_Error_WD > 1) break;
-
-		}
-
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
-			}
-
-		}
-	
-		// End Function
-		if (!_Response) return (false);
-
-		// **************************************************
-		// HTTPCFG Command
-		// **************************************************
-
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
-
-		// Declare Parameters
-		const uint8_t _Parameter_HTTPCFG_ProfID = 1;
-		const char *_Parameter_HTTPCFG_Server = "54.216.226.171";
-		const uint8_t _Parameter_HTTPCFG_Port = 80;
-		const uint8_t _Parameter_HTTPCFG_AuthType = 0;
-		const char *_Parameter_HTTPCFG_Username = "";
-		const char *_Parameter_HTTPCFG_Password = "";
-		const uint8_t _Parameter_HTTPCFG_SSL = 0;
-		const uint8_t _Parameter_HTTPCFG_TimeOut = 20;
-		const uint8_t _Parameter_HTTPCFG_Cid = 1;
-
-		// Declare Watchdog Variable
-		_Error_WD = 0;
-
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) {
-			Serial.print(F("AT#HTTPCFG="));
-			Serial.print(_Parameter_HTTPCFG_ProfID);
-			Serial.print(F(",\""));
-			Serial.print(F("*****"));
-			Serial.print(F("\","));
-			Serial.print(_Parameter_HTTPCFG_Port);
-			Serial.print(F(","));
-			Serial.print(_Parameter_HTTPCFG_AuthType);
-			Serial.print(F(",\""));
-			Serial.print(_Parameter_HTTPCFG_Username);
-			Serial.print(F("\",\""));
-			Serial.print(_Parameter_HTTPCFG_Password);
-			Serial.print(F("\","));
-			Serial.print(_Parameter_HTTPCFG_SSL);
-			Serial.print(F(","));
-			Serial.print(_Parameter_HTTPCFG_TimeOut);
-			Serial.print(F(","));
-			Serial.print(_Parameter_HTTPCFG_Cid);
-			Serial.print(F("......"));
-		}
-
-		// Process Command
-		while (!_Response) {
-
-			// Set HTTP Configuration
-			_Response = GSM_AT.HTTPCFG(_Parameter_HTTPCFG_ProfID, _Parameter_HTTPCFG_Server, _Parameter_HTTPCFG_Port, _Parameter_HTTPCFG_AuthType, _Parameter_HTTPCFG_Username, _Parameter_HTTPCFG_Password, _Parameter_HTTPCFG_SSL, _Parameter_HTTPCFG_TimeOut, _Parameter_HTTPCFG_Cid);
-
-			// Set WD Variable
-			_Error_WD++;
-
-			// Control for WD
-			if (_Error_WD > 1) break;
-
-		}
-
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
-			}
-
-		}
-	
-		// End Function
-		if (!_Response) return (false);
-
-		// **************************************************
-		// E2SLRI Command
-		// **************************************************
-
-		// Command Chain Delay (Advice by Telit)
-		delay(20);
-
-		// Declare Parameters
-		uint16_t _Parameter_E2SLRI_Pulse = 50;
-
-		// Declare Watchdog Variable
-		_Error_WD = 0;
-
-		// Set Response Variable
-		_Response = false;
-
-		// Command Debug
-		if (Debug_Mode) Serial.print(F("AT#E2SLRI="));
-		if (Debug_Mode) Serial.print(_Parameter_E2SLRI_Pulse);
-		if (Debug_Mode) Serial.print(F("................................"));
-
-		// Process Command
-		while (!_Response) {
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+CGACT="));
+			if (Debug_Mode) Serial.print(_Parameter_CGACT_State);
+			if (Debug_Mode) Serial.print(F(","));
+			if (Debug_Mode) Serial.print(_Parameter_CGACT_Cid);
+			if (Debug_Mode) Serial.print(F("................................"));
 
 			// Process Command
-			_Response = GSM_AT.E2SLRI(_Parameter_E2SLRI_Pulse);
+			while (!_Response) {
 
-			// Set WD Variable
-			_Error_WD++;
+				// Get IP Address
+				_Response = GSM_AT.CGACT(_Parameter_CGACT_State, _Parameter_CGACT_Cid);
 
-			// Control for WD
-			if (_Error_WD > 5) break;
+				// Set WD Variable
+				_Error_WD++;
 
-		}
+				// Control for WD
+				if (_Error_WD > 1) break;
 
-		// Print Command State
-		if (Debug_Mode) {
-
-			// Control for Response				
-			if (_Response) {
-				
-				Serial.println(F("..[OK]"));
-				
-			} else {
-				
-				Serial.println(F("[FAIL]"));
-				
 			}
 
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
 		}
-	
-		// End Function
-		if (!_Response) return (false);
 
+		// CGPADDR Command
+		if (_CGPADDR) {
+		
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
 
+			// Declare Parameters
+			const uint8_t _Parameter_CGPADDR_Cid = 1;
 
+			// Declare Watchdog Variable
+			_Error_WD = 0;
 
+			// Set Response Variable
+			_Response = false;
 
+			// Command Debug
+			if (Debug_Mode) Serial.print(F("AT+CGPADDR="));
+			if (Debug_Mode) Serial.print(_Parameter_CGPADDR_Cid);
+			if (Debug_Mode) Serial.print(F("................................"));
+
+			// Process Command
+			while (!_Response) {
+
+				// Get IP Address
+				_Response = GSM_AT.CGPADDR(_Parameter_CGPADDR_Cid);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 1) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+		}
+
+		// HTTPCFG Command
+		if (_HTTPCFG) {
+		
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			const uint8_t _Parameter_HTTPCFG_ProfID = 1;
+			const char *_Parameter_HTTPCFG_Server = "54.216.226.171";
+			const uint8_t _Parameter_HTTPCFG_Port = 80;
+			const uint8_t _Parameter_HTTPCFG_AuthType = 0;
+			const char *_Parameter_HTTPCFG_Username = "";
+			const char *_Parameter_HTTPCFG_Password = "";
+			const uint8_t _Parameter_HTTPCFG_SSL = 0;
+			const uint8_t _Parameter_HTTPCFG_TimeOut = 20;
+			const uint8_t _Parameter_HTTPCFG_Cid = 1;
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) {
+				Serial.print(F("AT#HTTPCFG="));
+				Serial.print(_Parameter_HTTPCFG_ProfID);
+				Serial.print(F(",\""));
+				Serial.print(F("*****"));
+				Serial.print(F("\","));
+				Serial.print(_Parameter_HTTPCFG_Port);
+				Serial.print(F(","));
+				Serial.print(_Parameter_HTTPCFG_AuthType);
+				Serial.print(F(",\""));
+				Serial.print(_Parameter_HTTPCFG_Username);
+				Serial.print(F("\",\""));
+				Serial.print(_Parameter_HTTPCFG_Password);
+				Serial.print(F("\","));
+				Serial.print(_Parameter_HTTPCFG_SSL);
+				Serial.print(F(","));
+				Serial.print(_Parameter_HTTPCFG_TimeOut);
+				Serial.print(F(","));
+				Serial.print(_Parameter_HTTPCFG_Cid);
+				Serial.print(F("......"));
+			}
+
+			// Process Command
+			while (!_Response) {
+
+				// Set HTTP Configuration
+				_Response = GSM_AT.HTTPCFG(_Parameter_HTTPCFG_ProfID, _Parameter_HTTPCFG_Server, _Parameter_HTTPCFG_Port, _Parameter_HTTPCFG_AuthType, _Parameter_HTTPCFG_Username, _Parameter_HTTPCFG_Password, _Parameter_HTTPCFG_SSL, _Parameter_HTTPCFG_TimeOut, _Parameter_HTTPCFG_Cid);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 1) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+		}
 
 		// **************************************************
 		// Control for IP Address
@@ -1567,7 +1572,57 @@ bool xE910_GSM::Send_Data_Pack(const char *_Data) {
 	return(false);
 
 }
-bool xE910_GSM::Socket_Listen(void) {
+bool xE910_GSM::Socket_Answer(void) {
+
+	// Interrupt Delay
+	delay(10);
+
+	// Control for Incoming Message
+	if (GSM_Serial.available() > 0) {
+
+		// Declare Read Order Variable
+		uint8_t _Read_Order = 0;
+
+		// Declare Response Variable
+		char _Serial_Buffer[GSM_Serial.available()];
+
+		// Read UART Response
+		while (GSM_Serial.available() > 0) {
+
+			// Read Serial Char
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+			// Increase Read Order
+			_Read_Order++;
+
+		}
+
+		// Control for Response
+		if (strstr(_Serial_Buffer, "SRING: 2") != NULL) {
+
+			// Reset Variable
+			GSM_AT.Remote_Command = 0;
+
+			// Socket Answer Command
+			uint16_t _Message_Length = GSM_AT.SA(2,1);
+
+			// Socket Recieve Command
+			GSM_AT.Remote_Command = GSM_AT.SRECV(2, _Message_Length);
+
+			// Close Socket Command
+			GSM_AT.SH(2);
+
+			// ReOpen Socket Command
+			GSM_AT.SL(2, 1, 80, 0); 
+
+		} else {
+
+			// Set Request Variable
+			GSM_AT.Remote_Command = 0;
+
+		}
+
+	}
 
 }
 bool xE910_GSM::RSSI_Refresh(void) {
@@ -2106,9 +2161,6 @@ void xE910_HARDWARE::LED(const bool _State) {
 
 bool xE910_AT::AT(void) {
 
-	// Declare Read Order Variable
-	uint8_t _Read_Order = 0;
-
 	// Clear UART Buffer
     _Clear_UART_Buffer();
 
@@ -2119,35 +2171,11 @@ bool xE910_AT::AT(void) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Command Work Delay
-	delay(10);
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
 	// Control for Response
-	if (strstr(_Serial_Buffer, "OK") != NULL) {
+	bool _Response = _AT_Response("OK", 1000);
 
-		// End Function
-		return (true);
-
-	} else {
-
-		// End Function
-		return (false);
-
-	}
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::ATE(const bool _ECHO) {
@@ -2166,35 +2194,11 @@ bool xE910_AT::ATE(const bool _ECHO) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Command Work Delay
-	delay(15);
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
 	// Control for Response
-	if (strstr(_Serial_Buffer, "OK") != NULL) {
+	bool _Response = _AT_Response("OK", 1000);
 
-		// End Function
-		return (true);
-
-	} else {
-
-		// End Function
-		return (false);
-
-	}
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::CMEE(const uint8_t _CMEE) {
@@ -2213,35 +2217,11 @@ bool xE910_AT::CMEE(const uint8_t _CMEE) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Command Work Delay
-	delay(15);
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
 	// Control for Response
-	if (strstr(_Serial_Buffer, "OK") != NULL) {
+	bool _Response = _AT_Response("OK", 1000);
 
-		// End Function
-		return (true);
-
-	} else {
-
-		// End Function
-		return (false);
-
-	}
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
@@ -2260,35 +2240,11 @@ bool xE910_AT::FCLASS(const uint8_t _FCLASS) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Command Work Delay
-	delay(15);
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
 	// Control for Response
-	if (strstr(_Serial_Buffer, "OK") != NULL) {
+	bool _Response = _AT_Response("OK", 1000);
 
-		// End Function
-		return (true);
-
-	} else {
-
-		// End Function
-		return (false);
-
-	}
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::K(const uint8_t _K) {
@@ -2307,35 +2263,11 @@ bool xE910_AT::K(const uint8_t _K) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Command Work Delay
-	delay(15);
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
 	// Control for Response
-	if (strstr(_Serial_Buffer, "OK") != NULL) {
+	bool _Response = _AT_Response("OK", 1000);
 
-		// End Function
-		return (true);
-
-	} else {
-
-		// End Function
-		return (false);
-
-	}
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::CPIN(void) {
@@ -2891,35 +2823,11 @@ bool xE910_AT::SLED(const uint8_t _SLED) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Command Work Delay
-	delay(15);
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
 	// Control for Response
-	if (strstr(_Serial_Buffer, "OK") != NULL) {
+	bool _Response = _AT_Response("OK", 1000);
 
-		// End Function
-		return (true);
-
-	} else {
-
-		// End Function
-		return (false);
-
-	}
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
@@ -2938,35 +2846,11 @@ bool xE910_AT::TXMONMODE(const uint8_t _TXMONMODE) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Command Work Delay
-	delay(15);
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
 	// Control for Response
-	if (strstr(_Serial_Buffer, "OK") != NULL) {
+	bool _Response = _AT_Response("OK", 1000);
 
-		// End Function
-		return (true);
-
-	} else {
-
-		// End Function
-		return (false);
-
-	}
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
@@ -2985,48 +2869,11 @@ bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Handle Response
-	if (_Response_Wait(_Response_Length, 1000)) {
+	// Control for Response
+	bool _Response = _AT_Response("OK", 1000);
 
-		// Declare Read Order Variable
-		uint8_t _Read_Order = 0;
-
-		// Declare Response Variable
-		char _Serial_Buffer[_Response_Length];
-
-		// Read UART Response
-		while (GSM_Serial.available() > 0) {
-
-			// Read Serial Char
-			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-			// Increase Read Order
-			_Read_Order++;
-
-			// Stream Delay
-			delay(1);
-
-		}
-
-		// Control for Response
-		if (strstr(_Serial_Buffer, "OK") != NULL) {
-
-			// End Function
-			return (true);
-
-		} else {
-
-			// End Function
-			return (false);
-
-		}
-
-    } else {
-
-		// End Function
-		return (false);
-
-    }
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::CREG(const bool _Mode) {
@@ -4467,17 +4314,9 @@ uint16_t xE910_AT::SA(const uint8_t _ConnID, const uint8_t _ConnMode) {
 
 	// Declare Read Order Variable
 	uint8_t _Read_Order = 0;
-	uint8_t _Data_Order = 0;
-	bool _Comma = false;
-
-	// Declare Connection Variable
-	bool _SRING = false;
-
-	// Declare Incomming Message Length Variable
-	char _Incomming_Length[4];
 
 	// Clear UART Buffer
-    _Clear_UART_Buffer();
+	_Clear_UART_Buffer();
 
 	// Send UART Command
 	GSM_Serial.print(F("AT#SA="));
@@ -4492,69 +4331,188 @@ uint16_t xE910_AT::SA(const uint8_t _ConnID, const uint8_t _ConnMode) {
 	// Command Work Delay
 	delay(20);
 
-	// Declare Watchdog Variables
-	uint8_t _Error_WD = 0;
+	// Read Current Time
+	uint32_t _Time = millis();
 
-	// Control Loop
-	while (!_SRING) {
+	// Wait for UART Available
+	while ((uint16_t)GSM_Serial.available() > (uint16_t)21) {
 
-		// Handle for Error
-		if (_Error_WD >= 10) return (false);
+		// Wait delay
+		delay(5);
 
-		// Declare Response Variable
-		char _Serial_Buffer[GSM_Serial.available()];
+		// Handle for timeout
+		if (millis() - _Time >= 2000) return (99);
 
-		// Read UART Response
-		while (GSM_Serial.available() > 0) {
+	}
 
-			// Read Serial Char
-			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+	// Declare Response Variable
+	char _Serial_Buffer[GSM_Serial.available()];
 
-			// Handle ,
-			if (_Serial_Buffer[_Read_Order] == 44) _Comma = true;
+	// Declare Data Order Variable
+	uint8_t _Data_Order = 0;
 
+	// Declare Handle Variable
+	bool _Comma = false;
+
+	// Declare Incomming Message Length Variable
+	char _Incomming_Length[4];
+
+	// Read UART Response
+	while (GSM_Serial.available() > 0) {
+
+		// Read Serial Char
+		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Handle ,
+		if (_Serial_Buffer[_Read_Order] == 44) _Comma = true;
+
+		// Handle Data
+		if (_Comma == true and _Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) {
+
+			// Get Data
+			_Incomming_Length[_Data_Order] = _Serial_Buffer[_Read_Order];
+
+			// Increase Data Order
+			_Data_Order++;
+
+		}
+
+		// Increase Read Order
+		_Read_Order++;
+
+		// Buffer Read Delay
+		delay(1);
+
+	}
+
+	// Control for Response
+	if (strstr(_Serial_Buffer, "SRING:") != NULL) {
+
+		// End Function
+		return(atoi(_Incomming_Length));
+
+	} else {
+
+		// End Function
+		return (0);
+
+	}
+
+}
+uint16_t xE910_AT::SRECV(const uint8_t _ConnID, const uint16_t _MaxByte) {
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Declare Data Order Variable
+	uint8_t _Data_Order = 0;
+
+	// Declare Loop Variable
+	bool _SRECV = false;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#SRECV="));
+	GSM_Serial.print(String(_ConnID));
+	GSM_Serial.print(F(","));
+	GSM_Serial.print(String(_MaxByte));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Declare Response Variable
+	char _Serial_Buffer[255];
+	memset(_Serial_Buffer, '\0' ,255);
+
+	// Declare Message_Handler
+	bool _Message_Handler = false;
+
+	// Declare Message Variable
+	char _Message_Buffer[4];
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Read UART Response
+	while (!_SRECV) {
+
+		// Read Serial Char
+		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Handle {
+		if (_Serial_Buffer[_Read_Order] == 123) _Message_Handler = true;
+
+		// Handle }
+		if (_Serial_Buffer[_Read_Order] == 125) _Message_Handler = false;
+
+		// Handle Message
+		if (_Message_Handler) {
+			
 			// Handle Data
-			if (_Comma == true and _Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) {
+			if (_Serial_Buffer[_Read_Order] < 58 and _Serial_Buffer[_Read_Order] > 47) {
 
 				// Get Data
-				_Incomming_Length[_Data_Order] = _Serial_Buffer[_Read_Order];
+				_Message_Buffer[_Data_Order] = _Serial_Buffer[_Read_Order];
 
 				// Increase Data Order
 				_Data_Order++;
 
 			}
 
-			// Increase Read Order
-			_Read_Order++;
+		}
+
+		// Control for Response
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
+
+			// Set Control Variable
+			_SRECV = true;
+
+		} else {
 
 			// Buffer Read Delay
 			delay(2);
 
+			// Set Control Variable
+			_SRECV = false;
+
 		}
 
-		// Control for Response
-		if (strstr(_Serial_Buffer, "SRING:") != NULL) {
+		// Handle for timeout
+		if (millis() - _Time >= 5000) return (99);
 
-			// Set Control Variable
-			_SRING = true;
-
-		} else {
-
-			// Connection Delay
-			delay(50);
-
-			// Set Control Variable
-			_SRING = false;
-
-			// Count for Error
-			_Error_WD++;
-
-		}
+		// Increase Read Order
+		_Read_Order++;
 
 	}
 
 	// End Function
-	return(atoi(_Incomming_Length));
+	return(atoi(_Message_Buffer));
+
+}
+bool xE910_AT::SH(const uint8_t _ConnID) {
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#SH="));
+	GSM_Serial.print(String(_ConnID));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Control for Response
+	bool _Response = _AT_Response("OK", 1000);
+
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::FRWL(const uint8_t _Action, const char *_IP_Addr, const char *_Net_Mask) {
@@ -4578,35 +4536,11 @@ bool xE910_AT::FRWL(const uint8_t _Action, const char *_IP_Addr, const char *_Ne
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Command Work Delay
-	delay(20);
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
 	// Control for Response
-	if (strstr(_Serial_Buffer, "OK") != NULL) {
+	bool _Response = _AT_Response("OK", 1000);
 
-		// End Function
-		return (true);
-
-	} else {
-
-		// End Function
-		return (false);
-
-	}
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const uint8_t _Port, const uint8_t _AuthType, const char *_Username, const char *_Password, const uint8_t _SSL, const uint8_t _TimeOut, const uint8_t _Cid) {
@@ -4641,35 +4575,11 @@ bool xE910_AT::HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const ui
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Command Work Delay
-	delay(20);
-
-	// Declare Response Variable
-	char _Serial_Buffer[GSM_Serial.available()];
-
-	// Read UART Response
-	while (GSM_Serial.available() > 0) {
-
-		// Read Serial Char
-		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-		// Increase Read Order
-		_Read_Order++;
-
-	}
-
 	// Control for Response
-	if (strstr(_Serial_Buffer, "OK") != NULL) {
+	bool _Response = _AT_Response("OK", 1000);
 
-		// End Function
-		return (true);
-
-	} else {
-
-		// End Function
-		return (false);
-
-	}
+	// End Function
+	return (_Response);
 
 }
 bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const char *_Data) {
@@ -5023,6 +4933,54 @@ bool xE910_AT::_Response_Wait(uint16_t _Length, uint32_t _TimeOut) {
 
 		// Handle for timeout
 		if (millis() - _Time >= _TimeOut) return (false);
+
+	}
+
+	// End Function
+	return (true);
+
+}
+bool xE910_AT::_AT_Response(const char *_Response, uint16_t _Time_Out) {
+
+	// Declare Response Variable
+	char _Serial_Buffer[255];
+
+	// Declare Loop Variable
+	bool _RESPONSE = false;
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Read UART Response
+	while (!_RESPONSE) {
+
+		// Read Serial Char
+		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Control for Response
+		if (strstr(_Serial_Buffer, _Response) != NULL) {
+
+			// Set Control Variable
+			_RESPONSE = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+			// Set Control Variable
+			_RESPONSE = false;
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Time_Out) return (false);
+
+		// Increase Read Order
+		_Read_Order++;
 
 	}
 
