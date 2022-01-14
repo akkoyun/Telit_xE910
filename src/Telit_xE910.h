@@ -18,6 +18,9 @@
 // Define PGMspace Function
 #include <avr/pgmspace.h>
 
+// Include String Library
+#include <string.h>
+
 // Define Library Structures
 #ifndef __Telit_xE910_Structures__
 #include <Telit_xE910_Structures.h>
@@ -857,7 +860,7 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const char *_IP);
+		bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const char *_IP, const uint8_t _Closure_Type, uint16_t _IPort, const bool _Conn_Mode, const char *_Data);
 
 		/**
 		 * @brief Execution command reports the current status of the socket
