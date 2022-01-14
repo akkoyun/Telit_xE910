@@ -68,7 +68,7 @@ if (GSM.Send_Data_Pack(DD) == true) {
 */
 
 GSM_AT.FRWL(1,"213.14.250.214", "255.255.255.0");
-GSM_AT.SL(2,1,80,0);
+GSM_AT.SL(2,1,80,255);
 
 	cli();
 	PCICR	|= 0b00000111;	// Set All Interrupt

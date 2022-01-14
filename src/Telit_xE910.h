@@ -1026,6 +1026,8 @@ class xE910_AT {
 		 */
 		bool E2SLRI(const uint16_t _Pulse_Duration);
 
+		bool ICMP(const uint8_t _Mode);
+
 	private:
 
 		/**

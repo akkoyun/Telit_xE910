@@ -839,6 +839,7 @@ bool xE910_GSM::Connect(void) {
 		const bool _CGACT = true;
 		const bool _CGPADDR = true;
 		const bool _HTTPCFG = true;
+		const bool _ICMP = true;
 
 		// TXMONMODE Command
 		if (_TXMONMODE) {
@@ -1522,6 +1523,63 @@ bool xE910_GSM::Connect(void) {
 
 		}
 
+		// ICMP Command
+		if (_ICMP) {
+		
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Declare Parameters
+			const uint8_t _Parameter_ICMP_Mode = 1;
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Command Debug
+			if (Debug_Mode) {
+				Serial.print(F("AT#ICMP="));
+				Serial.print(_Parameter_ICMP_Mode);
+				Serial.print(F(".............................."));
+			}
+
+			// Process Command
+			while (!_Response) {
+
+				// Set HTTP Configuration
+				_Response = GSM_AT.ICMP(_Parameter_ICMP_Mode);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 1) break;
+
+			}
+
+			// Print Command State
+			if (Debug_Mode) {
+
+				// Control for Response				
+				if (_Response) {
+					
+					Serial.println(F("..[OK]"));
+					
+				} else {
+					
+					Serial.println(F("[FAIL]"));
+					
+				}
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+		}
+
 		// **************************************************
 		// Control for IP Address
 		// **************************************************
@@ -1613,7 +1671,7 @@ bool xE910_GSM::Socket_Answer(void) {
 			bool _SH = GSM_AT.SH(2);
 
 			// ReOpen Socket Command
-			bool _SL = GSM_AT.SL(2, 1, 80, 0); 
+			bool _SL = GSM_AT.SL(2, 1, 80, 255); 
 
 		} else {
 
@@ -4839,6 +4897,26 @@ bool xE910_AT::E2SLRI(const uint16_t _Pulse_Duration) {
 	// End Function
 	return (_Response);
 
+
+}
+bool xE910_AT::ICMP(const uint8_t _Mode) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#ICMP="));
+	GSM_Serial.print(String(_Mode));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Control for Response
+	bool _Response = _AT_Response("OK", 1000);
+
+	// End Function
+	return (_Response);
 
 }
 
