@@ -1542,7 +1542,7 @@ bool xE910_GSM::Connect(void) {
 			if (Debug_Mode) {
 				Serial.print(F("AT#ICMP="));
 				Serial.print(_Parameter_ICMP_Mode);
-				Serial.print(F(".............................."));
+				Serial.print(F("..................................."));
 			}
 
 			// Process Command
@@ -1666,6 +1666,9 @@ bool xE910_GSM::Socket_Answer(void) {
 
 			// Socket Recieve Command
 			GSM_AT.Remote_Command = GSM_AT.SRECV(2, _Message_Length);
+
+			// Send Response Message
+			GSM_AT.SSEND(2,SUCCESS);
 
 			// Close Socket Command
 			bool _SH = GSM_AT.SH(2);
@@ -4485,6 +4488,111 @@ uint16_t xE910_AT::SRECV(const uint8_t _ConnID, const uint16_t _MaxByte) {
 	return(atol(_Message_Buffer));
 
 }
+bool xE910_AT::SSEND(const uint8_t _ConnID, const uint16_t _Response_Code) {
+
+	// Clear UART Buffer
+	_Clear_UART_Buffer();
+
+	// Send UART Command
+	GSM_Serial.print(F("AT#SSEND="));
+	GSM_Serial.print(String(_ConnID));
+	GSM_Serial.print(F("\r\n"));
+
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Declare Response Variable
+	char _Serial_Buffer[255];
+	memset(_Serial_Buffer, '\0', 255);
+
+	// Declare Loop Variable
+	bool _SEND = false;
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Read UART Response
+	while (!_SEND) {
+
+		// Read Serial Char
+		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Control for Response
+		if (strstr(_Serial_Buffer, "\r\n>") != NULL) {
+
+			// Handle Response
+			_SEND = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= 1000) return (98);
+
+		// Increase Read Order
+		_Read_Order++;
+
+	}
+
+	// Command Delay
+	delay(30);
+
+	// Print Response Headers
+	_Response_Headers();
+
+	// Print Response Message
+	_Response_Message(200);
+
+	// Declare Loop Variable
+	_SEND = false;
+
+	// Declare Response Variable
+	memset(_Serial_Buffer, '\0', 255);
+
+	// Declare Read Order Variable
+	_Read_Order = 0;
+
+	// Read Current Time
+	_Time = millis();
+
+	// Read UART Response
+	while (!_SEND) {
+
+		// Read Serial Char
+		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Control for Response
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_SEND = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= 1000) return (98);
+
+		// Increase Read Order
+		_Read_Order++;
+
+	}
+
+	// End Function
+	return(true);
+
+}
 bool xE910_AT::SH(const uint8_t _ConnID) {
 
 	// Clear UART Buffer
@@ -5003,6 +5111,25 @@ bool xE910_AT::_AT_Response(const char *_Response, uint16_t _Time_Out) {
 
 	// End Function
 	return (true);
+
+}
+void xE910_AT::_Response_Headers(void) {
+
+	// Print HTTP Header
+	GSM_Serial.print(F("HTTP/1.1 200 OK\r\n"));
+	GSM_Serial.print(F("Connection: close\r\n"));
+	GSM_Serial.print(F("Content-Type: application/json\r\n"));
+
+}
+void xE910_AT::_Response_Message(const uint16_t _Response_Code) {
+
+	// Print HTTP Header
+	GSM_Serial.print(F("{\"Response\":{\"Event\":"));
+	GSM_Serial.print(String(_Response_Code));
+	GSM_Serial.print(F("}}"));
+
+	// Print End Char
+	GSM_Serial.write((char)26);
 
 }
 

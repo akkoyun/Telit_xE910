@@ -37,7 +37,7 @@ class xE910_GSM {
 		/**
 		* Library global variables declarations.
 		*/
-		const char 	Version[9] 					= "01.03.10";		// Library Version
+		const char 	Version[9] 					= "01.06.00";		// Library Version
 		bool		Debug_Mode					= false;			// Debug Mode Variable
 
 		/**
@@ -940,6 +940,7 @@ class xE910_AT {
 		 * @return uint16_t 
 		 */
 		uint16_t SRECV(const uint8_t _ConnID, const uint16_t _MaxByte);
+		bool SSEND(const uint8_t _ConnID, const uint16_t _Response_Code);
 
 		/**
 		 * @brief Execution command controls the internal firewall settings.
@@ -1047,6 +1048,9 @@ class xE910_AT {
 		bool _Response_Wait(uint16_t _Length, uint32_t _TimeOut);
 
 		bool _AT_Response(const char *_Response, uint16_t _Time_Out);
+
+		void _Response_Headers(void);
+		void _Response_Message(const uint16_t _Response_Code);
 };
 
 /**
