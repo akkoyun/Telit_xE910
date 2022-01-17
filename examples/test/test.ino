@@ -68,7 +68,10 @@ if (GSM.Send_Data_Pack(DD) == true) {
 */
 
 GSM_AT.FRWL(1,"213.14.250.214", "255.255.255.0");
-GSM_AT.SL(2,1,80,0);
+GSM_AT.FRWL(1,"83.160.73.106", "255.255.255.0");
+
+
+GSM_AT.SL(2,1,80,255);
 
 	cli();
 	PCICR	|= 0b00000111;	// Set All Interrupt
@@ -92,9 +95,11 @@ void loop() {
        	// Set Interrupt Variable
         GSM.Socket_Answer();
 
-        Serial.println(GSM_AT.Remote_Command);
+        Serial.print(F("Server Command     : ")); Serial.println(GSM_AT.Remote_Command);
+        Serial.println(F("--------------------------------------------------"));
 
         Interrupt = false;
+        GSM_AT.Remote_Command = 0;
 
     }
     

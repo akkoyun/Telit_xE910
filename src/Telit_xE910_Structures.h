@@ -47,4 +47,14 @@ enum Connection_State {
 	CONNECTED							= 1					// Valid IP Address
 };
 
+/**
+ * @brief Server Communication Command Set
+ */
+enum Command_Set {
+	SUCCESS								= 200,				// Command Succesful
+	PUMP_START							= 256,				// Pump Start Command
+	PUMP_STOP							= 257,				// Pump Stop Command
+	STATUS_UPDATE						= 262				// Status Uğdate
+};
+
 #endif

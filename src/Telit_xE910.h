@@ -18,6 +18,9 @@
 // Define PGMspace Function
 #include <avr/pgmspace.h>
 
+// Include String Library
+#include <string.h>
+
 // Define Library Structures
 #ifndef __Telit_xE910_Structures__
 #include <Telit_xE910_Structures.h>
@@ -34,7 +37,7 @@ class xE910_GSM {
 		/**
 		* Library global variables declarations.
 		*/
-		const char 	Version[9] 					= "01.03.10";		// Library Version
+		const char 	Version[9] 					= "01.06.00";		// Library Version
 		bool		Debug_Mode					= false;			// Debug Mode Variable
 
 		/**
@@ -857,7 +860,7 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const char *_IP);
+		bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const char *_IP, const uint8_t _Closure_Type, uint16_t _IPort, const bool _Conn_Mode, const char *_Data);
 
 		/**
 		 * @brief Execution command reports the current status of the socket
@@ -937,6 +940,7 @@ class xE910_AT {
 		 * @return uint16_t 
 		 */
 		uint16_t SRECV(const uint8_t _ConnID, const uint16_t _MaxByte);
+		bool SSEND(const uint8_t _ConnID, const uint16_t _Response_Code);
 
 		/**
 		 * @brief Execution command controls the internal firewall settings.
@@ -1023,6 +1027,24 @@ class xE910_AT {
 		 */
 		bool E2SLRI(const uint16_t _Pulse_Duration);
 
+		/**
+		 * @brief Set command enables/disables the ICMP Ping support.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Mode 
+		 * 0 - disable ICMP Ping support (default)
+		 * 1 - enable firewalled ICMP Ping support: the module is sending a proper 
+		 * ECHO_REPLY only to a subset of IP Addresses pinging it; this subset of IP 
+		 * Addresses has been previously specified through #FRWL (see) 
+		 * 2 - enable free ICMP Ping support; the module is sending a proper
+		 * ECHO_REPLY to every IP Address pinging it.
+
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
+		bool ICMP(const uint8_t _Mode);
+
 	private:
 
 		/**
@@ -1041,7 +1063,35 @@ class xE910_AT {
  		*/
 		bool _Response_Wait(uint16_t _Length, uint32_t _TimeOut);
 
+		/**
+		 * @brief Search response for desiered response.
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Response String for search.
+		 * @param _Time_Out Time out 
+		 * 
+		 * @return true - Command successful
+		 * @return false - Command fails
+		 */
 		bool _AT_Response(const char *_Response, uint16_t _Time_Out);
+
+		/**
+		 * @brief Response header print
+		 * 
+		 * @version 01.00.00
+		 */
+		void _Response_Headers(void);
+
+		/**
+		 * @brief Response message print
+		 * 
+		 * @version 01.00.00
+		 * 
+		 * @param _Response_Code Response code.
+		 */
+		void _Response_Message(const uint16_t _Response_Code);
+
 };
 
 /**
