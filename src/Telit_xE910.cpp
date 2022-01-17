@@ -1076,7 +1076,7 @@ bool xE910_GSM::Connect(void) {
 			const uint8_t _Parameter_SCFG_Cid = 1;
 			const uint16_t _Parameter_SCFG_Pkt_Sz = 1500;
 			const uint16_t _Parameter_SCFG_Max_To = 90;
-			const uint16_t _Parameter_SCFG_Conn_To = 600;
+			const uint16_t _Parameter_SCFG_Conn_To = 300;
 			const uint8_t _Parameter_SCFG_TX_To = 50;
 
 			// Declare Watchdog Variable
@@ -5119,6 +5119,8 @@ void xE910_AT::_Response_Headers(void) {
 	GSM_Serial.print(F("HTTP/1.1 200 OK\r\n"));
 	GSM_Serial.print(F("Connection: close\r\n"));
 	GSM_Serial.print(F("Content-Type: application/json\r\n"));
+	GSM_Serial.print(F("User-Agent: STF-PowerStat\r\n"));
+	GSM_Serial.print(F("\r\n"));
 
 }
 void xE910_AT::_Response_Message(const uint16_t _Response_Code) {
