@@ -84,49 +84,7 @@ class xE910_GSM {
 		 */
 		bool RSSI_Refresh(void);
 
-		/**
-		 * @brief Returns GSM modem manufacturer name (string)
-		 * @version 01.00.01
-		 */
-		String Manufacturer(void);
-		
-		/**
-		 * @brief Returns GSM modem Model name (string)
-		 * @version 01.00.01
-		 */
-		String Model(void);
-
-		/**
-		 * @brief Returns GSM operator name (string)
-		 * @version 01.00.01
-		 */
-		String Operator(void);
-
-		/**
-		 * @brief Returns GSM modem firmware name (string)
-		 */
-		String Firmware(void);
-
-		/**
-		 * @brief Returns GSM modem IMEI (string)
-		 */
-		String IMEI(void);
-
-		/**
-		 * @brief Returns GSM modem serial id (string)
-		 */
-		String Serial_ID(void);
-
-		/**
-		 * @brief Returns GSM modem ICCID (string)
-		 */
-		String ICCID(void);
-
-		/**
-		 * @brief IP Variable
-		 * @version 01.00.01
-		 */
-		String IP(void);
+		bool Connection_Control(void);
 
 		/**
 		 * @brief Signal Strength x/4
@@ -138,7 +96,7 @@ class xE910_GSM {
 		 * @brief Data send procedure.
 		 * @version 01.00.01
 		 */
-		bool Send_Data_Pack(const char *_Data);
+		bool Send_Data_Pack(const String _Data);
 
 	private:
 	
@@ -235,6 +193,7 @@ class xE910_AT {
 		char		IP_Address[16]				= "";				// IP Address Variable
 		bool		Connection_Status			= false;			// Connection Status
 		uint16_t	Remote_Command				= 0;				// Remote Server Command
+		uint16_t	Server_Response				= 0;				// Server Response Command
 
 		uint8_t 	RTC_Day						= 29;				// Day Variable
 		uint8_t 	RTC_Month					= 10;				// Month Variable
@@ -242,6 +201,10 @@ class xE910_AT {
 		uint8_t 	RTC_Hour					= 0;				// Hour Variable
 		uint8_t 	RTC_Minute					= 0;				// Minute Variable
 		uint8_t 	RTC_Second					= 0;				// Second Variable
+
+		String		JSON_P01					= "";				// P01 JSON Pack
+		String		JSON_P02					= "";				// P02 JSON Pack
+		String		JSON_P03					= "";				// P03 JSON Pack
 
 		/**
 		 * @brief AT Function
@@ -1000,7 +963,7 @@ class xE910_AT {
 		 * @return true - Command successful
 		 * @return false - Command fails
 		 */
-		bool HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const char *_Data);
+		bool HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const String _Data);
 
 		/**
 		 * @brief Execution command permits the user to read data from HTTP server in response to a previous HTTP module request.
@@ -1047,11 +1010,15 @@ class xE910_AT {
 
 	private:
 
+		char _Serial_Buffer[255];
+
 		/**
 		 * @brief Clear GSM serial communication buffer.
 		 * @version 01.00.00
 		 */
 		void _Clear_UART_Buffer(void);	
+
+		void _Clear_Buffer_Variable(void);
 
 		/**
  		* @brief Waits serial stream message for specified length.
@@ -1064,25 +1031,12 @@ class xE910_AT {
 		bool _Response_Wait(uint16_t _Length, uint32_t _TimeOut);
 
 		/**
-		 * @brief Search response for desiered response.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Response String for search.
-		 * @param _Time_Out Time out 
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool _AT_Response(const char *_Response, uint16_t _Time_Out);
-
-		/**
 		 * @brief Response header print
 		 * 
 		 * @version 01.00.00
 		 */
 		void _Response_Headers(void);
-
+		void _Request_Headers(uint16_t _Size);
 		/**
 		 * @brief Response message print
 		 * 
