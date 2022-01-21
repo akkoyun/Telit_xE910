@@ -1679,62 +1679,6 @@ bool xE910_GSM::Send_Data_Pack(const String _Data) {
 	return(false);
 
 }
-bool xE910_GSM::Socket_Answer(void) {
-
-	// Interrupt Delay
-	delay(10);
-
-	// Control for Incoming Message
-	if (GSM_Serial.available() > 0) {
-
-		// Declare Read Order Variable
-		uint8_t _Read_Order = 0;
-
-		// Declare Response Variable
-		char _Serial_Buffer[GSM_Serial.available()];
-
-		// Read UART Response
-		while (GSM_Serial.available() > 0) {
-
-			// Read Serial Char
-			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
-
-			// Increase Read Order
-			_Read_Order++;
-
-		}
-
-		// Control for Response
-		if (strstr(_Serial_Buffer, "SRING: 2") != NULL) {
-
-			// Socket Answer Command
-			uint16_t _Message_Length = GSM_AT.SA(2,1);
-
-			// Reset Variable
-			GSM_AT.Remote_Command = 0;
-
-			// Socket Recieve Command
-			GSM_AT.Remote_Command = GSM_AT.SRECV(2, _Message_Length);
-
-			// Send Response Message
-			GSM_AT.SSEND(2,SUCCESS);
-
-			// Close Socket Command
-			bool _SH = GSM_AT.SH(2);
-
-			// ReOpen Socket Command
-			bool _SL = GSM_AT.SL(2, 1, 80, 255); 
-
-		} else {
-
-			// Set Request Variable
-			GSM_AT.Remote_Command = 0;
-
-		}
-
-	}
-
-}
 bool xE910_GSM::RSSI_Refresh(void) {
 
 	// Declare Response Status
@@ -3325,9 +3269,6 @@ bool xE910_AT::REGMODE(const uint8_t _REGMODE) {
 }
 bool xE910_AT::CREG(const bool _Mode) {
 
-	// Declare Read Order Variable
-	uint8_t _Read_Order = 0;
-
 	// Clear UART Buffer
     _Clear_UART_Buffer();
 
@@ -3339,106 +3280,135 @@ bool xE910_AT::CREG(const bool _Mode) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Command Work Delay
-	delay(15);
+	// Clear Buffer Variable
+	_Clear_Buffer_Variable();
 
-	// Declare Response Variable
-	uint8_t _Serial_Buffer_Size = GSM_Serial.available();
-	char _Serial_Buffer[_Serial_Buffer_Size];
+	// Declare Loop Variable
+	bool _RESPONSE = false;
+
+	// Declare Read Order Variable
+	uint8_t _Read_Order = 0;
+
+	// Read Current Time
+	uint32_t _Time = millis();
 
 	// Read UART Response
-	while (GSM_Serial.available() > 0) {
+	while (!_RESPONSE) {
 
 		// Read Serial Char
 		_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+
+		// Control for Response
+		if (strstr(_Serial_Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_RESPONSE = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= 1000) return (false);
 
 		// Increase Read Order
 		_Read_Order++;
 
 	}
 
-	// Control for Response
-	if (strstr(_Serial_Buffer, "OK") != NULL) {
+	// Declare Watchdog Variables
+	uint8_t _Error_WD = 0;
 
-		// Declare Watchdog Variables
-		uint8_t _Error_WD = 0;
+	// Reset CREG Variable
+	CREG_Status = NOT_REGISTERED;
 
-		// Control Loop
-		while (CREG_Status != HOME_REGISTERED) {
+	// Control Loop
+	while (CREG_Status != HOME_REGISTERED or CREG_Status != ROAMING_REGISTERED) {
 
-			// Handle for Error
-			if (_Error_WD >= 60) return (false);
+		// Handle for Error
+		if (_Error_WD >= 60) return (false);
 
-			// Declare Read Order Variable
-			_Read_Order = 0;
+		// Declare Read Order Variable
+		_Read_Order = 0;
 
-			// Clear UART Buffer
-			_Clear_UART_Buffer();
+		// Clear UART Buffer
+		_Clear_UART_Buffer();
 
-			// Send UART Command
-			GSM_Serial.print(F("AT+CREG?\r\n"));
+		// Send UART Command
+		GSM_Serial.print(F("AT+CREG?\r\n"));
 
-			// Wait for UART Data Send
-			GSM_Serial.flush();
+		// Wait for UART Data Send
+		GSM_Serial.flush();
 
-			// Command Work Delay
-			delay(15);
+		// Command Work Delay
+		delay(15);
 
-			// Clear Response Variable
-			memset(_Serial_Buffer, 0, _Serial_Buffer_Size);
+		// Clear Buffer Variable
+		_Clear_Buffer_Variable();
 
-			// Read UART Response
-			while (GSM_Serial.available() > 0) {
+		// Declare Loop Variable
+		_RESPONSE = false;
 
-				// Read Serial Char
-				_Serial_Buffer[_Read_Order] = GSM_Serial.read();
+		// Declare Read Order Variable
+		_Read_Order = 0;
 
-				// Increase Read Order
-				_Read_Order++;
+		// Read Current Time
+		_Time = millis();
 
-			}
+		// Read UART Response
+		while (!_RESPONSE) {
+
+			// Read Serial Char
+			_Serial_Buffer[_Read_Order] = GSM_Serial.read();
 
 			// Control for Response
 			if (strstr(_Serial_Buffer, "OK") != NULL) {
 
-				// Declare Status Variable
-				uint8_t _Status = _Serial_Buffer[11];
-
-				// Handle Stat Variable
-				if (_Status == 48) CREG_Status = NOT_REGISTERED; 		// Not Registered [0]
-				if (_Status == 49) CREG_Status = HOME_REGISTERED;		// Registered to Home Network [1]
-				if (_Status == 50) CREG_Status = SEARCHING;				// Searching Network [2]
-				if (_Status == 51) CREG_Status = DENIED;				// Registration Denied [3]
-				if (_Status == 52) CREG_Status = UNKNOWN;				// Unknown Error [4]
-				if (_Status == 53) CREG_Status = ROAMING_REGISTERED;	// Registered to Rooming Network [5]
+				// Handle Response
+				_RESPONSE = true;
 
 			} else {
 
-				// End Function
-				return (false);
+				// Buffer Read Delay
+				delay(2);
 
 			}
 
-			// Wait Delay
-			if (CREG_Status != HOME_REGISTERED) delay(2000);
+			// Handle for timeout
+			if (millis() - _Time >= 5000) return (false);
 
-			// Count for Error
-			_Error_WD++;
-
-			// Control for Response
-			if ((CREG_Status == HOME_REGISTERED) or (CREG_Status == ROAMING_REGISTERED)) return (true);
+			// Increase Read Order
+			_Read_Order++;
 
 		}
 
-		// End Function
-		return (false);
+		// Declare Status Variable
+		uint8_t _Status = _Serial_Buffer[11];
 
-	} else {
+		// Handle Stat Variable
+		if (_Status == 48) CREG_Status = NOT_REGISTERED; 		// Not Registered [0]
+		if (_Status == 49) CREG_Status = HOME_REGISTERED;		// Registered to Home Network [1]
+		if (_Status == 50) CREG_Status = SEARCHING;				// Searching Network [2]
+		if (_Status == 51) CREG_Status = DENIED;				// Registration Denied [3]
+		if (_Status == 52) CREG_Status = UNKNOWN;				// Unknown Error [4]
+		if (_Status == 53) CREG_Status = ROAMING_REGISTERED;	// Registered to Rooming Network [5]
 
-		// End Function
-		return (false);
+		// Wait Delay
+		if (CREG_Status != HOME_REGISTERED) delay(2000);
+
+		// Count for Error
+		_Error_WD++;
+
+		// Control for Response
+		if ((CREG_Status == HOME_REGISTERED) or (CREG_Status == ROAMING_REGISTERED)) return (true);
 
 	}
+
+	// End Function
+	return (false);
 
 }
 bool xE910_AT::CGREG(const bool _Mode) {
@@ -5050,7 +5020,7 @@ uint16_t xE910_AT::SRECV(const uint8_t _ConnID, const uint16_t _MaxByte) {
 	return(atol(_Message_Buffer));
 
 }
-bool xE910_AT::SSEND(const uint8_t _ConnID, const uint16_t _Response_Code) {
+bool xE910_AT::SSEND(const uint8_t _ConnID, const String _Data_Pack) {
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -5063,8 +5033,8 @@ bool xE910_AT::SSEND(const uint8_t _ConnID, const uint16_t _Response_Code) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Declare Response Variable
-	memset(_Serial_Buffer, '\0', 255);
+	// Clear Buffer Variable
+	_Clear_Buffer_Variable();
 
 	// Declare Loop Variable
 	bool _SEND = false;
@@ -5095,7 +5065,7 @@ bool xE910_AT::SSEND(const uint8_t _ConnID, const uint16_t _Response_Code) {
 		}
 
 		// Handle for timeout
-		if (millis() - _Time >= 1000) return (98);
+		if (millis() - _Time >= 1000) return (false);
 
 		// Increase Read Order
 		_Read_Order++;
@@ -5105,17 +5075,20 @@ bool xE910_AT::SSEND(const uint8_t _ConnID, const uint16_t _Response_Code) {
 	// Command Delay
 	delay(30);
 
-	// Print Response Headers
+	// Send Pack Headers Headers
 	_Response_Headers();
 
-	// Print Response Message
-	_Response_Message(200);
+	// Send Data Pack
+	GSM_Serial.print(String(_Data_Pack));
+
+	// Print End Char
+	GSM_Serial.write((char)26);
 
 	// Declare Loop Variable
 	_SEND = false;
 
-	// Declare Response Variable
-	memset(_Serial_Buffer, '\0', 255);
+	// Clear Buffer Variable
+	_Clear_Buffer_Variable();
 
 	// Declare Read Order Variable
 	_Read_Order = 0;
@@ -5143,7 +5116,7 @@ bool xE910_AT::SSEND(const uint8_t _ConnID, const uint16_t _Response_Code) {
 		}
 
 		// Handle for timeout
-		if (millis() - _Time >= 1000) return (98);
+		if (millis() - _Time >= 1000) return (false);
 
 		// Increase Read Order
 		_Read_Order++;

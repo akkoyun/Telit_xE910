@@ -73,12 +73,6 @@ class xE910_GSM {
 		bool Connect(void);
 
 		/**
-		 * @brief Socket listen function
-		 * @version 01.00.00
-		 */
-		bool Socket_Answer(void);
-
-		/**
 		 * @brief RSSI function
 		 * @version 01.00.00
 		 */
@@ -903,7 +897,9 @@ class xE910_AT {
 		 * @return uint16_t 
 		 */
 		uint16_t SRECV(const uint8_t _ConnID, const uint16_t _MaxByte);
-		bool SSEND(const uint8_t _ConnID, const uint16_t _Response_Code);
+		
+		
+		bool SSEND(const uint8_t _ConnID, const String _Data_Pack);
 
 		/**
 		 * @brief Execution command controls the internal firewall settings.
@@ -1008,8 +1004,6 @@ class xE910_AT {
 		 */
 		bool ICMP(const uint8_t _Mode);
 
-	private:
-
 		char _Serial_Buffer[255];
 
 		/**
@@ -1045,6 +1039,8 @@ class xE910_AT {
 		 * @param _Response_Code Response code.
 		 */
 		void _Response_Message(const uint16_t _Response_Code);
+
+	private:
 
 };
 
