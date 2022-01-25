@@ -51,7 +51,6 @@ enum Connection_State {
  * @brief Server Communication Command Set
  */
 enum Command_Set {
-	UNKNOWN								= 999,
 	SUCCESS								= 200,				// Command Succesful
 	ALLREADY_STARTED					= 201,
 	ALLREADY_STOPPED					= 202,
@@ -60,7 +59,8 @@ enum Command_Set {
 	ERROR_PHASE							= 205,
 	PUMP_START							= 256,				// Pump Start Command
 	PUMP_STOP							= 257,				// Pump Stop Command
-	STATUS_UPDATE						= 262				// Status Uğdate
+	STATUS_UPDATE						= 262,				// Status Uğdate
+	ILLEGAL								= 999
 };
 
 #endif
