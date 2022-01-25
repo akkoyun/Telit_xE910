@@ -12,7 +12,7 @@
  * Batch Functions
  **************************************************/
 
-bool xE910_GSM::Power_ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch) {
+bool xE910_GSM::Power_ON(const bool _Power_Switch = true, const bool _LED_Switch = true, const bool _Communication_Switch = true) {
 
 	// Send Shut Down Signal
 	GSM_HARDWARE.ShutDown(500);
@@ -74,7 +74,7 @@ bool xE910_GSM::Power_ON(const bool _Power_Switch, const bool _LED_Switch, const
 	return (false);
 
 }
-bool xE910_GSM::Power_OFF(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch, const bool _Clear_Variables) {
+bool xE910_GSM::Power_OFF(const bool _Power_Switch = true, const bool _LED_Switch = true, const bool _Communication_Switch = true, const bool _Clear_Variables = true) {
 
 		// Turn Off Modem
 		if (GSM_HARDWARE.PowerMonitor()) {
@@ -4690,8 +4690,6 @@ bool xE910_AT::SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, c
 
 	// Send Data
 	GSM_Serial.print(F("+++"));
-
-Serial.println(_Serial_Buffer);
 
 	// Clear Buffer Variable
 	_Clear_Buffer_Variable();
