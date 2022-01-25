@@ -92,6 +92,14 @@ class xE910_GSM {
 		 */
 		bool Send_Data_Pack(const String _Data);
 
+		/**
+		 * @brief Socket Listen batch
+		 * 
+		 * @return true 
+		 * @return false 
+		 */
+		bool Socket_Listen(void);
+
 	private:
 	
 };

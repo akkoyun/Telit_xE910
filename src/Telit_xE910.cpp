@@ -1796,6 +1796,19 @@ bool xE910_GSM::Connection_Control(void) {
 	if (_Serial_Buffer[10] ==  49) return(true);
 	
 }
+bool xE910_GSM::Socket_Listen(void) {
+
+	// Set Firewall
+	GSM_AT.FRWL(1,"192.168.0.1", "0.0.0.0");
+	// GSM_AT.FRWL(1,"213.14.250.214", "255.255.255.0");
+	// GSM_AT.FRWL(1,"83.160.73.106", "255.255.255.0");
+	// GSM_AT.FRWL(1,"213.127.108.158", "255.255.255.0");
+
+
+	// Socket Listen
+	GSM_AT.SL(2,1,80,255);
+
+}
 
 /**************************************************
  * Variable Functions
