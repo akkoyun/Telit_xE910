@@ -96,7 +96,7 @@ void loop() {
         delay(100);
         
        	// Set Interrupt Variable
-        GSM.Socket_Answer(200);
+        //GSM.Socket_Answer(200);
 
         Serial.print(F("Server Command     : ")); Serial.println(GSM_AT.Remote_Command);
         Serial.println(F("--------------------------------------------------"));
