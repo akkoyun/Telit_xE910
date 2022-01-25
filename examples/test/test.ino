@@ -14,23 +14,23 @@ void setup() {
         if (GSM.Debug_Mode) {
 
             Serial.println(F("--------------------------------------------------"));
-            Serial.print(F("Manufacturer      : ")); Serial.println(GSM_AT.Manufacturer);
-            Serial.print(F("Model             : ")); Serial.println(GSM_AT.Model);
-            Serial.print(F("Firmware          : ")); Serial.println(GSM_AT.Modem_Firmware);
-            Serial.print(F("IMEI Number       : ")); Serial.println(GSM_AT.IMEI);
-            Serial.print(F("Serial Number     : ")); Serial.println(GSM_AT.Serial_Number);
-            Serial.print(F("ICCID             : ")); Serial.println(GSM_AT.ICCID);
+            Serial.print(F("Manufacturer      : ")); Serial.println(GSM.Manufacturer());
+            Serial.print(F("Model             : ")); Serial.println(GSM.Model());
+            Serial.print(F("Firmware          : ")); Serial.println(GSM.Firmware());
+            Serial.print(F("IMEI Number       : ")); Serial.println(GSM.IMEI());
+            Serial.print(F("Serial Number     : ")); Serial.println(GSM.Serial_ID());
+            Serial.print(F("ICCID             : ")); Serial.println(GSM.ICCID());
             Serial.println(F("--------------------------------------------------"));
 
         }
-        GSM_Serial.print("AT+COPS?\r\n");
+        
         GSM.Connect();
 
         if (GSM.Debug_Mode) {
 
             Serial.println(F("--------------------------------------------------"));
-            Serial.print(F("Operator          : ")); Serial.println(GSM_AT.Operator);
-            Serial.print(F("IP Address        : ")); Serial.println(GSM_AT.IP_Address);
+            Serial.print(F("Operator          : ")); Serial.println(GSM.Operator());
+            Serial.print(F("IP Address        : ")); Serial.println(GSM.IP());
             Serial.println(F("--------------------------------------------------"));
 
         }
@@ -59,12 +59,9 @@ void setup() {
 
         }
 
-
-char *DD = "{\"Device\":{\"Type\":\"402-P02\",\"ID\":\"70A11D1D01000026\"},\"Power\":{\"Battery\": {\"IV\":4.115156,\"T\":25.5,\"AC\":-49.6875,\"SOC\":98.99609,\"FB\":1519,\"IB\":1503,\"CYC\":38}},\"IoT\":{\"GSM\":{\"Operator\":{\"RSSI\":12}}},\"Data\":{\"DeviceStatus\":240,\"FaultStatus\": 500,\"TimeStamp\":\"2000-01-01  23:46:51\"}}";
-GSM_AT.SD(1, 0, 80, "54.216.226.171", 0, 0, 0, DD);
-
-
 /*
+char *DD = "{\"Device\":{\"Type\":\"402-P02\",\"ID\":\"70A11D1D01000026\"},\"Power\":{\"Battery\": {\"IV\":4.115156,\"T\":25.5,\"AC\":-49.6875,\"SOC\":98.99609,\"FB\":1519,\"IB\":1503,\"CYC\":38}},\"IoT\":{\"GSM\":{\"Operator\":{\"RSSI\":12}}},\"Data\":{\"DeviceStatus\":240,\"FaultStatus\": 500,\"TimeStamp\":\"2000-01-01  23:46:51\"}}";
+
 if (GSM.Send_Data_Pack(DD) == true) {
     Serial.print(F("Data Send Test    : OK")); Serial.println("");
 }
@@ -96,7 +93,7 @@ void loop() {
         delay(100);
         
        	// Set Interrupt Variable
-        GSM.Socket_Answer(200);
+        GSM.Socket_Answer();
 
         Serial.print(F("Server Command     : ")); Serial.println(GSM_AT.Remote_Command);
         Serial.println(F("--------------------------------------------------"));

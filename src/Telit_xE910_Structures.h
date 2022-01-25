@@ -52,8 +52,6 @@ enum Connection_State {
  */
 enum Command_Set {
 	SUCCESS								= 200,				// Command Succesful
-	ALLREADY_STARTED					= 201,
-	ALLREADY_STOPPED					= 202,
 	PUMP_START							= 256,				// Pump Start Command
 	PUMP_STOP							= 257,				// Pump Stop Command
 	STATUS_UPDATE						= 262				// Status Uğdate
