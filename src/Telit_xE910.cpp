@@ -1824,11 +1824,11 @@ uint8_t xE910_GSM::Signal_Strength(void) {
 	if (GSM_AT.Signal_RSSI >= 31) _RSSI = -51;
 	
 	// Calculate Signal Strength
-	if (_RSSI >= -70) return(4);
-	if (_RSSI < -70 and _RSSI >= -85) return(3);
-	if (_RSSI < -85 and _RSSI >= -100) return(2);
-	if (_RSSI < -100) return(1);
-	if (_RSSI < -110) return(0);
+	if (_RSSI >= -70) return(5);
+	if (_RSSI < -70 and _RSSI >= -85) return(4);
+	if (_RSSI < -85 and _RSSI >= -100) return(3);
+	if (_RSSI < -100) return(2);
+	if (_RSSI < -110) return(1);
 
 	// End Function
 	return(0);
@@ -3035,13 +3035,37 @@ bool xE910_AT::CSQ(void) {
 
 	}
 
+	// Clear Variables
+	Signal_RSSI = 0;
+
 	// Declare Response Data
 	char _CSQ[2]; 
 
-	// Handle RSSI
-	_CSQ[0] = _Serial_Buffer[8];
-	_CSQ[1] = _Serial_Buffer[9];
-	
+	// Declare Data Order Variable
+	uint8_t _Data_Order = 0;
+
+	// Declare Handle Data
+	bool _Handle = true;
+
+	// Control for Buffer
+	for (uint8_t i = 0; i < 255; i++) {
+
+		// Handle Data
+		if (_Serial_Buffer[i] < 58 and _Serial_Buffer[i] > 47 and _Handle == true) {
+
+			// Get Data
+			_CSQ[_Data_Order] = _Serial_Buffer[i];
+
+			// Increase Data Order
+			_Data_Order++;
+
+		}
+
+		// Set Handle Pointer
+		if (_Serial_Buffer[i] == 44) _Handle = false;
+
+	}
+
 	// Set Signal Variable
 	Signal_RSSI = atoi(_CSQ);
 
