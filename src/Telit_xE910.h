@@ -26,6 +26,11 @@
 #include <Telit_xE910_Structures.h>
 #endif
 
+// Define VT100 Terminal
+#ifndef VT100_H_
+#include <VT100.h>
+#endif
+
 /**
  * @brief GSM Modem global function class
  * @version 01.00.00

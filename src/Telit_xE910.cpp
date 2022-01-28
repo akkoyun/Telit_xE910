@@ -152,9 +152,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT.........................................."));
-
 			// Process Command
 			while (!_Response) {
 
@@ -166,22 +163,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 				// Control for WD
 				if (_Error_WD > 5) break;
-
-			}
-
-			// Print Command State
-			if (Debug_Mode) {
-
-				// Control for Response				
-				if (_Response) {
-					
-					Serial.println(F("..[OK]"));
-					
-				} else {
-					
-					Serial.println(F("[FAIL]"));
-					
-				}
 
 			}
 		
@@ -198,8 +179,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("ATE=0......................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(15, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -221,11 +202,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(15, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(15, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -244,8 +227,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CMEE=1..................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(16, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -267,11 +250,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(16, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(16, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -290,8 +275,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+FCLASS=0................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(17, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -313,11 +298,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(17, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(17, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -336,8 +323,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT&K0......................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(18, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -359,11 +346,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(18, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(18, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -382,8 +371,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CPIN?...................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(19, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -405,11 +394,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(19, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(19, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -428,8 +419,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CGSN....................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(20, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -451,11 +442,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(20, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(20, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -474,8 +467,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+GSN......................................"));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(21, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -497,11 +490,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(21, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(21, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -520,8 +515,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CCID....................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(22, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -543,11 +538,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(22, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(22, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -566,8 +563,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+GMI......................................"));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(23, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -589,11 +586,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(23, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(23, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -612,8 +611,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+GMM......................................"));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(24, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -635,11 +634,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(24, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(24, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -658,8 +659,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+GMR......................................"));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(25, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -681,11 +682,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(25, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(25, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -704,8 +707,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+SLED=2..................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(26, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -727,11 +730,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(26, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(26, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -744,9 +749,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// E2SLRI Command
 			// **************************************************
 
-			// Command Chain Delay (Advice by Telit)
-			delay(20);
-
 			// Declare Parameters
 			uint16_t _Parameter_E2SLRI_Pulse = 50;
 
@@ -756,10 +758,8 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT#E2SLRI="));
-			if (Debug_Mode) Serial.print(_Parameter_E2SLRI_Pulse);
-			if (Debug_Mode) Serial.print(F("................................"));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(27, 32); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -781,11 +781,13 @@ bool xE910_GSM::Begin(const bool _Debug) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(27, 33); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(27, 32); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -857,10 +859,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT#REGMODE="));
-			if (Debug_Mode) Serial.print(_Parameter_REGMODE);
-			if (Debug_Mode) Serial.print(F("................................"));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(14, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -880,8 +880,17 @@ bool xE910_GSM::Connect(void) {
 			if (Debug_Mode) {
 
 				// Control for Response				
-				if (_Response) Serial.println(F("..[OK]"));
-				if (!_Response) Serial.println(F("[FAIL]"));
+				if (_Response) {
+					
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(14, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
+					
+				} else {
+					
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(14, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
+					
+				}
 
 			}
 		
@@ -905,10 +914,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT#TXMONMODE="));
-			if (Debug_Mode) Serial.print(_Parameter_TXMONMODE);
-			if (Debug_Mode) Serial.print(F(".............................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(15, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -928,8 +935,17 @@ bool xE910_GSM::Connect(void) {
 			if (Debug_Mode) {
 
 				// Control for Response				
-				if (_Response) Serial.println(F("..[OK]"));
-				if (!_Response) Serial.println(F("[FAIL]"));
+				if (_Response) {
+					
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(15, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
+					
+				} else {
+					
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(15, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
+					
+				}
 
 			}
 		
@@ -956,10 +972,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CREG="));
-			if (Debug_Mode) Serial.print(_Parameter_CREG_Mode);
-			if (Debug_Mode) Serial.print(F("..................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(16, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -979,8 +993,17 @@ bool xE910_GSM::Connect(void) {
 			if (Debug_Mode) {
 
 				// Control for Response				
-				if (_Response) Serial.println(F("..[OK]"));
-				if (!_Response) Serial.println(F("[FAIL]"));
+				if (_Response) {
+					
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(16, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
+					
+				} else {
+					
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(16, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
+					
+				}
 
 			}
 		
@@ -1004,10 +1027,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CGREG="));
-			if (Debug_Mode) Serial.print(_Parameter_CGREG_Mode);
-			if (Debug_Mode) Serial.print(F(".................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(17, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -1027,8 +1048,17 @@ bool xE910_GSM::Connect(void) {
 			if (Debug_Mode) {
 
 				// Control for Response				
-				if (_Response) Serial.println(F("..[OK]"));
-				if (!_Response) Serial.println(F("[FAIL]"));
+				if (_Response) {
+					
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(17, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
+					
+				} else {
+					
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(17, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
+					
+				}
 
 			}
 		
@@ -1039,8 +1069,8 @@ bool xE910_GSM::Connect(void) {
 			uint32_t _CRTime = millis() - _CTime;
 			GSM_AT.Connection_Time = uint8_t(_CRTime / 1000);
 
-			// Print GSM Command
-			if (Debug_Mode) {Serial.print(F("GSM Connection Time...........................[")); Serial.print(GSM_AT.Connection_Time); Serial.println(F("]"));}
+			// Print Serial Message
+			VT100.setTextColor(VT_CYAN); VT100.setCursor(23, 122); Serial.print(GSM_AT.Connection_Time); VT100.setTextColor(VT_WHITE);
 
 		}
 
@@ -1064,20 +1094,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT#SCFG="));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_ConnID);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_Cid);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_Pkt_Sz);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_Max_To);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_Conn_To);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_TX_To);
-			if (Debug_Mode) Serial.print(F(".................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(18, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -1099,11 +1117,13 @@ bool xE910_GSM::Connect(void) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(18, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(18, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -1134,20 +1154,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT#SCFG="));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_ConnID);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_Cid);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_Pkt_Sz);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_Max_To);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_Conn_To);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFG_TX_To);
-			if (Debug_Mode) Serial.print(F(".................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(19, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -1169,11 +1177,13 @@ bool xE910_GSM::Connect(void) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(19, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(19, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -1204,20 +1214,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT#SCFGEXT="));
-			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_ConnID);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_SrMode);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Recv_Data_Mode);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Keep_Alieve);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Listen_Auto_Response);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_SCFGEXT_Send_Data_Mode);
-			if (Debug_Mode) Serial.print(F("......................"));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(20, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -1239,11 +1237,13 @@ bool xE910_GSM::Connect(void) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(20, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(20, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -1274,24 +1274,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) {
-
-				Serial.print(F("AT+CGDCONT="));
-				Serial.print(_Parameter_CDGCONT_Cid);
-				Serial.print(F(",\""));
-				Serial.print(_Parameter_CGDCONT_PDP);
-				Serial.print(F("\",\""));
-				Serial.print(_Parameter_CGDCONT_APN);
-				Serial.print(F("\",\""));
-				Serial.print(_Parameter_CDGCONT_PDP_Addr);
-				Serial.print(F("\","));
-				Serial.print(_Parameter_CDGCONT_D_Comp);
-				Serial.print(F(","));
-				Serial.print(_Parameter_CDGCONT_H_Comp);
-				Serial.print(F("......"));
-				
-			}
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(21, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 			
 			// Process Command
 			while (!_Response) {
@@ -1313,11 +1297,13 @@ bool xE910_GSM::Connect(void) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(21, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(21, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -1340,8 +1326,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT#SERVIFO.................................."));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(22, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -1363,11 +1349,13 @@ bool xE910_GSM::Connect(void) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(22, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(22, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -1394,12 +1382,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CGACT="));
-			if (Debug_Mode) Serial.print(_Parameter_CGACT_State);
-			if (Debug_Mode) Serial.print(F(","));
-			if (Debug_Mode) Serial.print(_Parameter_CGACT_Cid);
-			if (Debug_Mode) Serial.print(F("................................"));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(23, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -1421,11 +1405,13 @@ bool xE910_GSM::Connect(void) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(23, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(23, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -1451,10 +1437,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) Serial.print(F("AT+CGPADDR="));
-			if (Debug_Mode) Serial.print(_Parameter_CGPADDR_Cid);
-			if (Debug_Mode) Serial.print(F("................................"));
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(24, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -1476,11 +1460,13 @@ bool xE910_GSM::Connect(void) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(24, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(24, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -1514,28 +1500,9 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) {
-				Serial.print(F("AT#HTTPCFG="));
-				Serial.print(_Parameter_HTTPCFG_ProfID);
-				Serial.print(F(",\""));
-				Serial.print(F("*****"));
-				Serial.print(F("\","));
-				Serial.print(_Parameter_HTTPCFG_Port);
-				Serial.print(F(","));
-				Serial.print(_Parameter_HTTPCFG_AuthType);
-				Serial.print(F(",\""));
-				Serial.print(_Parameter_HTTPCFG_Username);
-				Serial.print(F("\",\""));
-				Serial.print(_Parameter_HTTPCFG_Password);
-				Serial.print(F("\","));
-				Serial.print(_Parameter_HTTPCFG_SSL);
-				Serial.print(F(","));
-				Serial.print(_Parameter_HTTPCFG_TimeOut);
-				Serial.print(F(","));
-				Serial.print(_Parameter_HTTPCFG_Cid);
-				Serial.print(F("......"));
-			}
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(25, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
+
 
 			// Process Command
 			while (!_Response) {
@@ -1557,11 +1524,13 @@ bool xE910_GSM::Connect(void) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(25, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(25, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -1575,9 +1544,6 @@ bool xE910_GSM::Connect(void) {
 		// ICMP Command
 		if (_ICMP) {
 		
-			// Command Chain Delay (Advice by Telit)
-			delay(30);
-
 			// Declare Parameters
 			const uint8_t _Parameter_ICMP_Mode = 1;
 
@@ -1587,12 +1553,8 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (Debug_Mode) {
-				Serial.print(F("AT#ICMP="));
-				Serial.print(_Parameter_ICMP_Mode);
-				Serial.print(F("..................................."));
-			}
+			// Print Serial Message
+			VT100.setTextColor(VT_YELLOW); VT100.setCursor(26, 82); Serial.print(F(" ** ")); VT100.setTextColor(VT_WHITE);
 
 			// Process Command
 			while (!_Response) {
@@ -1614,11 +1576,13 @@ bool xE910_GSM::Connect(void) {
 				// Control for Response				
 				if (_Response) {
 					
-					Serial.println(F("..[OK]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_GREEN); VT100.setCursor(26, 83); Serial.print(F("OK")); VT100.setTextColor(VT_WHITE);
 					
 				} else {
 					
-					Serial.println(F("[FAIL]"));
+					// Print Serial Message
+					VT100.setTextColor(VT_RED); VT100.setCursor(26, 82); Serial.print(F("FAIL")); VT100.setTextColor(VT_WHITE);
 					
 				}
 
@@ -1694,8 +1658,8 @@ bool xE910_GSM::RSSI_Refresh(void) {
 	// Declare Watchdog Variable
 	uint8_t _Error_WD = 0;
 
-	// Command Debug
-	if (Debug_Mode) Serial.print(F("AT+CSQ......................................"));
+	// Print Serial Message
+	VT100.setTextColor(VT_YELLOW); VT100.setCursor(24, 122); Serial.print(F("**")); VT100.setTextColor(VT_WHITE);
 
 	// Process Command
 	while (!_Response) {
@@ -1714,16 +1678,8 @@ bool xE910_GSM::RSSI_Refresh(void) {
 	// Print Command State
 	if (Debug_Mode) {
 
-		// Control for Response				
-		if (_Response) {
-			
-			Serial.println(F("..[OK]"));
-			
-		} else {
-			
-			Serial.println(F("[FAIL]"));
-			
-		}
+		// Print Serial Message
+		VT100.setTextColor(VT_CYAN); VT100.setCursor(24, 122); Serial.print(GSM_AT.Signal_RSSI); VT100.setTextColor(VT_WHITE);
 
 	}
 
@@ -1807,6 +1763,9 @@ bool xE910_GSM::Socket_Listen(void) {
 	// Socket Listen
 	GSM_AT.SL(2,1,80,255);
 
+	// Print Serial Message
+	VT100.setTextColor(VT_GREEN); VT100.setCursor(27, 115); Serial.print(F("Listening")); VT100.setTextColor(VT_WHITE);
+
 }
 
 /**************************************************
@@ -1869,11 +1828,6 @@ bool xE910_RTC::Time_Update(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (GSM.Debug_Mode) Serial.print(F("AT#NITZ="));
-			if (GSM.Debug_Mode) Serial.print(_Parameter_NITZ_State);
-			if (GSM.Debug_Mode) Serial.print(F("..................................."));
-
 			// Process Command
 			while (!_Response) {
 
@@ -1888,22 +1842,6 @@ bool xE910_RTC::Time_Update(void) {
 
 			}
 
-			// Print Command State
-			if (GSM.Debug_Mode) {
-
-				// Control for Response				
-				if (_Response) {
-					
-					Serial.println(F("..[OK]"));
-					
-				} else {
-					
-					Serial.println(F("[FAIL]"));
-					
-				}
-
-			}
-		
 			// End Function
 			if (!_Response) return (false);
 
@@ -1923,11 +1861,6 @@ bool xE910_RTC::Time_Update(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (GSM.Debug_Mode) Serial.print(F("AT+CTZU="));
-			if (GSM.Debug_Mode) Serial.print(_Parameter_CTZU_State);
-			if (GSM.Debug_Mode) Serial.print(F("..................................."));
-
 			// Process Command
 			while (!_Response) {
 
@@ -1942,22 +1875,6 @@ bool xE910_RTC::Time_Update(void) {
 
 			}
 
-			// Print Command State
-			if (GSM.Debug_Mode) {
-
-				// Control for Response				
-				if (_Response) {
-					
-					Serial.println(F("..[OK]"));
-					
-				} else {
-					
-					Serial.println(F("[FAIL]"));
-					
-				}
-
-			}
-		
 			// End Function
 			if (!_Response) return (false);
 
@@ -1980,17 +1897,6 @@ bool xE910_RTC::Time_Update(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Command Debug
-			if (GSM.Debug_Mode) Serial.print(F("AT#NTP=\""));
-			if (GSM.Debug_Mode) Serial.print(_Parameter_NTP_Addr);
-			if (GSM.Debug_Mode) Serial.print(F("\","));
-			if (GSM.Debug_Mode) Serial.print(_Parameter_NTP_Port);
-			if (GSM.Debug_Mode) Serial.print(F(","));
-			if (GSM.Debug_Mode) Serial.print(_Parameter_NTP_Update);
-			if (GSM.Debug_Mode) Serial.print(F(","));
-			if (GSM.Debug_Mode) Serial.print(_Parameter_NTP_TimeOut);
-			if (GSM.Debug_Mode) Serial.print(F(".............."));
-
 			// Process Command
 			while (!_Response) {
 
@@ -2005,22 +1911,6 @@ bool xE910_RTC::Time_Update(void) {
 
 			}
 
-			// Print Command State
-			if (GSM.Debug_Mode) {
-
-				// Control for Response				
-				if (_Response) {
-					
-					Serial.println(F("..[OK]"));
-					
-				} else {
-					
-					Serial.println(F("[FAIL]"));
-					
-				}
-
-			}
-		
 			// End Function
 			if (!_Response) return (false);
 
@@ -2123,23 +2013,29 @@ bool xE910_HARDWARE::PowerMonitor(void) {
 }
 void xE910_HARDWARE::OnOff(const uint16_t _Time) {
 
-	// Debug Mode
-	if (GSM.Debug_Mode) Serial.print(F("Power On Modem.")); // 30 dot
-
 	// Set On/Off Signal HIGH [PJ6]
 	PORTJ |= 0b01000000;
 
 	// Command Delay
-	if (GSM.Debug_Mode) {for (uint8_t i = 1; i < 30; i++) {delay(_Time / 30); Serial.print(F("."));}}
+	if (GSM.Debug_Mode) {
+		
+		for (uint8_t i = 1; i < 100; i++) {
+			delay(_Time / 100); 
+			VT100.setTextColor(VT_WHITE); 
+			VT100.setCursor(14, 32); 
+			Serial.print(i); 
+			VT100.setCursor(14, 35); 
+			Serial.print(F("%")); 
+			VT100.setTextColor(VT_WHITE);
+		}
+
+	}
 
 	// Set On/Off Signal LOW [PJ6]
 	PORTJ &= 0b10111111;
 
-	// Print Status
-	if (GSM.Debug_Mode) Serial.println(F("..[OK]"));
-
-	// Print Divider
-    if (GSM.Debug_Mode) Serial.println("--------------------------------------------------");
+	// Print Serial Message
+	VT100.setTextColor(VT_GREEN); VT100.setCursor(14, 32); Serial.print(F(" OK ")); VT100.setTextColor(VT_WHITE);
 
 }
 void xE910_HARDWARE::ShutDown(const uint16_t _Time) {
@@ -4160,8 +4056,8 @@ bool xE910_AT::CGPADDR(const uint8_t _Cid) {
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Declare Response Variable
-	memset(_Serial_Buffer, '\0', 255);
+	// Clear Buffer Variable
+	_Clear_Buffer_Variable();
 
 	// Declare Loop Variable
 	bool _RESPONSE = false;
@@ -4199,17 +4095,17 @@ bool xE910_AT::CGPADDR(const uint8_t _Cid) {
 
 	}
 
+	// Clear Variables
+	memset(IP_Address, 0, 16);
+
 	// Declare Data Order Variable
 	uint8_t _Data_Order = 0;
-
-	// Clear Variable
-	memset(IP_Address, '\0', 255);
 
 	// Control for Buffer
 	for (uint8_t i = 0; i < 255; i++) {
 
 		// Handle Data
-		if ((_Serial_Buffer[i] < 58 and _Serial_Buffer[i] > 47) or _Serial_Buffer[i] == 46) {
+		if (i > 23 and (_Serial_Buffer[i] < 58 and _Serial_Buffer[i] > 47) or _Serial_Buffer[i] == 46) {
 
 			// Get Data
 			IP_Address[_Data_Order] = _Serial_Buffer[i];
