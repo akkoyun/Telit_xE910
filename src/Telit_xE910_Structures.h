@@ -51,6 +51,7 @@ enum Connection_State {
  * @brief Server Communication Command Set
  */
 enum Command_Set {
+	HARD_RESET							= 100,				// Command Succesful
 	SUCCESS								= 200,				// Command Succesful
 	ALLREADY_STARTED					= 201,
 	ALLREADY_STOPPED					= 202,
