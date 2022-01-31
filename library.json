@@ -1,16 +1,17 @@
 {
 	"name": "Telit xE910 Series GSM Modem Library",
-	"version": "1.3.10",
+	"version": "1.9.6",
 	"keywords": "GSM, modem, gprs, iot, telit",
 	"description": "Telit xE910 series GSM modem library.",
 	"authors":
 	{
 		"name": "Mehmet Gunce Akkoyun",
 		"email": "akkoyun@me.com",
-		"url": ""
+		"url": "https://github.com/akkoyun"
 	},
 	"license": "MIT",
 	"frameworks": "arduino",
+	"headers": "Telit_xE910.h",
 	"platforms":
 	[
 		"atmelavr",
