@@ -95,7 +95,7 @@ class xE910_GSM {
 		 * @brief Data send procedure.
 		 * @version 01.00.01
 		 */
-		bool Send_Data_Pack(const String _Data);
+		bool Send_Data_Pack(const uint8_t _Pack_Type, const String _Data);
 
 		/**
 		 * @brief Socket Listen batch
@@ -104,6 +104,9 @@ class xE910_GSM {
 		 * @return false 
 		 */
 		bool Socket_Listen(void);
+
+		bool Socket_Open(void);
+		bool Socket_Close(void);
 
 	private:
 	

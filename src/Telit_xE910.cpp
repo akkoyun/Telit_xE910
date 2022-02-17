@@ -1621,26 +1621,25 @@ bool xE910_GSM::Connect(void) {
 	return(false);
 
 }
-bool xE910_GSM::Send_Data_Pack(const String _Data) {
+bool xE910_GSM::Send_Data_Pack(const uint8_t _Pack_Type, const String _Data) {
 
-	// Declare Variables
-	const bool _Protocol = 0;						// TCP Protocol
-	const char _Service[15] = "/api/v1.1/p402";		// Service URL
-	const uint8_t _TimeOut = 20;					// Time Out
+	// Set Response Variable
+	bool _Response = false;
 
-	// Send Data
-	if (GSM_AT.HTTPSND(1, _Protocol, _Service, _TimeOut, _Data) == true) {
-		
-		// Get Response
-		bool _Response = GSM_AT.HTTPRCV(1);
+	// Set WD Variable
+	uint8_t _Error_WD = 0;
 
-		// End Function
-		return(_Response);
-		
-	}
+	// Close Socket Command
+	if (_Pack_Type != 1) GSM.Socket_Close();
+
+	// Send Pack
+	if (GSM_AT.HTTPSND(1, 0, "/api/v1.1/p402", 30, _Data)) GSM_AT.HTTPRCV(1);
+
+	// Open Socket Command
+	if (_Pack_Type != 1) GSM.Socket_Open();
 
 	// End Function
-	return(false);
+	return(_Response);
 
 }
 bool xE910_GSM::RSSI_Refresh(void) {
@@ -1760,11 +1759,96 @@ bool xE910_GSM::Socket_Listen(void) {
 	GSM_AT.FRWL(1,"83.160.73.106", "255.255.255.0");
 	GSM_AT.FRWL(1,"213.127.108.158", "255.255.255.0");
 
+	// Open Socket Command
+	GSM.Socket_Open();
+
 	// Socket Listen
-	GSM_AT.SL(2,1,80,255);
+	//GSM_AT.SL(2,1,80,255);
 
 	// Print Serial Message
-	VT100.setTextColor(VT_GREEN); VT100.setCursor(27, 115); Serial.print(F("Listening")); VT100.setTextColor(VT_WHITE);
+	//VT100.setTextColor(VT_GREEN); VT100.setCursor(27, 115); Serial.print(F("Listening")); VT100.setTextColor(VT_WHITE);
+
+}
+bool xE910_GSM::Socket_Open(void) {
+
+	// Set Response Variable
+	bool _Response = false;
+
+	// Set WD Variable
+	uint8_t _Error_WD = 0;
+
+	// Process Command
+	while (!_Response) {
+
+		// Socket Listen
+		_Response = GSM_AT.SL(2,1,80,255);
+
+		// Set WD Variable
+		_Error_WD++;
+
+		// Control for WD
+		if (_Error_WD > 5) break;
+
+		// Command Delay
+		delay(50);
+
+	}
+
+	// Print Serial Message
+	if (_Response == true) {
+		VT100.setTextColor(VT_GREEN); 
+		VT100.setCursor(27, 115); 
+		Serial.print(F("Listening")); 
+	}
+	if (_Response == false) {
+		VT100.setTextColor(VT_RED); 
+		VT100.setCursor(27, 115); 
+		Serial.print(F("Error 1  ")); 
+	}
+
+	// Set Terminal Color
+	VT100.setTextColor(VT_WHITE);
+
+}
+bool xE910_GSM::Socket_Close(void) {
+
+	// Set Response Variable
+	bool _Response = false;
+
+	// Set WD Variable
+	uint8_t _Error_WD = 0;
+
+	// Process Command
+	while (!_Response) {
+
+		// Socket Listen
+		_Response = GSM_AT.SL(2,0,80,255);
+
+		// Set WD Variable
+		_Error_WD++;
+
+		// Control for WD
+		if (_Error_WD > 5) break;
+
+		// Command Delay
+		delay(20);
+
+	}
+
+	// Print Serial Message
+	if (_Response == true) {
+		VT100.setTextColor(VT_GREEN); 
+		VT100.setCursor(27, 115); 
+		Serial.print(F(" Closed  ")); 
+	}
+	if (_Response == false) {
+		VT100.setTextColor(VT_RED); 
+		VT100.setCursor(27, 115); 
+		Serial.print(F("Error 2  ")); 
+	}
+
+	// Set Terminal Color
+	VT100.setTextColor(VT_WHITE);
 
 }
 
@@ -4756,7 +4840,7 @@ bool xE910_AT::SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_
 		}
 
 		// Handle for timeout
-		if (millis() - _Time >= 1000) return (false);
+		if (millis() - _Time >= 5000) return (false);
 
 		// Increase Read Order
 		_Read_Order++;
@@ -5352,8 +5436,8 @@ bool xE910_AT::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char
 }
 bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 
-	// Declare Response Variable
-	memset(_Serial_Buffer, '\0', 255);
+	// Clear Buffer Variable
+	_Clear_Buffer_Variable();
 
 	// Declare Loop Variable
 	bool _RESPONSE = false;
@@ -5384,7 +5468,7 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 		}
 
 		// Handle for timeout
-		if (millis() - _Time >= 5000) return (false);
+		if (millis() - _Time >= 10000) return (false);
 
 		// Increase Read Order
 		_Read_Order++;
@@ -5402,8 +5486,11 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 	GSM_Serial.print(String(_ProfID));
 	GSM_Serial.print(F("\r\n"));
 
-	// Declare Response Variable
-	memset(_Serial_Buffer, '\0', 255);
+	// Wait for UART Data Send
+	GSM_Serial.flush();
+
+	// Clear Buffer Variable
+	_Clear_Buffer_Variable();
 
 	// Declare Loop Variable
 	_RESPONSE = false;
@@ -5444,8 +5531,8 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 	// Command Work Delay
 	delay(30);
 
-	// Declare Response Variable
-	memset(_Serial_Buffer, 0, 255);
+	// Clear Buffer Variable
+	_Clear_Buffer_Variable();
 
 	// Declare Loop Variable
 	_RESPONSE = false;
