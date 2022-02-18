@@ -83,7 +83,7 @@ fi
 export ARDUINO_HEX_DIR=arduino_build_$TRAVIS_BUILD_NUMBER
 
 # link test library folder to the arduino libraries folder
-ln -s $TRAVIS_BUILD_DIR $HOME/arduino_ide/libraries/Adafruit_Test_Library
+ln -s $TRAVIS_BUILD_DIR $HOME/arduino_ide/libraries/Console
 
 # add the arduino CLI to our PATH
 export PATH="$HOME/arduino_ide:$PATH"
@@ -95,17 +95,6 @@ echo "########################################################################";
 # install dependancy libraries in library.properties
 grep "depends=" $HOME/arduino_ide/libraries/Telit_xE910/library.properties | sed 's/depends=//' | sed -n 1'p' |  tr ',' '\n' | while read word; do arduino --install-library "$word"; done
 
-# install the zero, esp8266, and adafruit board packages
-echo -n "ADD PACKAGE INDEX: "
-DEPENDENCY_OUTPUT=$(arduino --pref "boardsmanager.additional.urls=https://adafruit.github.io/arduino-board-index/package_adafruit_index.json,http://arduino.esp8266.com/stable/package_esp8266com_index.json,https://dl.espressif.com/dl/package_esp32_index.json" --save-prefs 2>&1)
-if [ $? -ne 0 ]; then echo -e """$RED""\xe2\x9c\x96"; else echo -e """$GREEN""\xe2\x9c\x93"; fi
-
-# This is a hack, we have to install by hand so lets delete it
-echo "Removing ESP32 cache"
-rm -rf ~/.arduino15/packages/esp32
-echo -n "Current packages list:"
-[ -d ~/.arduino15/packages/ ] && ls ~/.arduino15/packages/
-
 INSTALL_AVR=$([[ $INSTALL_PLATFORMS == *"avr"* || -z "$INSTALL_PLATFORMS" ]] && echo 1 || echo 0)
 
 if [[ $INSTALL_AVR == 1 ]]; then
@@ -113,13 +102,6 @@ if [[ $INSTALL_AVR == 1 ]]; then
 	DEPENDENCY_OUTPUT=$(arduino --install-boards adafruit:avr 2>&1)
 	if [ $? -ne 0 ]; then echo -e "\xe2\x9c\x96 OR CACHED"; else echo -e """$GREEN""\xe2\x9c\x93"; fi
 fi
-
-# install random lib so the arduino IDE grabs a new library index
-# see: https://github.com/arduino/Arduino/issues/3535
-echo -n "UPDATE LIBRARY INDEX: "
-DEPENDENCY_OUTPUT=$(arduino --install-library Console 2>&1)
-if [ $? -ne 0 ]; then echo -e """$RED""\xe2\x9c\x96"; else echo -e """$GREEN""\xe2\x9c\x93"; fi
-
 
 
 # set the maximal compiler warning level
