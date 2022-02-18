@@ -10,6 +10,7 @@ install:
 
 env:
 - BOARD=megaatmega2560
+- lib_deps = akkoyun/Console@^1.0.0
 
 script:
 - for e in examples/*; do
