@@ -26,7 +26,8 @@
 	[
 		{
 			"name": "external-repo",
-			"version": "https://github.com/akkoyun/Telit_xE910#10.0.1"		}
+			"version": "https://github.com/akkoyun/Console@^1.0.1"
+		}
 	],
 	"examples": [
 		{
