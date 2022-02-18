@@ -10,25 +10,9 @@
 #ifndef __Telit_xE910__
 #define __Telit_xE910__
 
-// Define Arduino Library
-#ifndef __Arduino__
-#include <Arduino.h>
-#endif
-
-// Define PGMspace Function
-#include <avr/pgmspace.h>
-
-// Include String Library
-#include <string.h>
-
 // Define Library Structures
 #ifndef __Telit_xE910_Structures__
 #include <Telit_xE910_Structures.h>
-#endif
-
-// Define VT100 Terminal
-#ifndef VT100_H_
-#include <VT100.h>
 #endif
 
 /**
@@ -107,6 +91,7 @@ class xE910_GSM {
 
 		bool Socket_Open(void);
 		bool Socket_Close(void);
+		bool Socket_Control(void);
 
 	private:
 	
