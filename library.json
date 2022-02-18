@@ -25,8 +25,9 @@
 	"dependencies":
 	[
 		{
-			"name": "external-repo",
-			"version": "https://github.com/akkoyun/Console@^1.0.1"
+			"owner": "akkoyun",
+			"name": "Console",
+			"version": "^1.0.0"
 		}
 	],
 	"examples": [
