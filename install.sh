@@ -117,8 +117,10 @@ fi
 # install random lib so the arduino IDE grabs a new library index
 # see: https://github.com/arduino/Arduino/issues/3535
 echo -n "UPDATE LIBRARY INDEX: "
-DEPENDENCY_OUTPUT=$(arduino --install-library USBHost > /dev/null 2>&1)
+DEPENDENCY_OUTPUT=$(arduino --install-library Console 2>&1)
 if [ $? -ne 0 ]; then echo -e """$RED""\xe2\x9c\x96"; else echo -e """$GREEN""\xe2\x9c\x93"; fi
+
+
 
 # set the maximal compiler warning level
 echo -n "SET BUILD PREFERENCES: "
