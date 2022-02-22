@@ -1387,25 +1387,8 @@ bool xE910_GSM::Socket_Open(void) {
 	// Set Response Variable
 	bool _Response = false;
 
-	// Set WD Variable
-	uint8_t _Error_WD = 0;
-
-	// Process Command
-	while (!_Response) {
-
-		// Socket Listen
-		_Response = GSM_AT.SL(2,1,80,255);
-
-		// Set WD Variable
-		_Error_WD++;
-
-		// Control for WD
-		if (_Error_WD > 5) break;
-
-		// Command Delay
-		delay(50);
-
-	}
+	// Socket Listen
+	_Response = GSM_AT.SL(2, 1, 80, 255);
 
 	// Print Serial Message
 	if (_Response) Terminal.Text(26, 108, GREEN, "Listening");
@@ -1417,25 +1400,8 @@ bool xE910_GSM::Socket_Close(void) {
 	// Set Response Variable
 	bool _Response = false;
 
-	// Set WD Variable
-	uint8_t _Error_WD = 0;
-
-	// Process Command
-	while (!_Response) {
-
-		// Socket Listen
-		_Response = GSM_AT.SL(2,0,80,255);
-
-		// Set WD Variable
-		_Error_WD++;
-
-		// Control for WD
-		if (_Error_WD > 5) break;
-
-		// Command Delay
-		delay(20);
-
-	}
+	// Socket Listen
+	_Response = GSM_AT.SL(2, 0, 80, 255);
 
 	// Print Serial Message
 	if (_Response) Terminal.Text(26, 108, GREEN, "Closed   ");
@@ -1448,16 +1414,16 @@ bool xE910_GSM::Socket_Control(void) {
 	uint8_t _State = 0;
 
 	// Socket State
-	_State = GSM_AT.SS(2);
+	//_State = GSM_AT.SS(2);
 
 	// Print Serial Message
-	if (_State == 0) Terminal.Text(26, 108, RED, " Closed  ");
-	if (_State == 1) Terminal.Text(26, 108, GREEN, " Active  ");
-	if (_State == 2) Terminal.Text(26, 108, RED, " Suspend ");
-	if (_State == 4) Terminal.Text(26, 108, GREEN, " Suspend ");
-	if (_State == 5) Terminal.Text(26, 108, GREEN, " Income  ");
-	if (_State == 6) Terminal.Text(26, 108, RED, " DNS     ");
-	if (_State == 7) Terminal.Text(26, 108, RED, " Conn..  ");
+	//if (_State == 0) Terminal.Text(26, 108, RED, " Closed  ");
+	//if (_State == 1) Terminal.Text(26, 108, GREEN, " Active  ");
+	//if (_State == 2) Terminal.Text(26, 108, RED, " Suspend ");
+	//if (_State == 4) Terminal.Text(26, 108, GREEN, " Suspend ");
+	//if (_State == 5) Terminal.Text(26, 108, GREEN, " Income  ");
+	//if (_State == 6) Terminal.Text(26, 108, RED, " DNS     ");
+	//if (_State == 7) Terminal.Text(26, 108, RED, " Conn..  ");
 
 }
 
@@ -4423,8 +4389,8 @@ bool xE910_AT::SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_
 	// Wait for UART Data Send
 	GSM_Serial.flush();
 
-	// Declare Response Variable
-	memset(_Serial_Buffer, '\0', 255);
+	// Clear Buffer Variable
+	_Clear_Buffer_Variable();
 
 	// Declare Loop Variable
 	bool _RESPONSE = false;
@@ -5178,7 +5144,7 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 		}
 
 		// Handle for timeout
-		if (millis() - _Time >= 1000) return (false);
+		if (millis() - _Time >= 15000) return (false);
 
 		// Increase Read Order
 		_Read_Order++;
