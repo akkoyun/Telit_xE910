@@ -197,9 +197,7 @@ class xE910_AT {
 		uint8_t 	RTC_Minute					= 0;				// Minute Variable
 		uint8_t 	RTC_Second					= 0;				// Second Variable
 
-		String		JSON_P01					= "";				// P01 JSON Pack
-		String		JSON_P02					= "";				// P02 JSON Pack
-		String		JSON_P03					= "";				// P03 JSON Pack
+		String		JSON						= "";				// JSON Pack
 
 		/**
 		 * @brief AT Function
@@ -1054,14 +1052,6 @@ class xE910_RTC {
 	public:
 
 		bool Time_Update(void);
-
-		uint16_t Year(void);
-		uint8_t Month(void);
-		uint8_t Day(void);
-		uint8_t Hour(void);
-		uint8_t Minute(void);
-		uint8_t Second(void);
-
 
 	private:
 

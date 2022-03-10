@@ -11,6 +11,9 @@
 #include <Console.h>
 #endif
 
+// Define JSON Library
+#include <ArduinoJson.h>
+
 // Define PGMspace Function
 #include <avr/pgmspace.h>
 

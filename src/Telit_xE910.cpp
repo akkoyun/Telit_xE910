@@ -145,10 +145,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 		// Control for Connection
 		if (!GSM_AT.Connection_Status) {
 
-			// Default terminal Coordinate
-			uint8_t _X = 14;
-			uint8_t _Y = 33;
-
 			// **************************************************
 			// AT Command
 			// **************************************************
@@ -183,9 +179,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
@@ -201,7 +194,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X, _Y+1, GREEN, "OK");} else {Terminal.Text(_X, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 14, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -215,9 +208,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+1, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -234,7 +224,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+1, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+1, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 15, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -248,9 +238,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+2, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -267,7 +254,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+2, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+2, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 16, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -281,9 +268,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+3, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -300,7 +284,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+3, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+3, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 17, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -314,9 +298,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+4, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -333,7 +314,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+4, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+4, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 18, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -347,9 +328,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+5, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -366,7 +344,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+5, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+5, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 19, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -380,9 +358,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+6, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -399,7 +374,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+6, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+6, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 20, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -413,9 +388,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+7, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -432,7 +404,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+7, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+7, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 21, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -446,9 +418,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+8, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -465,7 +434,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+8, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+8, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 22, 33);
 
 			// End Function
 			if (!_Response) return (false);
@@ -479,9 +448,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+9, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -498,7 +464,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+9, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+9, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 23, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -512,9 +478,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+10, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -531,7 +494,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+10, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+10, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 24, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -545,9 +508,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+11, _Y, YELLOW, " ** ");
 
 			// Process Command
 			while (!_Response) {
@@ -564,8 +524,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+11, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+11, _Y, RED, "FAIL");}}
-
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 25, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -583,9 +542,6 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+12, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
@@ -601,7 +557,7 @@ bool xE910_GSM::Begin(const bool _Debug) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+12, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+12, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 26, 33);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -664,23 +620,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			bool _Parameter_REGMODE = 1;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.REGMODE(_Parameter_REGMODE);
+				_Response = GSM_AT.REGMODE(1);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -691,8 +641,8 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X, _Y+1, GREEN, "OK");} else {Terminal.Text(_X, _Y, RED, "FAIL");}}
-		
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 14, 73);
+
 			// End Function
 			if (!_Response) return (false);
 			
@@ -704,23 +654,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			bool _Parameter_TXMONMODE = 1;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+1, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.TXMONMODE(_Parameter_TXMONMODE);
+				_Response = GSM_AT.TXMONMODE(1);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -731,7 +675,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+1, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+1, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 15, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -747,23 +691,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			bool _Parameter_CREG_Mode = 0;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+2, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.CREG(_Parameter_CREG_Mode);
+				_Response = GSM_AT.CREG(0);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -774,7 +712,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+2, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+2, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 16, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -787,23 +725,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			bool _Parameter_CGREG_Mode = 0;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+3, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.CGREG(_Parameter_CGREG_Mode);
+				_Response = GSM_AT.CGREG(0);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -814,7 +746,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+3, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+3, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 17, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -834,28 +766,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			const uint8_t _Parameter_SCFG_ConnID = 1;
-			const uint8_t _Parameter_SCFG_Cid = 1;
-			const uint16_t _Parameter_SCFG_Pkt_Sz = 1500;
-			const uint16_t _Parameter_SCFG_Max_To = 90;
-			const uint16_t _Parameter_SCFG_Conn_To = 600;
-			const uint8_t _Parameter_SCFG_TX_To = 50;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+4, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.SCFG(_Parameter_SCFG_ConnID, _Parameter_SCFG_Cid, _Parameter_SCFG_Pkt_Sz, _Parameter_SCFG_Max_To, _Parameter_SCFG_Conn_To, _Parameter_SCFG_TX_To);
+				_Response = GSM_AT.SCFG(1, 1, 1500, 90, 600, 50);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -866,7 +787,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+4, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+4, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 18, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -879,28 +800,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			const uint8_t _Parameter_SCFG_ConnID = 2;
-			const uint8_t _Parameter_SCFG_Cid = 1;
-			const uint16_t _Parameter_SCFG_Pkt_Sz = 1500;
-			const uint16_t _Parameter_SCFG_Max_To = 90;
-			const uint16_t _Parameter_SCFG_Conn_To = 300;
-			const uint8_t _Parameter_SCFG_TX_To = 50;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+5, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.SCFG(_Parameter_SCFG_ConnID, _Parameter_SCFG_Cid, _Parameter_SCFG_Pkt_Sz, _Parameter_SCFG_Max_To, _Parameter_SCFG_Conn_To, _Parameter_SCFG_TX_To);
+				_Response = GSM_AT.SCFG(2, 1, 1500, 90, 300, 50);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -911,7 +821,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+5, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+5, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 19, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -924,28 +834,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			const uint8_t _Parameter_SCFGEXT_ConnID = 2;
-			const uint8_t _Parameter_SCFGEXT_SrMode = 1;
-			const bool _Parameter_SCFGEXT_Recv_Data_Mode = false;
-			const uint8_t _Parameter_SCFGEXT_Keep_Alieve = 1;
-			const bool _Parameter_SCFGEXT_Listen_Auto_Response = false;
-			const bool _Parameter_SCFGEXT_Send_Data_Mode = false;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+6, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.SCFGEXT(_Parameter_SCFGEXT_ConnID, _Parameter_SCFGEXT_SrMode, _Parameter_SCFGEXT_Recv_Data_Mode, _Parameter_SCFGEXT_Keep_Alieve, _Parameter_SCFGEXT_Listen_Auto_Response, _Parameter_SCFGEXT_Send_Data_Mode);
+				_Response = GSM_AT.SCFGEXT(2, 1, false, 1, false, false);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -956,7 +855,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+6, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+6, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 20, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -969,28 +868,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			const uint8_t _Parameter_CDGCONT_Cid = 1;
-			const char _Parameter_CGDCONT_PDP[3] = "IP";
-			const char _Parameter_CGDCONT_APN[5] = "mgbs";
-			const char _Parameter_CDGCONT_PDP_Addr[8] = "0.0.0.0";
-			const bool _Parameter_CDGCONT_D_Comp = false;
-			const bool _Parameter_CDGCONT_H_Comp = false;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
-
-			// Print Serial Message
-			Terminal.Text(_X+7, _Y, YELLOW, " ** ");
 			
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = GSM_AT.CGDCONT(_Parameter_CDGCONT_Cid, _Parameter_CGDCONT_PDP, _Parameter_CGDCONT_APN, _Parameter_CDGCONT_PDP_Addr, _Parameter_CDGCONT_D_Comp, _Parameter_CDGCONT_H_Comp);
+				_Response = GSM_AT.CGDCONT(1, "IP", "mgbs", "0.0.0.0", false, false);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1001,7 +889,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+7, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+7, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 21, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1020,9 +908,6 @@ bool xE910_GSM::Connect(void) {
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+8, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
@@ -1038,7 +923,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+8, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+8, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 22, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1051,24 +936,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			const bool _Parameter_CGACT_State = true;
-			const uint8_t _Parameter_CGACT_Cid = 1;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+9, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Get IP Address
-				_Response = GSM_AT.CGACT(_Parameter_CGACT_State, _Parameter_CGACT_Cid);
+				_Response = GSM_AT.CGACT(true, 1);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1079,7 +957,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+9, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+9, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 23, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1092,23 +970,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			const uint8_t _Parameter_CGPADDR_Cid = 1;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+10, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Get IP Address
-				_Response = GSM_AT.CGPADDR(_Parameter_CGPADDR_Cid);
+				_Response = GSM_AT.CGPADDR(1);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1119,7 +991,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+10, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+10, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 24, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1132,31 +1004,17 @@ bool xE910_GSM::Connect(void) {
 			// Command Chain Delay (Advice by Telit)
 			delay(20);
 
-			// Declare Parameters
-			const uint8_t _Parameter_HTTPCFG_ProfID = 1;
-			const char *_Parameter_HTTPCFG_Server = "54.216.226.171";
-			const uint8_t _Parameter_HTTPCFG_Port = 80;
-			const uint8_t _Parameter_HTTPCFG_AuthType = 0;
-			const char *_Parameter_HTTPCFG_Username = "";
-			const char *_Parameter_HTTPCFG_Password = "";
-			const uint8_t _Parameter_HTTPCFG_SSL = 0;
-			const uint8_t _Parameter_HTTPCFG_TimeOut = 20;
-			const uint8_t _Parameter_HTTPCFG_Cid = 1;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+11, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Set HTTP Configuration
-				_Response = GSM_AT.HTTPCFG(_Parameter_HTTPCFG_ProfID, _Parameter_HTTPCFG_Server, _Parameter_HTTPCFG_Port, _Parameter_HTTPCFG_AuthType, _Parameter_HTTPCFG_Username, _Parameter_HTTPCFG_Password, _Parameter_HTTPCFG_SSL, _Parameter_HTTPCFG_TimeOut, _Parameter_HTTPCFG_Cid);
+				_Response = GSM_AT.HTTPCFG(1, "54.216.226.171", 80, 0, "", "", 0, 20, 1);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1167,7 +1025,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+11, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+11, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 25, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1177,23 +1035,17 @@ bool xE910_GSM::Connect(void) {
 		// ICMP Command
 		if (_ICMP) {
 		
-			// Declare Parameters
-			const uint8_t _Parameter_ICMP_Mode = 1;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
 			// Set Response Variable
 			_Response = false;
 
-			// Print Serial Message
-			Terminal.Text(_X+12, _Y, YELLOW, " ** ");
-
 			// Process Command
 			while (!_Response) {
 
 				// Set HTTP Configuration
-				_Response = GSM_AT.ICMP(_Parameter_ICMP_Mode);
+				_Response = GSM_AT.ICMP(1);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1204,7 +1056,7 @@ bool xE910_GSM::Connect(void) {
 			}
 
 			// Print Command State
-			if (Debug_Mode) {if (_Response) {Terminal.Text(_X+12, _Y+1, GREEN, "OK");} else {Terminal.Text(_X+12, _Y, RED, "FAIL");}}
+			if (Debug_Mode) Terminal.OK_Decide(_Response, 26, 73);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1248,13 +1100,16 @@ bool xE910_GSM::Send_Data_Pack(const uint8_t _Pack_Type, const String _Data) {
 	uint8_t _Error_WD = 0;
 
 	// Close Socket Command
-	if (_Pack_Type != 1) GSM.Socket_Close();
+	//if (_Pack_Type != 1) GSM.Socket_Close();
 
 	// Send Pack
-	if (GSM_AT.HTTPSND(1, 0, "/api/v1.1/p402", 30, _Data)) GSM_AT.HTTPRCV(1);
+	if (GSM_AT.HTTPSND(1, 0, "/api/v1.1/p402", 30, _Data)) _Response = GSM_AT.HTTPRCV(1);
 
 	// Open Socket Command
-	if (_Pack_Type != 1) GSM.Socket_Open();
+	//if (_Pack_Type != 1) GSM.Socket_Open();
+
+	// Control Socket
+	Socket_Control();
 
 	// End Function
 	return(_Response);
@@ -1384,28 +1239,33 @@ bool xE910_GSM::Socket_Listen(void) {
 }
 bool xE910_GSM::Socket_Open(void) {
 
-	// Set Response Variable
-	bool _Response = false;
+	// Print Serial Message
+	Terminal.Text(26, 108, WHITE, "         ");
+
+	// Command Delay
+	delay(200);
 
 	// Socket Listen
-	_Response = GSM_AT.SL(2, 1, 80, 255);
+	bool _Response = GSM_AT.SL(2, 1, 80, 255);
 
-	// Print Serial Message
-	if (_Response) Terminal.Text(26, 108, GREEN, "Listening");
-	if (!_Response) Terminal.Text(26, 108, RED, "Error 1  ");
+	// End Function
+	return(_Response);
+
 	
 }
 bool xE910_GSM::Socket_Close(void) {
 
-	// Set Response Variable
-	bool _Response = false;
+	// Print Serial Message
+	Terminal.Text(26, 108, WHITE, "         ");
 
 	// Socket Listen
-	_Response = GSM_AT.SL(2, 0, 80, 255);
+	bool _Response = GSM_AT.SL(2, 0, 80, 255);
 
-	// Print Serial Message
-	if (_Response) Terminal.Text(26, 108, GREEN, "Closed   ");
-	if (!_Response) Terminal.Text(26, 108, RED, "Error 2  ");
+	// Command Delay
+	delay(200);
+
+	// End Function
+	return(_Response);
 
 }
 bool xE910_GSM::Socket_Control(void) {
@@ -1414,16 +1274,16 @@ bool xE910_GSM::Socket_Control(void) {
 	uint8_t _State = 0;
 
 	// Socket State
-	//_State = GSM_AT.SS(2);
+	_State = GSM_AT.SS(2);
 
 	// Print Serial Message
-	//if (_State == 0) Terminal.Text(26, 108, RED, " Closed  ");
-	//if (_State == 1) Terminal.Text(26, 108, GREEN, " Active  ");
-	//if (_State == 2) Terminal.Text(26, 108, RED, " Suspend ");
-	//if (_State == 4) Terminal.Text(26, 108, GREEN, " Suspend ");
-	//if (_State == 5) Terminal.Text(26, 108, GREEN, " Income  ");
-	//if (_State == 6) Terminal.Text(26, 108, RED, " DNS     ");
-	//if (_State == 7) Terminal.Text(26, 108, RED, " Conn..  ");
+	if (_State == 0) Terminal.Text(26, 108, RED, " Closed  ");
+	if (_State == 1) Terminal.Text(26, 108, GREEN, " Active  ");
+	if (_State == 2) Terminal.Text(26, 108, RED, " Suspend ");
+	if (_State == 4) Terminal.Text(26, 108, GREEN, " Suspend ");
+	if (_State == 5) Terminal.Text(26, 108, GREEN, " Income  ");
+	if (_State == 6) Terminal.Text(26, 108, RED, " DNS     ");
+	if (_State == 7) Terminal.Text(26, 108, RED, " Conn..  ");
 
 }
 
@@ -1591,36 +1451,6 @@ bool xE910_RTC::Time_Update(void) {
 	return(false);
 
 }
-uint16_t xE910_RTC::Year(void) {
-
-	return(GSM_AT.RTC_Year);
-
-}
-uint8_t xE910_RTC::Month(void) {
-
-	return(GSM_AT.RTC_Month);
-
-}
-uint8_t xE910_RTC::Day(void) {
-
-	return(GSM_AT.RTC_Day);
-
-}
-uint8_t xE910_RTC::Hour(void) {
-
-	return(GSM_AT.RTC_Hour);
-
-}
-uint8_t xE910_RTC::Minute(void) {
-
-	return(GSM_AT.RTC_Minute);
-
-}
-uint8_t xE910_RTC::Second(void) {
-
-	return(GSM_AT.RTC_Second);
-
-}
 
 /**************************************************
  * Hardware Functions
@@ -1700,7 +1530,7 @@ void xE910_HARDWARE::OnOff(const uint16_t _Time) {
 	Terminal.Text(29, 10, WHITE, String(F("                                                                                                    ")));
 
 	// Print Serial Message
-	Terminal.Text(14, 32, GREEN, " OK ");
+	Terminal.Text(14, 33, GREEN, " OK ");
 
 }
 void xE910_HARDWARE::ShutDown(const uint16_t _Time) {
@@ -3957,7 +3787,7 @@ bool xE910_AT::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _U
 			// Parse Year
 			_Buffer[0] = _Response[8];
 			_Buffer[1] = _Response[9];
-			RTC_Year = 2000 + (uint8_t)atoi(_Buffer);
+			RTC_Year = (uint8_t)atoi(_Buffer);
 
 			// Parse Month
 			_Buffer[0] = _Response[11];
@@ -4535,8 +4365,6 @@ uint16_t xE910_AT::SRECV(const uint8_t _ConnID, const uint16_t _MaxByte) {
 
 	// Declare Read Order Variable
 	uint8_t _Read_Order = 0;
-
-	// Declare Data Order Variable
 	uint8_t _Data_Order = 0;
 
 	// Declare Loop Variable
@@ -5049,7 +4877,7 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 		}
 
 		// Handle for timeout
-		if (millis() - _Time >= 10000) return (false);
+		if (millis() - _Time >= 10000) return ("");
 
 		// Increase Read Order
 		_Read_Order++;
@@ -5102,7 +4930,7 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 		}
 
 		// Handle for timeout
-		if (millis() - _Time >= 1000) return (false);
+		if (millis() - _Time >= 1000) return ("");
 
 		// Increase Read Order
 		_Read_Order++;
@@ -5144,7 +4972,7 @@ bool xE910_AT::HTTPRCV(const uint8_t _ProfID) {
 		}
 
 		// Handle for timeout
-		if (millis() - _Time >= 15000) return (false);
+		if (millis() - _Time >= 15000) return ("");
 
 		// Increase Read Order
 		_Read_Order++;
