@@ -549,26 +549,29 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 	// Declare Response Status
 	bool _Response = false;
 
+	// Declare Time Variable
+	uint32_t _Connection_Start_Time = 0;
+	uint32_t _Connection_Time = 0;
+
 	// Control for Initialization Monitor
 	if (Modem.Initialize_Status) {
 
 		// Command Set
 		struct _Command_Struct {
-			bool REGMODE = true;
-			bool TXMONMODE = true;
-			bool CREG = true;
-			bool CGREG = true;
-			bool SCFG1 = true;
-			bool SCFG2 = true;
-			bool SCFGEXT1 = true;
-			bool SCFGEXT2 = true;
-			bool CGDCONT = true;
-			bool SERVINFO = true;
-			bool CGACT = true;
-			bool CGPADDR = true;
-			bool HTTPCFG = true;
-			bool ICMP = true;
-			bool CSQ = true;
+			const bool REGMODE = true;
+			const bool TXMONMODE = true;
+			const bool CREG = true;
+			const bool CGREG = true;
+			const bool SCFG1 = true;
+			const bool SCFG2 = true;
+			const bool SCFGEXT2 = true;
+			const bool CGDCONT = true;
+			const bool SERVINFO = true;
+			const bool SGACT = true;
+			const bool HTTPCFG = true;
+			const bool Firewall = true;
+			const bool ICMP = true;
+			const bool CSQ = true;
 		} _Command;
 
 		// REGMODE Command
@@ -587,7 +590,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			while (!_Response) {
 
 				// Process Command
-				_Response = REGMODE(1);
+				_Response = REGMODE(0);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -639,11 +642,11 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			
 		}
 
-		// Read Current Time
-		const uint32_t _CTime = millis();
-
 		// CREG Command
 		if (_Command.CREG) {
+
+			// Get Connection Start Time
+			_Connection_Start_Time = millis();
 
 			// Declare Watchdog Variable
 			_Error_WD = 0;
@@ -670,7 +673,10 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 
 			// Print Command State
 			if (_Terminal) Terminal.OK_Decide(_Response, _X + 2, _Y);
-		
+
+			// Calculate Connection Time
+			_Connection_Time += millis() - _Connection_Start_Time;		
+
 			// End Function
 			if (!_Response) return (false);
 
@@ -678,6 +684,9 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 
 		// CGREG Command
 		if (_Command.CGREG) {
+
+			// Get Connection Start Time
+			_Connection_Start_Time = millis();
 
 			// Declare Watchdog Variable
 			_Error_WD = 0;
@@ -704,15 +713,14 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 
 			// Print Command State
 			if (_Terminal) Terminal.OK_Decide(_Response, _X + 3, _Y);
-		
+
+			// Calculate Connection Time
+			_Connection_Time += millis() - _Connection_Start_Time;		
+
 			// End Function
 			if (!_Response) return (false);
 
 		}
-
-		// Read Current Time
-		uint32_t _Time = millis() - _CTime;
-		Variables.Connection_Time = (_Time / 1000);
 
 		// SCFG Command Socket 1
 		if (_Command.SCFG1) {
@@ -887,8 +895,14 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 
 		}
 
-		// CGACT Command
-		if (_Command.CGACT) {
+		// SGACT Command
+		if (_Command.SGACT) {
+
+			// Get Connection Start Time
+			_Connection_Start_Time = millis();
+
+			// Close Connection
+			SGACT(1, false);
 
 			// Declare Watchdog Variable
 			_Error_WD = 0;
@@ -903,7 +917,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			while (!_Response) {
 
 				// Get IP Address
-				_Response = CGACT(true, 1);
+				_Response = SGACT(1, true);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -919,43 +933,9 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			// Print Command State
 			if (_Terminal) Terminal.OK_Decide(_Response, _X + 9, _Y);
 		
-			// End Function
-			if (!_Response) return (false);
+			// Calculate Connection Time
+			_Connection_Time += millis() - _Connection_Start_Time;		
 
-		}
-
-		// CGPADDR Command
-		if (_Command.CGPADDR) {
-
-			// Declare Watchdog Variable
-			_Error_WD = 0;
-
-			// Set Response Variable
-			_Response = false;
-
-			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 10, _Y, BLUE, F(" .. "));
-
-			// Process Command
-			while (!_Response) {
-
-				// Get IP Address
-				_Response = CGPADDR(1);
-
-				// Set WD Variable
-				_Error_WD++;
-
-				// Control for WD
-				if (_Error_WD > 1) break;
-
-				// Delay
-				delay(100);
-
-			}
-
-			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 10, _Y);
-		
 			// End Function
 			if (!_Response) return (false);
 
@@ -1002,13 +982,50 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
+			if (_Terminal) Terminal.Text(_X + 10, _Y, BLUE, F(" .. "));
+
+			// Process Command
+			while (!_Response) {
+
+				// Set HTTP Configuration
+				_Response = HTTPCFG("54.216.226.171", 80);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 1) break;
+
+				// Delay
+				delay(100);
+
+			}
+
+			// Print Command State
+			if (_Terminal) Terminal.OK_Decide(_Response, _X + 10, _Y);
+		
+			// End Function
+			if (!_Response) return (false);
+
+		}
+
+		// ICMP Command
+		if (_Command.ICMP) {
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Print Command State
 			if (_Terminal) Terminal.Text(_X + 11, _Y, BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
 
 				// Set HTTP Configuration
-				_Response = HTTPCFG(1, "54.216.226.171", 80, 0, "", "", 0, 20, 1);
+				_Response = ICMP(1);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1029,8 +1046,8 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 
 		}
 
-		// ICMP Command
-		if (_Command.ICMP) {
+		// Firewall Command
+		if (_Command.Firewall) {
 
 			// Declare Watchdog Variable
 			_Error_WD = 0;
@@ -1044,8 +1061,8 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			// Process Command
 			while (!_Response) {
 
-				// Set HTTP Configuration
-				_Response = ICMP(1);
+				// Set Firewall Configuration
+				_Response = Set_Firewall();
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1060,15 +1077,14 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 
 			// Print Command State
 			if (_Terminal) Terminal.OK_Decide(_Response, _X + 12, _Y);
-		
+
 			// End Function
 			if (!_Response) return (false);
 
 		}
 
-		FRWL(1,"213.14.250.214", "255.255.255.0");
-		FRWL(1,"83.160.73.106", "255.255.255.0");
-		FRWL(1,"213.127.108.158", "255.255.255.0");
+		// Calculate Connection Time
+		Variables.Connection_Time = (_Connection_Start_Time / 1000);
 
 		// **************************************************
 		// Control for IP Address
@@ -1172,12 +1188,6 @@ bool Telit_xE910::Time_Update(void) {
 		// NTP Command
 		if (_Command.NTP) {
 
-			// Declare Parameters
-			const char _Parameter_NTP_Addr[16] = "time.google.com";
-			const uint16_t _Parameter_NTP_Port = 123;
-			const bool _Parameter_NTP_Update = true;
-			const uint8_t _Parameter_NTP_TimeOut = 10;
-
 			// Declare Watchdog Variable
 			_Error_WD = 0;
 
@@ -1188,7 +1198,7 @@ bool Telit_xE910::Time_Update(void) {
 			while (!_Response) {
 
 				// Send Command
-				_Response = NTP(_Parameter_NTP_Addr, _Parameter_NTP_Port, _Parameter_NTP_Update, _Parameter_NTP_TimeOut);
+				_Response = NTP("time.google.com", 123, true, 3);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -1326,24 +1336,336 @@ bool Telit_xE910::Connection_Control(void) {
 	return(false);
 
 }
-bool Telit_xE910::Send_Data_Pack(const uint8_t _Pack_Type, const String _Data) {
+bool Telit_xE910::Send_Data_Pack(const uint8_t _Pack_Type, const char *_Data) {
 
 	// Declare Variable
 	bool _Response = false;
 
 	// Close Socket Command
-	//if (_Pack_Type != 1) GSM.Socket_Close();
+	if (_Pack_Type != 1) GSM.Socket_Close();
 
 	// Send Pack
-	if (HTTPSND(1, 0, "/api/v1.1/p402", 30, _Data)) _Response = HTTPRCV(1);
+	if (HTTPSND("/api/v1.1/p402", _Data)) _Response = HTTPRCV();
 
 	// Open Socket Command
-	//if (_Pack_Type != 1) GSM.Socket_Open();
+	if (_Pack_Type != 1) GSM.Socket_Open();
 
 	// End Function
 	return(_Response);
 
 }
+bool Telit_xE910::Set_Firewall(void) {
+
+	// Declare Response Status
+	bool _Response = false;
+
+	// Declare Watchdog Variable
+	uint8_t _Error_WD = 0;
+
+	// Command Set
+	struct _Command_Struct {
+		const bool Firewall_1 = true;
+		const bool Firewall_2 = false;
+		const bool Firewall_3 = false;
+	} _Command;
+
+	// Firewall 1 Command
+	if (_Command.Firewall_1) {
+
+		// Declare Watchdog Variable
+		_Error_WD = 0;
+
+		// Set Response Variable
+		_Response = false;
+
+		// Process Command
+		while (!_Response) {
+
+			// Send Command
+			_Response = FRWL(1, "213.14.250.214");
+
+			// Set WD Variable
+			_Error_WD++;
+
+			// Control for WD
+			if (_Error_WD > 5) break;
+
+		}
+
+		// End Function
+		if (!_Response) return (false);
+
+	}
+
+	// Firewall 2 Command
+	if (_Command.Firewall_2) {
+
+		// Declare Watchdog Variable
+		_Error_WD = 0;
+
+		// Set Response Variable
+		_Response = false;
+
+		// Process Command
+		while (!_Response) {
+
+			// Send Command
+			_Response = FRWL(1, "83.160.73.106");
+
+			// Set WD Variable
+			_Error_WD++;
+
+			// Control for WD
+			if (_Error_WD > 5) break;
+
+		}
+
+		// End Function
+		if (!_Response) return (false);
+
+	}
+
+	// Firewall 3 Command
+	if (_Command.Firewall_3) {
+
+		// Declare Watchdog Variable
+		_Error_WD = 0;
+
+		// Set Response Variable
+		_Response = false;
+
+		// Process Command
+		while (!_Response) {
+
+			// Send Command
+			_Response = FRWL(1, "213.127.108.158");
+
+			// Set WD Variable
+			_Error_WD++;
+
+			// Control for WD
+			if (_Error_WD > 5) break;
+
+		}
+
+		// End Function
+		if (!_Response) return (false);
+
+	}
+
+	// End Function
+	return(true);
+
+}
+
+// Socket Functions
+bool Telit_xE910::Socket_Close(void) {
+
+	// Declare Variable
+	bool _Response = false;
+
+	// Control Socket Connection
+	uint8_t _SS = SS(2);
+
+	// Open Socket
+	if (_SS == 0) {
+
+		// End Function
+		return(true);
+
+	} else {
+
+		// Close Socket
+		SL(2, 0, 80, 255);
+
+		// Re Check Socket
+		_SS = SS(2);
+
+		// Control for Socket
+		if (_SS == 0) return(true);
+
+	}
+	
+	// End Function
+	return(false);
+
+}
+bool Telit_xE910::Socket_Open(void) {
+
+	// Declare Variable
+	bool _Response = false;
+
+	// Control Socket Connection
+	uint8_t _SS = SS(2);
+
+	// Open Socket
+	if (_SS == 4) {
+
+		// End Function
+		return(true);
+
+	} else {
+
+		// Close Socket
+		SL(2, 1, 80, 255);
+
+		// Re Check Socket
+		_SS = SS(2);
+
+		// Control for Socket
+		if (_SS == 4) return(true);
+
+	}
+	
+	// End Function
+	return(false);
+
+}
+uint8_t Telit_xE910::Socket_Status(void) {
+
+	// Socket Listen
+	uint8_t _Response = SS(2);
+
+	// End Function
+	return(_Response);
+
+}
+uint16_t Telit_xE910::Socket_Answer(void) {
+
+	// Beep
+	Terminal.Beep();
+
+	// Answer Socket
+	uint16_t _Incomming_Size = SA(2,1);
+
+	// Socket Recieve Command
+	uint16_t Incomming_Command = SRECV(2, _Incomming_Size);
+
+	// Debug Message
+	Terminal.Text(17, 110, YELLOW, String(Incomming_Command));
+
+	// End Function
+	return(Incomming_Command);
+
+}
+bool Telit_xE910::Socket_Send(const char * _Data_Pack) {
+
+	// Send Response Message
+	bool _Response_Send = SSEND(2, _Data_Pack);
+	
+	// Close Socket
+	bool _Response_Close = SH(2);
+
+	// ReOpen Socket
+	Socket_Open();
+
+	// End Function
+	return(_Response_Send and _Response_Close);
+
+}
+
+// Variable Functions
+char * Telit_xE910::Get_IMEI(void) {
+	
+	// End Function
+	return(Variables.IMEI);
+	
+}
+char * Telit_xE910::Get_Serial_ID(void) {
+	
+	// End Function
+	return(Variables.Serial_Number);
+	
+}
+char * Telit_xE910::Get_ICCID(void) {
+	
+	// End Function
+	return(Variables.ICCID);
+	
+}
+uint8_t Telit_xE910::Get_Manufacturer(void) {
+	
+	// End Function
+	return(Variables.Manufacturer);
+	
+}
+uint8_t Telit_xE910::Get_Model(void) {
+
+	// End Function
+	return(Variables.Model);
+	
+}
+char * Telit_xE910::Get_Firmware(void) {
+	
+	// End Function
+	return(Variables.Firmware);
+	
+}
+uint8_t Telit_xE910::Get_Signal_Level(void) {
+	
+	// End Function
+	return(Variables.RSSI);
+	
+}
+uint16_t Telit_xE910::Get_Operator(void) {
+	
+	// End Function
+	return(Variables.Operator);
+	
+}
+uint16_t Telit_xE910::Get_Connection_Time(void) {
+	
+	// End Function
+	return(Variables.Connection_Time);
+	
+}
+char * Telit_xE910::Get_IP_Address(void) {
+
+	// End Function
+	return(Variables.IP_Address);
+
+}
+
+// Time Functions
+uint8_t Telit_xE910::Get_Year(void) {
+	
+	// End Function
+	return(Time.Year);
+	
+}
+uint8_t Telit_xE910::Get_Month(void) {
+	
+	// End Function
+	return(Time.Month);
+	
+}
+uint8_t Telit_xE910::Get_Day(void) {
+	
+	// End Function
+	return(Time.Day);
+	
+}
+uint8_t Telit_xE910::Get_Hour(void) {
+	
+	// End Function
+	return(Time.Hour);
+	
+}
+uint8_t Telit_xE910::Get_Minute(void) {
+	
+	// End Function
+	return(Time.Minute);
+	
+}
+uint8_t Telit_xE910::Get_Second(void) {
+	
+	// End Function
+	return(Time.Second);
+	
+}
+
+// Socket Functions
+uint8_t Telit_xE910::Get_Connection_Status(void) {return(Modem.Connection_Status);}
 
 /**************************************************
  * Private Functions
@@ -1522,7 +1844,7 @@ bool Telit_xE910::Power_OFF(const bool _Power_Switch, const bool _LED_Switch, co
 
 }
 
-// AT Command Set
+// Initialize Commands
 bool Telit_xE910::AT(void) {
 
 	// Clear UART Buffer
@@ -2493,6 +2815,8 @@ bool Telit_xE910::REGMODE(const uint8_t _REGMODE) {
 	return (true);
 
 }
+
+// Context Functions
 bool Telit_xE910::CREG(const bool _Mode) {
 
 	// Clear UART Buffer
@@ -2648,7 +2972,7 @@ bool Telit_xE910::CREG(const bool _Mode) {
 			_Error_WD++;
 
 			// Wait Delay
-			delay(2000);
+			delay(5000);
 
 		} // Registration Denied [3]
 		if (_Stat == 52) {
@@ -2837,7 +3161,7 @@ bool Telit_xE910::CGREG(const bool _Mode) {
 				_Error_WD++;
 
 				// Wait Delay
-				delay(2000);
+				delay(5000);
 
 			} // Registration Denied [3]
 			if (_Stat == 52) {
@@ -2940,37 +3264,29 @@ bool Telit_xE910::CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char 
 	return (true);
 
 }
-bool Telit_xE910::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _Pkt_Sz, const uint16_t _Max_To, const uint16_t _Conn_To, const uint8_t _TX_To) {
+bool Telit_xE910::SGACT(const uint8_t _Cid, const bool _Stat) {
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
 
 	// Declare Buffer Object
-	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 1000};
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 150000};
 
 	// Command Delay
 	delay(20);
 
 	// Send UART Command
-	_GSM_Serial->print(F("AT#SCFG="));
-	_GSM_Serial->print(String(_Conn_ID));
-	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(F("AT#SGACT="));
 	_GSM_Serial->print(String(_Cid));
 	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Pkt_Sz));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Max_To));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Conn_To));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_TX_To));
+	_GSM_Serial->print(String(_Stat));
 	_GSM_Serial->print(F("\r\n"));
-
-	// Read Current Time
-	uint32_t _Time = millis();
 
 	// Command Delay
 	delay(20);
+
+	// Read Current Time
+	uint32_t _Time = millis();
 
 	// Read UART Response
 	while (!_Buffer.Response) {
@@ -2987,7 +3303,7 @@ bool Telit_xE910::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_
 		} else {
 
 			// Buffer Read Delay
-			delay(2);
+			delay(5);
 
 		}
 
@@ -2999,191 +3315,27 @@ bool Telit_xE910::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_
 
 	}
 
-	// End Function
-	return (true);
+	// Clear Variables
+	memset(Variables.IP_Address, '\0', 16);
 
-}
-bool Telit_xE910::SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uint8_t _Recv_Data_Mode, const uint8_t _Keep_Alive, const uint8_t _Listen_Auto_Rsp, const uint8_t _Send_Data_Mode) {
+	// Control for Buffer
+	for (uint8_t i = 0; i < _Buffer.Read_Order; i++) {
 
-	// Clear UART Buffer
-    _Clear_UART_Buffer();
+		// Handle Data
+		if (((_Buffer.Buffer[i] < 58 and _Buffer.Buffer[i] > 47) or _Buffer.Buffer[i] == 46)) {
 
-	// Declare Buffer Object
-	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 1000};
+			// Get Data
+			Variables.IP_Address[_Buffer.Data_Order] = _Buffer.Buffer[i];
 
-	// Command Delay
-	delay(20);
-
-	// Send UART Command
-	_GSM_Serial->print(F("AT#SCFGEXT="));
-	_GSM_Serial->print(String(_Conn_ID));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Sr_Mode));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Recv_Data_Mode));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Keep_Alive));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Listen_Auto_Rsp));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Send_Data_Mode));
-	_GSM_Serial->print(F("\r\n"));
-
-	// Read Current Time
-	uint32_t _Time = millis();
-
-	// Command Delay
-	delay(20);
-
-	// Read UART Response
-	while (!_Buffer.Response) {
-
-		// Read Serial Char
-		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
-
-		// Control for Response
-		if (strstr(_Buffer.Buffer, "OK") != NULL) {
-
-			// Handle Response
-			_Buffer.Response = true;
-
-		} else {
-
-			// Buffer Read Delay
-			delay(2);
+			// Increase Data Order
+			_Buffer.Data_Order++;
 
 		}
-
-		// Handle for timeout
-		if (millis() - _Time >= _Buffer.Time_Out) return(false);
-
-		// Increase Read Order
-		_Buffer.Read_Order++;
 
 	}
 
 	// End Function
-	return (true);
-
-}
-bool Telit_xE910::SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, const uint8_t _Abort_Conn_Attempt, const uint8_t _SRing_Len, const uint8_t _SRing_To, const uint8_t _No_Carrier_Mode) {
-
-	// Clear UART Buffer
-    _Clear_UART_Buffer();
-
-	// Declare Buffer Object
-	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 1000};
-
-	// Command Delay
-	delay(20);
-
-	// Send UART Command
-	_GSM_Serial->print(F("AT#SCFGEXT2="));
-	_GSM_Serial->print(String(_Conn_ID));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Buffer_Start));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Abort_Conn_Attempt));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_SRing_Len));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_SRing_To));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_No_Carrier_Mode));
-	_GSM_Serial->print(F("\r\n"));
-
-	// Read Current Time
-	uint32_t _Time = millis();
-
-	// Command Delay
-	delay(20);
-
-	// Read UART Response
-	while (!_Buffer.Response) {
-
-		// Read Serial Char
-		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
-
-		// Control for Response
-		if (strstr(_Buffer.Buffer, "OK") != NULL) {
-
-			// Handle Response
-			_Buffer.Response = true;
-
-		} else {
-
-			// Buffer Read Delay
-			delay(2);
-
-		}
-
-		// Handle for timeout
-		if (millis() - _Time >= _Buffer.Time_Out) return(false);
-
-		// Increase Read Order
-		_Buffer.Read_Order++;
-
-	}
-
-	// End Function
-	return (true);
-
-}
-bool Telit_xE910::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const uint8_t _Closure_Type_Cmd_Mode_Enabling) {
-
-	// Clear UART Buffer
-    _Clear_UART_Buffer();
-
-	// Declare Buffer Object
-	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 1000};
-
-	// Command Delay
-	delay(20);
-
-	// Send UART Command
-	_GSM_Serial->print(F("AT#SCFGEXT3="));
-	_GSM_Serial->print(String(_Conn_ID));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Imm_Rsp));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Closure_Type_Cmd_Mode_Enabling));
-	_GSM_Serial->print(F("\r\n"));
-
-	// Read Current Time
-	uint32_t _Time = millis();
-
-	// Command Delay
-	delay(20);
-
-	// Read UART Response
-	while (!_Buffer.Response) {
-
-		// Read Serial Char
-		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
-
-		// Control for Response
-		if (strstr(_Buffer.Buffer, "OK") != NULL) {
-
-			// Handle Response
-			_Buffer.Response = true;
-
-		} else {
-
-			// Buffer Read Delay
-			delay(2);
-
-		}
-
-		// Handle for timeout
-		if (millis() - _Time >= _Buffer.Time_Out) return(false);
-
-		// Increase Read Order
-		_Buffer.Read_Order++;
-
-	}
-
-	// End Function
-	return (true);
+	return(true);
 
 }
 bool Telit_xE910::CGACT(const uint8_t _State, const bool _Cid) {
@@ -3736,15 +3888,13 @@ bool Telit_xE910::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool
 	uint32_t _Time = millis();
 
 	// Command Delay
-	delay(50);
+	delay(100);
 
 	// Read UART Response
 	while (!_Buffer.Response) {
 
 		// Read Serial Char
 		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
-
-		Terminal.Text(40, _Buffer.Read_Order, CYAN, String(_Buffer.Buffer[_Buffer.Read_Order]));
 
 		// Control for Response
 		if (strstr(_Buffer.Buffer, "OK") != NULL) {
@@ -3767,51 +3917,32 @@ bool Telit_xE910::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool
 
 	}
 
-//	Terminal.Text(40, 0, CYAN, String(_Buffer.Buffer));
+	// Define Time Buffer Variables
+	char _Serial_Time_Buffer[18];
 
-	// Declare Buffer
-//	char _Time_Buffer[2];
+	// Control for Buffer
+	for (uint8_t i = 0; i < _Buffer.Read_Order; i++) {
 
-	// Parse Year
-//	_Time_Buffer[0] = _Buffer.Buffer[8];
-//	_Time_Buffer[1] = _Buffer.Buffer[9];
-//	Time.Year = (uint8_t)atoi(_Time_Buffer);
-//	memset(_Time_Buffer, '\0', 2);
+		// Handle Data
+		if (_Buffer.Buffer[i] < 58 and _Buffer.Buffer[i] > 47) {
 
-	// Parse Month
-//	_Time_Buffer[0] = _Buffer.Buffer[11];
-//	_Time_Buffer[1] = _Buffer.Buffer[12];
-//	if ((uint8_t)atoi(_Time_Buffer) > 12) Time.Month = 1;
-//	Time.Month = (uint8_t)atoi(_Time_Buffer);
-//	memset(_Time_Buffer, '\0', 2);
+			// Get Data
+			_Serial_Time_Buffer[_Buffer.Data_Order] = _Buffer.Buffer[i];
 
-	// Parse Day
-//	_Time_Buffer[0] = _Buffer.Buffer[14];
-//	_Time_Buffer[1] = _Buffer.Buffer[15];
-//	if ((uint8_t)atoi(_Time_Buffer) > 31) Time.Day = 1;
-//	Time.Day = (uint8_t)atoi(_Time_Buffer);
-//	memset(_Time_Buffer, '\0', 2);
+			// Increase Data Order
+			_Buffer.Data_Order++;
 
-	// Parse Hour
-//	_Time_Buffer[0] = _Buffer.Buffer[17];
-//	_Time_Buffer[1] = _Buffer.Buffer[18];
-//	if ((uint8_t)atoi(_Time_Buffer) > 24) Time.Hour = 0;
-//	Time.Hour = (uint8_t)atoi(_Time_Buffer);
-//	memset(_Time_Buffer, '\0', 2);
+		}
 
-	// Parse Minute
-//	_Time_Buffer[0] = _Buffer.Buffer[20];
-//	_Time_Buffer[1] = _Buffer.Buffer[21];
-//	if ((uint8_t)atoi(_Time_Buffer) > 60) Time.Minute = 0;
-//	Time.Minute = (uint8_t)atoi(_Time_Buffer);
-//	memset(_Time_Buffer, '\0', 2);
+	}
 
-	// Parse Second
-//	_Time_Buffer[0] = _Buffer.Buffer[23];
-//	_Time_Buffer[1] = _Buffer.Buffer[24];
-//	if ((uint8_t)atoi(_Time_Buffer) > 60) Time.Second = 0;
-//	Time.Second = (uint8_t)atoi(_Time_Buffer);
-//	memset(_Time_Buffer, '\0', 2);
+	// Handle Time
+	Time.Year = (((_Serial_Time_Buffer[0] - 48) * 10) + (_Serial_Time_Buffer[1] - 48));
+	Time.Month = (((_Serial_Time_Buffer[2] - 48) * 10) + (_Serial_Time_Buffer[3] - 48));
+	Time.Day = (((_Serial_Time_Buffer[4] - 48) * 10) + (_Serial_Time_Buffer[5] - 48));
+	Time.Hour = (((_Serial_Time_Buffer[6] - 48) * 10) + (_Serial_Time_Buffer[7] - 48));
+	Time.Minute = (((_Serial_Time_Buffer[8] - 48) * 10) + (_Serial_Time_Buffer[9] - 48));
+	Time.Second = (((_Serial_Time_Buffer[10] - 48) * 10) + (_Serial_Time_Buffer[11] - 48));
 
 	// End Function
 	return (true);
@@ -3915,7 +4046,7 @@ bool Telit_xE910::CCLK(void) {
 }
 
 // Data Functions
-bool Telit_xE910::FRWL(const uint8_t _Action, const char *_IP_Addr, const char *_Net_Mask) {
+bool Telit_xE910::FRWL(const uint8_t _Action, const char *_IP_Addr) {
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -3931,16 +4062,14 @@ bool Telit_xE910::FRWL(const uint8_t _Action, const char *_IP_Addr, const char *
 	_GSM_Serial->print(String(_Action));
 	_GSM_Serial->print(F(",\""));
 	_GSM_Serial->print(String(_IP_Addr));
-	_GSM_Serial->print(F("\",\""));
-	_GSM_Serial->print(String(_Net_Mask));
-	_GSM_Serial->print(F("\""));
+	_GSM_Serial->print(F("\",\"255.255.255.0\""));
 	_GSM_Serial->print(F("\r\n"));
 
 	// Read Current Time
 	uint32_t _Time = millis();
 
 	// Command Delay
-	delay(20);
+	delay(50);
 
 	// Read UART Response
 	while (!_Buffer.Response) {
@@ -3973,7 +4102,7 @@ bool Telit_xE910::FRWL(const uint8_t _Action, const char *_IP_Addr, const char *
 	return (true);
 
 }
-bool Telit_xE910::HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const uint8_t _Port, const uint8_t _AuthType, const char *_Username, const char *_Password, const uint8_t _SSL, const uint8_t _TimeOut, const uint8_t _Cid) {
+bool Telit_xE910::HTTPCFG(const char *_HTTP_Server, const uint8_t _Port) {
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -3985,24 +4114,11 @@ bool Telit_xE910::HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const
 	delay(20);
 
 	// Send UART Command
-	_GSM_Serial->print(F("AT#HTTPCFG="));
-	_GSM_Serial->print(String(_ProfID));
-	_GSM_Serial->print(F(",\""));
+	_GSM_Serial->print(F("AT#HTTPCFG=1,\""));
 	_GSM_Serial->print(String(_HTTP_Server));
 	_GSM_Serial->print(F("\","));
 	_GSM_Serial->print(String(_Port));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_AuthType));
-	_GSM_Serial->print(F(",\""));
-	_GSM_Serial->print(String(_Username));
-	_GSM_Serial->print(F("\",\""));
-	_GSM_Serial->print(String(_Password));
-	_GSM_Serial->print(F("\","));
-	_GSM_Serial->print(String(_SSL));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_TimeOut));
-	_GSM_Serial->print(F(","));
-	_GSM_Serial->print(String(_Cid));
+	_GSM_Serial->print(F(",0,\"\",\"\",0,20,1"));
 	_GSM_Serial->print(F("\r\n"));
 
 	// Read Current Time
@@ -4016,8 +4132,6 @@ bool Telit_xE910::HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const
 
 		// Read Serial Char
 		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
-
-//		Terminal.Text(50, _Buffer.Read_Order, CYAN, String(_Buffer.Buffer[_Buffer.Read_Order]));
 
 		// Control for Response
 		if (strstr(_Buffer.Buffer, "OK") != NULL) {
@@ -4044,26 +4158,22 @@ bool Telit_xE910::HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const
 	return (true);
 
 }
-bool Telit_xE910::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const String _Data) {
+bool Telit_xE910::HTTPSND(const char *_URL, const char *_Data) {
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
 
 	// Declare Buffer Object
-	Struct_Serial_Buffer _Buffer_Set = {false, 0, 0, "", 5000};
+	Struct_Serial_Buffer _Buffer_Set = {false, 0, 0, "", 10000};
 
 	// Command Delay
 	delay(20);
 
 	// Send UART Command
-	_GSM_Serial->print(F("AT#HTTPSND="));
-	_GSM_Serial->print(String(_ProfID));
-	_GSM_Serial->print(F(",")); 
-	_GSM_Serial->print(String(_Command));
-	_GSM_Serial->print(F(",\"")); 
+	_GSM_Serial->print(F("AT#HTTPSND=1,0,\"")); 
 	_GSM_Serial->print(String(_URL));
 	_GSM_Serial->print(F("\","));
-	_GSM_Serial->print(String(_Data.length()));
+	_GSM_Serial->print(String(_Data).length());
 	_GSM_Serial->print(F(",\"application/json\""));
 	_GSM_Serial->print(F("\r\n"));
 
@@ -4103,16 +4213,16 @@ bool Telit_xE910::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const c
 	}
 
 	// Send Delay
-	delay(30);
+	delay(50);
 
 	// Print Data
 	_GSM_Serial->print(String(_Data));
 
 	// Send Delay
-	delay(30);
+	delay(50);
 
 	// Declare Buffer Object
-	Struct_Serial_Buffer _Buffer_Get = {false, 0, 0, "", 5000};
+	Struct_Serial_Buffer _Buffer_Get = {false, 0, 0, "", 10000};
 
 	// Read Current Time
 	_Time = millis();
@@ -4148,7 +4258,7 @@ bool Telit_xE910::HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const c
 	return (true);
 
 }
-bool Telit_xE910::HTTPRCV(const uint8_t _ProfID) {
+bool Telit_xE910::HTTPRCV(void) {
 
 	// Declare Buffer Object
 	Struct_Serial_Buffer _Buffer_Get = {false, 0, 0, "", 10000};
@@ -4183,8 +4293,6 @@ bool Telit_xE910::HTTPRCV(const uint8_t _ProfID) {
 
 	}
 
-//	Terminal.Text(50, 0, CYAN, String(_Buffer_Get.Response));
-
 	// Command Work Delay
 	delay(15);
 
@@ -4195,8 +4303,7 @@ bool Telit_xE910::HTTPRCV(const uint8_t _ProfID) {
 	Struct_Serial_Buffer _Buffer_Read = {false, 0, 0, "", 5000};
 
 	// Send UART Command
-	_GSM_Serial->print(F("AT#HTTPRCV="));
-	_GSM_Serial->print(String(_ProfID));
+	_GSM_Serial->print(F("AT#HTTPRCV=1"));
 	_GSM_Serial->print(F("\r\n"));
 
 	// Read Current Time
@@ -4270,6 +4377,883 @@ bool Telit_xE910::HTTPRCV(const uint8_t _ProfID) {
 
 	// End Function
 	return (false);
+
+}
+
+// Socket Functions
+bool Telit_xE910::SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _Pkt_Sz, const uint16_t _Max_To, const uint16_t _Conn_To, const uint8_t _TX_To) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 1000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SCFG="));
+	_GSM_Serial->print(String(_Conn_ID));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Cid));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Pkt_Sz));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Max_To));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Conn_To));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_TX_To));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// End Function
+	return (true);
+
+}
+bool Telit_xE910::SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uint8_t _Recv_Data_Mode, const uint8_t _Keep_Alive, const uint8_t _Listen_Auto_Rsp, const uint8_t _Send_Data_Mode) {
+
+	// <connId> - socket connection identifier (1..6)
+	// <srMode> - SRing unsolicited mode
+	// <recvDataMode> - data view mode for received data in command mode(AT#SRECV or <srMode> = 2)
+	// <keepalive> - Set the TCP Keepalive value in minutes
+	// <ListenAutoRsp> - Set the listen auto-response mode, that affects the commands AT#SL and AT#SLUDP
+	// <sendDataMode> - data mode for sending data in command mode(AT#SSEND)
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 1000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SCFGEXT="));
+	_GSM_Serial->print(String(_Conn_ID));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Sr_Mode));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Recv_Data_Mode));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Keep_Alive));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Listen_Auto_Rsp));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Send_Data_Mode));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// End Function
+	return (true);
+
+}
+bool Telit_xE910::SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, const uint8_t _Abort_Conn_Attempt, const uint8_t _SRing_Len, const uint8_t _SRing_To, const uint8_t _No_Carrier_Mode) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 1000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SCFGEXT2="));
+	_GSM_Serial->print(String(_Conn_ID));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Buffer_Start));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Abort_Conn_Attempt));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_SRing_Len));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_SRing_To));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_No_Carrier_Mode));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// End Function
+	return (true);
+
+}
+bool Telit_xE910::SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const uint8_t _Closure_Type_Cmd_Mode_Enabling) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 1000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SCFGEXT3="));
+	_GSM_Serial->print(String(_Conn_ID));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Imm_Rsp));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Closure_Type_Cmd_Mode_Enabling));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// End Function
+	return (true);
+
+}
+bool Telit_xE910::SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_t _Listen_Port, const uint8_t _Closure_Type) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 5000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SL="));
+	_GSM_Serial->print(String(_ConnID));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Listen_State));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Listen_Port));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Closure_Type));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer.Response = true;
+
+		} else if (strstr(_Buffer.Buffer, "ERROR") != NULL) {
+
+			// End Function
+			return(false);
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// End Function
+	return (true);
+
+}
+uint16_t Telit_xE910::SA(const uint8_t _ConnID, const uint8_t _ConnMode) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 15000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SA="));
+	_GSM_Serial->print(String(_ConnID));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_ConnMode));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Declare Control Variables
+	bool _R = false;
+	bool _N = false;
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "SRING:") != NULL) {
+
+			// Control for Char
+			if (_Buffer.Buffer[_Buffer.Read_Order] == '\r') _R = true;
+			if (_Buffer.Buffer[_Buffer.Read_Order] == '\n') _N = true;
+
+			// Handle Response
+			if (_R and _N) _Buffer.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// Debug Message
+//	Terminal.Text(30, 0, WHITE, String(F("AT#SA Response : "))); Terminal.Text(30, 17, CYAN, String(_Buffer.Buffer));
+
+	// Declare Handle Variable
+	bool _Comma = false;
+
+	// Declare Incomming Message Length Variable
+	char _Incomming_Length[4];
+	memset(_Incomming_Length, '\0', 4);
+
+	// Control for Buffer
+	for (uint8_t i = 0; i < _Buffer.Read_Order; i++) {
+
+		// Handle ,
+		if (_Buffer.Buffer[i] == 44) _Comma = true;
+
+		// Handle Data
+		if (_Comma == true and _Buffer.Buffer[i] < 58 and _Buffer.Buffer[i] > 47) {
+
+			// Get Data
+			_Incomming_Length[_Buffer.Data_Order] = _Buffer.Buffer[i];
+
+			// Increase Data Order
+			_Buffer.Data_Order++;
+
+		}
+
+	}
+
+	// Debug Message
+//	Terminal.Text(40, 0, YELLOW, String(_Incomming_Length));
+
+	// End Function
+	return(atoi(_Incomming_Length));
+
+}
+bool Telit_xE910::SH(const uint8_t _ConnID) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 5000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SH="));
+	_GSM_Serial->print(String(_ConnID));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// End Function
+	return (true);
+
+}
+bool Telit_xE910::SO(const uint8_t _ConnID) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 5000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SO="));
+	_GSM_Serial->print(String(_ConnID));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// End Function
+	return (true);
+
+}
+bool Telit_xE910::SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const uint8_t _Closure_Type, uint16_t _IPort, const bool _Conn_Mode, const char *_IP, const char *_URL, const char *_Data) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer_Connect = {false, 0, 0, "", 10000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SD="));
+	_GSM_Serial->print(String(_Cid));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Pro));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Port));
+	_GSM_Serial->print(F(",\""));
+	_GSM_Serial->print(String(_IP));
+	_GSM_Serial->print(F("\","));
+	_GSM_Serial->print(String(_Closure_Type));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_IPort));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_Conn_Mode));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer_Connect.Response) {
+
+		// Read Serial Char
+		_Buffer_Connect.Buffer[_Buffer_Connect.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer_Connect.Buffer, "CONNECT") != NULL) {
+
+			// Handle Response
+			_Buffer_Connect.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer_Connect.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer_Connect.Read_Order++;
+
+	}
+
+	// Command Work Delay
+	delay(30);
+
+	// Print HTTP Header
+	_GSM_Serial->print(F("POST ")); _GSM_Serial->print(String(_URL)); _GSM_Serial->print(F(" HTTP/1.1\r\n"));
+	_GSM_Serial->print(F("Host: ")); _GSM_Serial->print(String(_IP)); _GSM_Serial->print(F("\r\n"));
+	_GSM_Serial->print(F("Content-Length: ")); _GSM_Serial->print(String(_Data).length()); _GSM_Serial->print(F("\r\n"));
+	_GSM_Serial->print(F("Connection: close\r\n"));
+	_GSM_Serial->print(F("Content-Type: application/json\r\n"));
+	_GSM_Serial->print(F("User-Agent: STF-PowerStat\r\n"));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Send Data
+	_GSM_Serial->print(String(_Data));
+
+	// Command Work Delay
+	delay(50);
+
+	// Send Data
+	_GSM_Serial->print(F("+++"));
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer_Get = {false, 0, 0, "", 10000};
+
+	// Command Delay
+	delay(20);
+
+	// Read Current Time
+	_Time = millis();
+
+	// Read UART Response
+	while (!_Buffer_Get.Response) {
+
+		// Read Serial Char
+		_Buffer_Get.Buffer[_Buffer_Get.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer_Get.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer_Get.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer_Get.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer_Get.Read_Order++;
+
+	}
+
+	// End Function
+	return (true);
+
+}
+uint8_t Telit_xE910::SS(const uint8_t _ConnID) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 1000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SS="));
+	_GSM_Serial->print(String(_ConnID));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(9);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// End Function
+	return (_Buffer.Buffer[9] - 48);
+
+}
+uint16_t Telit_xE910::SRECV(const uint8_t _ConnID, const uint16_t _MaxByte) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 5000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SRECV="));
+	_GSM_Serial->print(String(_ConnID));
+	_GSM_Serial->print(F(","));
+	_GSM_Serial->print(String(_MaxByte));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(9);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// Declare Handle Variable
+	bool _Handle_Char = false;
+
+	// Declare Incomming Message Length Variable
+	char _Message_Buffer[4];
+
+	// Control for Buffer
+	for (uint8_t i = 0; i < _Buffer.Read_Order; i++) {
+
+		// Handle ,
+		if (_Buffer.Buffer[i] == 123) _Handle_Char = true;
+
+		// Handle Data
+		if (_Handle_Char == true and _Buffer.Buffer[i] < 58 and _Buffer.Buffer[i] > 47) {
+
+			// Get Data
+			_Message_Buffer[_Buffer.Data_Order] = _Buffer.Buffer[i];
+
+			// Increase Data Order
+			_Buffer.Data_Order++;
+
+		}
+
+	}
+
+	// End Function
+	return(atol(_Message_Buffer));
+
+}
+bool Telit_xE910::SSEND(const uint8_t _ConnID, const char * _Data_Pack) {
+
+	// Clear UART Buffer
+    _Clear_UART_Buffer();
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer = {false, 0, 0, "", 2000};
+
+	// Command Delay
+	delay(20);
+
+	// Send UART Command
+	_GSM_Serial->print(F("AT#SSEND="));
+	_GSM_Serial->print(String(_ConnID));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Read Current Time
+	uint32_t _Time = millis();
+
+	// Command Delay
+	delay(20);
+
+	// Read UART Response
+	while (!_Buffer.Response) {
+
+		// Read Serial Char
+		_Buffer.Buffer[_Buffer.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer.Buffer, "\r\n>") != NULL) {
+
+			// Handle Response
+			_Buffer.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer.Read_Order++;
+
+	}
+
+	// Command Delay
+	delay(30);
+
+	// Print HTTP Header
+	_GSM_Serial->print(F("HTTP/1.1 200 OK\r\n"));
+	_GSM_Serial->print(F("Connection: close\r\n"));
+	_GSM_Serial->print(F("Content-Type: application/json\r\n"));
+	_GSM_Serial->print(F("User-Agent: STF\r\n"));
+	_GSM_Serial->print(F("\r\n"));
+
+	// Send Data Pack
+	_GSM_Serial->print(String(_Data_Pack));
+
+	// Print End Char
+	_GSM_Serial->print((char)26);
+
+	// Declare Buffer Object
+	Struct_Serial_Buffer _Buffer_Get = {false, 0, 0, "", 2000};
+
+	// Read UART Response
+	while (!_Buffer_Get.Response) {
+
+		// Read Serial Char
+		_Buffer_Get.Buffer[_Buffer_Get.Read_Order] = _GSM_Serial->read();
+
+		// Control for Response
+		if (strstr(_Buffer_Get.Buffer, "OK") != NULL) {
+
+			// Handle Response
+			_Buffer_Get.Response = true;
+
+		} else {
+
+			// Buffer Read Delay
+			delay(2);
+
+		}
+
+		// Handle for timeout
+		if (millis() - _Time >= _Buffer_Get.Time_Out) return(false);
+
+		// Increase Read Order
+		_Buffer_Get.Read_Order++;
+
+	}
+
+	// End Function
+	return(true);
 
 }
 

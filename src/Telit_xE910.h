@@ -10,11 +10,15 @@
 #ifndef __Telit_xE910__
 #define __Telit_xE910__
 
-// Define Library Structures
-#ifndef __Telit_xE910_Structures__
-#include <Telit_xE910_Structures.h>
+// Define Arduino Library
+#ifndef __Arduino__
+#include <Arduino.h>
 #endif
 
+// Define VT100 Terminal
+#ifndef __Console__
+#include <Console.h>
+#endif
 
 class Telit_xE910 {
 
@@ -22,6 +26,72 @@ class Telit_xE910 {
 
 		// Stream Object Definition
 		Stream *_GSM_Serial;
+
+		// Define Modem Structure
+		struct _Struct_Modem {
+			const char Version[9]		= "02.00.00";	// Version
+			bool Power_Monitor			= false;		// Power Monitor
+			bool SIM_Status				= false;		// SIM Status
+			bool Initialize_Status		= false;		// Initialize Status
+			bool Connection_Status		= false;		// Connection Status
+			bool CREG_Status			= false;		// CREG Status
+			bool CGREG_Status			= false;		// CGREG Status
+		} Modem;
+
+		// Define Variable Structure
+		struct _Struct_Variables {
+			char IMEI[17]				= "";	// IMEI Variable
+			char Serial_Number[11]		= "";	// Serial Number Variable
+			char ICCID[21]				= "";	// ICCID Variable
+			uint8_t Manufacturer		= 0;	// Manufacturer Variable	
+			uint8_t Model				= 0;	// Model Variable
+			char Firmware[10]			= "";	// Modem Firmware Version Variable
+			uint8_t RSSI				= 0;	// Signal Variable
+			uint16_t Operator			= 0;	// Operator Variable
+			uint8_t Connection_Time		= 0;	// Connection Time
+			char IP_Address[16]			= "";	// IP Addres
+		} Variables;
+
+		// Define Time Structure
+		struct _Struct_Time {
+			uint8_t Year				= 0;
+			uint8_t Month				= 0;
+			uint8_t Day					= 0;
+			uint8_t Hour				= 0;
+			uint8_t Minute				= 0;
+			uint8_t Second				= 0;
+		} Time;
+
+		// Define Serial Buffer Structure
+		struct Struct_Serial_Buffer {
+			bool Response;
+			uint8_t Read_Order;
+			uint8_t Data_Order;
+			char Buffer[255];
+			uint16_t Time_Out;
+		};
+
+		// Power Enum Definations
+		enum Power_Enum {
+			NOT_POWERED = 0,
+			POWERED = 1
+		};
+
+		// Connection Enum Definations
+		enum Connection_Enum {
+			NOT_CONNECTED = 0,
+			CONNECTED = 1
+		};
+
+		// Stat Enum Definations
+		enum Stat_Enum {
+			NOT_REGISTERED = 0,
+			HOME_REGISTERED = 1,
+			SEARCHING = 2,
+			DENIED = 3,
+			UNKNOWN	= 4,
+			ROAMING_REGISTERED = 5
+		};
 
 		// Hardware Functions
 		void Set_Communication(const bool _State);
@@ -63,48 +133,35 @@ class Telit_xE910 {
 		bool SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const uint8_t _Closure_Type_Cmd_Mode_Enabling);
 		bool CGACT(const uint8_t _State, const bool _Cid);
 		bool CGPADDR(const uint8_t _Cid);
-		bool FRWL(const uint8_t _Action, const char *_IP_Addr, const char *_Net_Mask);
+		bool FRWL(const uint8_t _Action, const char *_IP_Addr);
 		bool ICMP(const uint8_t _Mode);
 		bool CTZU(const bool _State);
 		bool NITZ(const bool _State);
 		bool NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _Update_Module_Clock, const uint8_t _Time_Out);
 		bool CCLK(void);
 		bool SHDN(void);
+		bool SGACT(const uint8_t _Cid, const bool _Stat);
 
 		// Data Functions
-		bool HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const uint8_t _Port, const uint8_t _AuthType, const char *_Username, const char *_Password, const uint8_t _SSL, const uint8_t _TimeOut, const uint8_t _Cid);
-		bool HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const String _Data);
-		bool HTTPRCV(const uint8_t _ProfID);
+		bool HTTPCFG(const char *_HTTP_Server, const uint8_t _Port);
+		bool HTTPSND(const char *_URL, const char *_Data);
+		bool HTTPRCV(void);
+
+		// Socket Functions
+		bool SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_t _Listen_Port, const uint8_t _Closure_Type);
+		uint16_t SA(const uint8_t _ConnID, const uint8_t _ConnMode);
+		bool SH(const uint8_t _ConnID);
+		bool SO(const uint8_t _ConnID);
+		bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const uint8_t _Closure_Type, uint16_t _IPort, const bool _Conn_Mode, const char *_IP, const char *_URL, const char *_Data);
+		uint8_t SS(const uint8_t _ConnID);
+		uint16_t SRECV(const uint8_t _ConnID, const uint16_t _MaxByte);
+		bool SSEND(const uint8_t _ConnID, const char * _Data_Pack);
 
 		// Tool Functions
 		void _Clear_UART_Buffer(void);	
 		uint8_t _Signal_Strength(uint16_t _CSQ);
 
 	public:
-
-		// Define Struct
-		Struct_Modem Modem {
-			"02.00.00",			// Version
-			false,				// Power Monitor
-			false,				// SIM Status
-			false,				// Initialize Status
-			false,				// Connection Status
-			false,				// CREG Status
-			false				// CGREG Status
-		};
-		Struct_Variables Variables {
-			"",					// IMEI Variable
-			"",					// Serial Number Variable
-			"",					// ICCID Variable
-			0,					// Manufacturer Variable
-			0,					// Model Variable
-			"",					// Firmware Variable
-			0,					// RSSI Variable
-			0,					// Operator Variable
-			0,					// Connection Time
-			""					// IP Address
-		};
-		Struct_Time Time {0, 0, 0, 0, 0, 0};
 
 		// Public Functions
 		bool Begin(Stream &_Serial);
@@ -114,7 +171,39 @@ class Telit_xE910 {
 		bool Get_RSSI(void);
 		uint8_t Get_Signal(void);
 		bool Connection_Control(void);
-		bool Send_Data_Pack(const uint8_t _Pack_Type, const String _Data);
+		bool Send_Data_Pack(const uint8_t _Pack_Type, const char *_Data);
+		bool Set_Firewall(void);
+
+		// Socket Functions
+		bool Socket_Close(void);
+		bool Socket_Open(void);
+		bool Socket_Listen(void);
+		uint8_t Socket_Status(void);
+		uint16_t Socket_Answer(void);
+		bool Socket_Send(const char * _Data_Pack);
+
+		// Variable Functions
+		char * Get_IMEI(void);
+		char * Get_Serial_ID(void);
+		char * Get_ICCID(void);
+		uint8_t Get_Manufacturer(void);
+		uint8_t Get_Model(void);
+		char * Get_Firmware(void);
+		uint8_t Get_Signal_Level(void);
+		uint16_t Get_Operator(void);
+		uint16_t Get_Connection_Time(void);
+		char * Get_IP_Address(void);
+
+		// Time Funcrions
+		uint8_t Get_Year(void);
+		uint8_t Get_Month(void);
+		uint8_t Get_Day(void);
+		uint8_t Get_Hour(void);
+		uint8_t Get_Minute(void);
+		uint8_t Get_Second(void);
+
+		// Status Functions
+		uint8_t Get_Connection_Status(void);
 
 };
 
