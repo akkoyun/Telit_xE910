@@ -18,31 +18,22 @@ void setup() {
 
     // Start GSM Serial
     Serial3.begin(115200);
+	GSM.Begin(Serial3, true);
 
-	// Start GSM
-	GSM.Begin(Serial3);
-
-	// GSM Details
-	Terminal.Text(5, 116, CYAN, String(GSM.Get_Manufacturer()));
-	Terminal.Text(6, 116, CYAN, String(GSM.Get_Model()));
-	Terminal.Text(7, 108, CYAN, String(GSM.Get_Firmware()));
-	Terminal.Text(8, 102, CYAN, String(GSM.Get_IMEI()));
-	Terminal.Text(9, 107, CYAN, String(GSM.Get_Serial_ID()));
-	Terminal.Text(10, 98, CYAN, String(GSM.Get_ICCID()));
+	// Initialize Modem
+	GSM.Set_Modem();
 
 	// Connect
-	GSM.Connect(true, 5, 73);
+	uint8_t _Connection_Time;
+	GSM.Connect(_Connection_Time);
 
-	// GSM Details
-	Terminal.Text(13, 113, CYAN, String(GSM.Get_Connection_Time()));
-	Terminal.Text(14, 115, CYAN, String(GSM.Get_Signal_Level()));
-	Terminal.Text(15, 112, CYAN, String(GSM.Get_Operator()));
-	Terminal.Text(16, 102, CYAN, String(GSM.Get_IP_Address()));
+
+
+
+
+
 
 	if (GSM.Get_Connection_Status()) {Terminal.Text(23, 105, CYAN, String("Connected      "));} else {Terminal.Text(23, 105, RED, String("Not Connected  "));}
-
-	// Connect
-	GSM.Time_Update();
 
 	// Declare Timestamp Variable
 	char _Time_Stamp[25];	// dd-mm-yyyy hh.mm.ss
@@ -96,18 +87,23 @@ void loop() {
 
 	if (Interrupt) {
 
+		// Set Interrupt Variable
 		Interrupt_Control = false;
 
 		// Get Command
 		uint16_t Command = GSM.Socket_Answer();
 
-		char * _Response = "{\"Response\":{\"Event\":500,\"TimeStamp\":\"2022-03-17  09:06:32\"}}";
+		// Declare Message Variable
+		char _Response[65];
 
+		// Handle Message
+		sprintf(_Response, "{\"Response\":{\"Event\":%02hhu,\"TimeStamp\":\"20%02hhu-%02hhu-%02hhu  %02hhu:%02hhu:%02hhu\"}}", 100, GSM.Get_Year(), GSM.Get_Month(), GSM.Get_Day(), GSM.Get_Hour(), GSM.Get_Minute(), GSM.Get_Second());
+
+		// Send Message
 		GSM.Socket_Send(_Response);
 
 		// Set Interrupt Variable
 		Interrupt = false;
-
 		Interrupt_Control = true;
 
 	}

@@ -28,6 +28,9 @@ class Telit_xE910 {
 		Stream *_GSM_Serial;
 
 		// Define Modem Structure
+		bool _Debug_Mon = false;
+
+		// Define Modem Structure
 		struct _Struct_Modem {
 			const char Version[9]		= "02.00.00";	// Version
 			bool Power_Monitor			= false;		// Power Monitor
@@ -40,15 +43,15 @@ class Telit_xE910 {
 
 		// Define Variable Structure
 		struct _Struct_Variables {
-			char IMEI[17]				= "";	// IMEI Variable
-			char Serial_Number[11]		= "";	// Serial Number Variable
-			char ICCID[21]				= "";	// ICCID Variable
-			uint8_t Manufacturer		= 0;	// Manufacturer Variable	
-			uint8_t Model				= 0;	// Model Variable
-			char Firmware[10]			= "";	// Modem Firmware Version Variable
-			uint8_t RSSI				= 0;	// Signal Variable
-			uint16_t Operator			= 0;	// Operator Variable
-			uint8_t Connection_Time		= 0;	// Connection Time
+//			char IMEI[17]				= "";	// IMEI Variable
+//			char Serial_Number[11]		= "";	// Serial Number Variable
+//			char ICCID[21]				= "";	// ICCID Variable
+//			uint8_t Manufacturer		= 0;	// Manufacturer Variable	
+//			uint8_t Model				= 0;	// Model Variable
+//			char Firmware[10]			= "";	// Modem Firmware Version Variable
+//			uint8_t RSSI				= 0;	// Signal Variable
+//			uint16_t Operator			= 0;	// Operator Variable
+//			uint8_t Connection_Time		= 0;	// Connection Time
 			char IP_Address[16]			= "";	// IP Addres
 		} Variables;
 
@@ -71,31 +74,9 @@ class Telit_xE910 {
 			uint16_t Time_Out;
 		};
 
-		// Power Enum Definations
-		enum Power_Enum {
-			NOT_POWERED = 0,
-			POWERED = 1
-		};
-
-		// Connection Enum Definations
-		enum Connection_Enum {
-			NOT_CONNECTED = 0,
-			CONNECTED = 1
-		};
-
-		// Stat Enum Definations
-		enum Stat_Enum {
-			NOT_REGISTERED = 0,
-			HOME_REGISTERED = 1,
-			SEARCHING = 2,
-			DENIED = 3,
-			UNKNOWN	= 4,
-			ROAMING_REGISTERED = 5
-		};
-
 		// Hardware Functions
 		void Set_Communication(const bool _State);
-		void Set_OnOff(const uint16_t _Time, const bool _Terminal, const uint8_t _X, const uint8_t _Y);
+		void Set_OnOff(const uint16_t _Time);
 		void Set_ShutDown(const uint16_t _Time);
 		void Set_Power_Switch(const bool _State);
 		void Set_LED(const bool _State);
@@ -112,14 +93,14 @@ class Telit_xE910 {
 		bool FCLASS(const uint8_t _FCLASS);
 		bool K(const uint8_t _K);
 		bool CPIN(void);
-		bool CGSN(void);
-		bool GSN(void);
-		bool CCID(void);
-		bool GMI(void);
-		bool GMM(void);
-		bool GMR(void);
-		bool CSQ(void);
-		bool SERVINFO(void);
+		bool CGSN(char * _IMEI);
+		bool GSN(char * _Serial_Number);
+		bool CCID(char * _ICCID);
+		bool GMI(uint8_t &_Manufacturer);
+		bool GMM(uint8_t &_Model);
+		bool GMR(char * _Firmware);
+		bool CSQ(uint8_t &_RSSI);
+		bool SERVINFO(uint16_t &_Operator);
 		bool SLED(const uint8_t _SLED);
 		bool E2SLRI(const uint16_t _Pulse_Duration);
 		bool TXMONMODE(const uint8_t _TXMONMODE);
@@ -164,11 +145,10 @@ class Telit_xE910 {
 	public:
 
 		// Public Functions
-		bool Begin(Stream &_Serial);
-		bool Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_t _Y);
-		bool Connect(const bool _Terminal, const uint8_t _X, const uint8_t _Y);
-		bool Time_Update(void);
-		bool Get_RSSI(void);
+		bool Begin(Stream &_Serial, const bool _Debug_Monitor);
+		bool Set_Modem(void);
+		bool Connect(uint8_t &_Connection_Time);
+		uint8_t Get_RSSI(void);
 		uint8_t Get_Signal(void);
 		bool Connection_Control(void);
 		bool Send_Data_Pack(const uint8_t _Pack_Type, const char *_Data);
@@ -180,7 +160,7 @@ class Telit_xE910 {
 		bool Socket_Listen(void);
 		uint8_t Socket_Status(void);
 		uint16_t Socket_Answer(void);
-		bool Socket_Send(const char * _Data_Pack);
+		bool Socket_Send(char * _Data_Pack);
 
 		// Variable Functions
 		char * Get_IMEI(void);
@@ -189,9 +169,7 @@ class Telit_xE910 {
 		uint8_t Get_Manufacturer(void);
 		uint8_t Get_Model(void);
 		char * Get_Firmware(void);
-		uint8_t Get_Signal_Level(void);
 		uint16_t Get_Operator(void);
-		uint16_t Get_Connection_Time(void);
 		char * Get_IP_Address(void);
 
 		// Time Funcrions

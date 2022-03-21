@@ -11,7 +11,7 @@
 /**************************************************
  * Public Functions
  **************************************************/
-bool Telit_xE910::Begin(Stream &_Serial) {
+bool Telit_xE910::Begin(Stream &_Serial, const bool _Debug_Monitor) {
 
 	// GSM Module Port Definations
 	DDRJ	&= 0b11111011;	PORTJ	|= 0b00000100;	// PJ2 - Input / Pull Down [GSM Ring]
@@ -20,23 +20,38 @@ bool Telit_xE910::Begin(Stream &_Serial) {
 	DDRJ	|= 0b00100000;	PORTJ	&= 0b11011111;	// PJ5 - Output / Pull Down [GSM Shut Down]
 	DDRJ	|= 0b01000000;	PORTJ	&= 0b10111111;	// PJ6 - Output / Pull Down [GSM On Off]
 
-	//Set serial port
+	//Set Serial Port
 	_GSM_Serial = &_Serial;
 
-	// Power On Modem
-	Power_ON(false, false, true);
+	// Set Debug Variable
+	_Debug_Mon = _Debug_Monitor;
 
-	// Initialize Modem
-	Set_Modem(true, 5, 33);
+	// Power On Modem
+	bool _Response = Power_ON(false, false, true);
+
+	// End Function
+	return(_Response);
 
 }
-bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_t _Y) {
+bool Telit_xE910::Set_Modem(void) {
 
 	// Declare Response Status
 	bool _Response = false;
 
 	// Declare Watchdog Variable
 	uint8_t _Error_WD = 0;
+
+	// Define Modem Structure
+	struct _Struct_Terminal {
+		const uint8_t Initialize[2]		= {5, 33};
+		const uint8_t Connect[2]		= {5, 73};
+		const uint8_t Manufacturer[2]	= {5, 116};
+		const uint8_t Model[2]			= {6, 116};
+		const uint8_t Firmware[2]		= {7, 108};
+		const uint8_t IMEI[2]			= {8, 102};
+		const uint8_t Serial_ID[2]		= {9, 107};
+		const uint8_t ICCID[2]			= {10, 98};
+	} _Debug;
 
 	// Command Set
 	struct _Command_Struct {
@@ -97,7 +112,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0], _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -114,7 +129,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0], _Debug.Initialize[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -131,7 +146,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 1, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 1, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -148,7 +163,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 1, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 1, _Debug.Initialize[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -165,7 +180,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 2, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 2, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -182,7 +197,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 2, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 2, _Debug.Initialize[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -199,7 +214,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 3, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 3, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -216,7 +231,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 3, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 3, _Debug.Initialize[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -233,7 +248,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 4, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 4, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -250,7 +265,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 4, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 4, _Debug.Initialize[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -266,14 +281,18 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			// Set Response Variable
 			_Response = false;
 
+			// Declare Variable
+			char _IMEI[17];
+			memset(_IMEI, '\0', 18);
+
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 5, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 5, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
 
 				// Send Command
-				_Response = CGSN();
+				_Response = CGSN(_IMEI);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -284,8 +303,14 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 5, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 5, _Debug.Initialize[1]);
 		
+			// Debug Output
+			if (_Debug_Mon and _Response) Terminal.Text(_Debug.IMEI[0], _Debug.IMEI[1], CYAN, String(_IMEI));
+
+			// Clear Variable
+			memset(_IMEI, '\0', 18);
+
 			// End Function
 			if (!_Response) return (false);
 
@@ -300,14 +325,18 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			// Set Response Variable
 			_Response = false;
 
+			// Declare Variable
+			char _Serial_Number[11];
+			memset(_Serial_Number, '\0', 12);
+
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 6, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 6, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
 
 				// Send Command
-				_Response = GSN();
+				_Response = GSN(_Serial_Number);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -318,8 +347,14 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 6, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 6, _Debug.Initialize[1]);
 		
+			// Debug Output
+			if (_Debug_Mon and _Response) Terminal.Text(_Debug.Serial_ID[0], _Debug.Serial_ID[1], CYAN, String(_Serial_Number));
+
+			// Clear variable
+			memset(_Serial_Number, '\0', 12);
+
 			// End Function
 			if (!_Response) return (false);
 
@@ -334,14 +369,18 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			// Set Response Variable
 			_Response = false;
 
+			// Declare Variable
+			char _ICCID[21];
+			memset(_ICCID, '\0', 22);
+
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 7, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 7, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
 
 				// Send Command
-				_Response = CCID();
+				_Response = CCID(_ICCID);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -352,8 +391,14 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 7, _Y);
-		
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 7, _Debug.Initialize[1]);
+
+			// Debug Output
+			if (_Debug_Mon and _Response) Terminal.Text(_Debug.ICCID[0], _Debug.ICCID[1], CYAN, String(_ICCID));
+
+			// Clear Variable
+			memset(_ICCID, '\0', 22);
+
 			// End Function
 			if (!_Response) return (false);
 
@@ -368,14 +413,17 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			// Set Response Variable
 			_Response = false;
 
+			// Declare Variable
+			uint8_t _Manufacturer;
+
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 8, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 8, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
 
 				// Send Command
-				_Response = GMI();
+				_Response = GMI(_Manufacturer);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -386,7 +434,10 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 8, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 8, _Debug.Initialize[1]);
+
+			// Debug Output
+			if (_Debug_Mon and _Response) Terminal.Text(_Debug.Manufacturer[0], _Debug.Manufacturer[1], CYAN, String(_Manufacturer));
 
 			// End Function
 			if (!_Response) return (false);
@@ -402,14 +453,17 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			// Set Response Variable
 			_Response = false;
 
+			// Declare Variable
+			uint8_t _Model;
+
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 9, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 9, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
 
 				// Send Command
-				_Response = GMM();
+				_Response = GMM(_Model);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -420,8 +474,11 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 9, _Y);
-		
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 9, _Debug.Initialize[1]);
+
+			// Debug Output
+			if (_Debug_Mon and _Response) Terminal.Text(_Debug.Model[0], _Debug.Model[1], CYAN, String(_Model));
+
 			// End Function
 			if (!_Response) return (false);
 
@@ -436,14 +493,18 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			// Set Response Variable
 			_Response = false;
 
+			// Declare Variable
+			char _Firmware[10];
+			memset(_Firmware, '\0', 11);
+
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 10, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 10, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
 
 				// Send Command
-				_Response = GMR();
+				_Response = GMR(_Firmware);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -454,8 +515,14 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 10, _Y);
-		
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 10, _Debug.Initialize[1]);
+
+			// Debug Output
+			if (_Debug_Mon and _Response) Terminal.Text(_Debug.Firmware[0], _Debug.Firmware[1], CYAN, String(_Firmware));
+
+			// Clear Variable
+			memset(_Firmware, '\0', 11);
+
 			// End Function
 			if (!_Response) return (false);
 
@@ -471,7 +538,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 11, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 11, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -488,7 +555,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 11, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 11, _Debug.Initialize[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -505,7 +572,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 12, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Initialize[0] + 12, _Debug.Initialize[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -522,7 +589,7 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 12, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Initialize[0] + 12, _Debug.Initialize[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -541,20 +608,29 @@ bool Telit_xE910::Set_Modem(const bool _Terminal, const uint8_t _X, const uint8_
 	return(false);
 
 }
-bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t _Y) { 
+bool Telit_xE910::Connect(uint8_t &_Connection_Time) { 
 
 	// Declare Watchdog Variable
 	uint8_t _Error_WD = 0;
 
+	// Define Modem Structure
+	struct _Struct_Terminal {
+		const uint8_t Connect[2]		= {5, 73};
+		const uint8_t Connection_Time[2] = {13, 113};
+		const uint8_t RSSI[2]			= {14, 115};
+		const uint8_t Operator[2]		= {15, 112};
+		const uint8_t IP[2]				= {16, 102};
+	} _Debug;
+
 	// Declare Response Status
 	bool _Response = false;
 
-	// Declare Time Variable
-	uint32_t _Connection_Start_Time = 0;
-	uint32_t _Connection_Time = 0;
-
 	// Control for Initialization Monitor
 	if (Modem.Initialize_Status) {
+
+		// Declare Time Variable
+		uint32_t _Connection_Start_Time = 0;
+		uint32_t _Connection_Time = 0;
 
 		// Command Set
 		struct _Command_Struct {
@@ -584,7 +660,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0], _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -601,7 +677,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0], _Debug.Connect[1]);
 
 			// End Function
 			if (!_Response) return (false);
@@ -618,7 +694,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 1, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 1, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -635,7 +711,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 1, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 1, _Debug.Connect[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -655,7 +731,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 2, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 2, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -672,7 +748,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 2, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 2, _Debug.Connect[1]);
 
 			// Calculate Connection Time
 			_Connection_Time += millis() - _Connection_Start_Time;		
@@ -695,7 +771,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 3, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 3, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -712,7 +788,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 3, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 3, _Debug.Connect[1]);
 
 			// Calculate Connection Time
 			_Connection_Time += millis() - _Connection_Start_Time;		
@@ -732,7 +808,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 4, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 4, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -749,7 +825,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 4, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 4, _Debug.Connect[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -766,7 +842,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 5, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 5, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -783,7 +859,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 5, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 5, _Debug.Connect[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -800,7 +876,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 6, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 6, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -817,7 +893,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 6, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 6, _Debug.Connect[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -834,7 +910,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 7, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 7, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -851,7 +927,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 7, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 7, _Debug.Connect[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -867,14 +943,17 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			// Set Response Variable
 			_Response = false;
 
+			// Declare Variable
+			uint16_t _Operator;
+
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 8, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 8, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
 
 				// Send Command
-				_Response = SERVINFO();
+				_Response = SERVINFO(_Operator);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -888,8 +967,11 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 8, _Y);
-		
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 8, _Debug.Connect[1]);
+
+			// Debug Output
+			if (_Debug_Mon and _Response) Terminal.Text(_Debug.Operator[0], _Debug.Operator[1], CYAN, String(_Operator));
+
 			// End Function
 			if (!_Response) return (false);
 
@@ -911,7 +993,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 9, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 9, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -931,7 +1013,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 9, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 9, _Debug.Connect[1]);
 		
 			// Calculate Connection Time
 			_Connection_Time += millis() - _Connection_Start_Time;		
@@ -950,11 +1032,14 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			// Set Response Variable
 			_Response = false;
 
+			// Declare Variable
+			uint8_t _RSSI;
+
 			// Process Command
 			while (!_Response) {
 
 				// Get RSSI 
-				_Response = CSQ();
+				_Response = CSQ(_RSSI);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -966,6 +1051,9 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 				delay(100);
 
 			}
+
+			// Debug Output
+			if (_Debug_Mon and _Response) Terminal.Text(_Debug.RSSI[0], _Debug.RSSI[1], CYAN, String(_RSSI));
 
 			// End Function
 			if (!_Response) return (false);
@@ -982,7 +1070,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 10, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 10, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -1002,7 +1090,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 10, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 10, _Debug.Connect[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1019,7 +1107,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 11, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 11, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -1039,7 +1127,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 11, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 11, _Debug.Connect[1]);
 		
 			// End Function
 			if (!_Response) return (false);
@@ -1056,7 +1144,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			_Response = false;
 
 			// Print Command State
-			if (_Terminal) Terminal.Text(_X + 12, _Y, BLUE, F(" .. "));
+			if (_Debug_Mon) Terminal.Text(_Debug.Connect[0] + 12, _Debug.Connect[1], BLUE, F(" .. "));
 
 			// Process Command
 			while (!_Response) {
@@ -1076,7 +1164,7 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 			}
 
 			// Print Command State
-			if (_Terminal) Terminal.OK_Decide(_Response, _X + 12, _Y);
+			if (_Debug_Mon) Terminal.OK_Decide(_Response, _Debug.Connect[0] + 12, _Debug.Connect[1]);
 
 			// End Function
 			if (!_Response) return (false);
@@ -1084,42 +1172,30 @@ bool Telit_xE910::Connect(const bool _Terminal, const uint8_t _X, const uint8_t 
 		}
 
 		// Calculate Connection Time
-		Variables.Connection_Time = (_Connection_Start_Time / 1000);
+		_Connection_Time = (_Connection_Start_Time / 1000);
 
-		// **************************************************
+		// Debug Output
+		if (_Debug_Mon) Terminal.Text(_Debug.Connection_Time[0], _Debug.Connection_Time[1], CYAN, String(_Connection_Time));
+
 		// Control for IP Address
-		// **************************************************
-
 		if (sizeof(Variables.IP_Address) >= 7 and Modem.CREG_Status and Modem.CGREG_Status) {
 
 			// Set Variable
-			Modem.Connection_Status = CONNECTED;
+			Modem.Connection_Status = true;
 
-			// End Function
-			return (true);
+			// Debug Output
+			if (_Debug_Mon) Terminal.Text(_Debug.IP[0], _Debug.IP[1], CYAN, String(Variables.IP_Address));
 
 		} else {
 
 			// Set Variable
-			Modem.Connection_Status = NOT_CONNECTED;
-
-			// End Function
-			return (false);
+			Modem.Connection_Status = false;
 
 		}
 
 	}
 
-}
-bool Telit_xE910::Time_Update(void) {
-
-	// Declare Response Status
-	bool _Response = false;
-
-	// Declare Watchdog Variable
-	uint8_t _Error_WD = 0;
-
-	// Control for Initialization Monitor
+	// Control for Connection
 	if (Modem.Connection_Status) {
 
 		// Command Set
@@ -1213,16 +1289,11 @@ bool Telit_xE910::Time_Update(void) {
 
 		}
 
-		// End Function
-		return(true);
-
 	}
-
-	// End Function
-	return(false);
+	
 
 }
-bool Telit_xE910::Get_RSSI(void) {
+uint8_t Telit_xE910::Get_RSSI(void) {
 
 	// Declare Watchdog Variable
 	uint8_t _Error_WD = 0;
@@ -1230,11 +1301,14 @@ bool Telit_xE910::Get_RSSI(void) {
 	// Set Response Variable
 	bool _Response = false;
 
+	// Declare Variable
+	uint8_t _RSSI;
+
 	// Process Command
 	while (!_Response) {
 
 		// Get RSSI 
-		_Response = CSQ();
+		_Response = CSQ(_RSSI);
 
 		// Set WD Variable
 		_Error_WD++;
@@ -1248,7 +1322,7 @@ bool Telit_xE910::Get_RSSI(void) {
 	}
 
 	// End Function
-	return(_Response);
+	return(_RSSI);
 
 }
 uint8_t Telit_xE910::Get_Signal(void) {
@@ -1259,11 +1333,14 @@ uint8_t Telit_xE910::Get_Signal(void) {
 	// Set Response Variable
 	bool _Response = false;
 
+	// Declare Variable
+	uint8_t _RSSI;
+
 	// Process Command
 	while (!_Response) {
 
 		// Get RSSI 
-		_Response = CSQ();
+		_Response = CSQ(_RSSI);
 
 		// Set WD Variable
 		_Error_WD++;
@@ -1277,7 +1354,7 @@ uint8_t Telit_xE910::Get_Signal(void) {
 	}
 
 	// End Function
-	return(_Signal_Strength(Variables.RSSI));
+	return(_Signal_Strength(_RSSI));
 
 }
 bool Telit_xE910::Connection_Control(void) {
@@ -1548,7 +1625,7 @@ uint16_t Telit_xE910::Socket_Answer(void) {
 	return(Incomming_Command);
 
 }
-bool Telit_xE910::Socket_Send(const char * _Data_Pack) {
+bool Telit_xE910::Socket_Send(char * _Data_Pack) {
 
 	// Send Response Message
 	bool _Response_Send = SSEND(2, _Data_Pack);
@@ -1567,57 +1644,87 @@ bool Telit_xE910::Socket_Send(const char * _Data_Pack) {
 // Variable Functions
 char * Telit_xE910::Get_IMEI(void) {
 	
+	// Declare Variable
+	char * _IMEI;
+
+	// Get IMEI Number
+	CGSN(_IMEI);
+
 	// End Function
-	return(Variables.IMEI);
+	return(_IMEI);
 	
 }
 char * Telit_xE910::Get_Serial_ID(void) {
-	
+
+	// Declare Variable
+	char * _Serial_Number;
+
+	// Get IMEI Number
+	GSN(_Serial_Number);
+
 	// End Function
-	return(Variables.Serial_Number);
-	
+	return(_Serial_Number);
+
 }
 char * Telit_xE910::Get_ICCID(void) {
-	
+
+	// Declare Variable
+	char * _ICCID;
+
+	// Get IMEI Number
+	CCID(_ICCID);
+
 	// End Function
-	return(Variables.ICCID);
-	
+	return(_ICCID);
+
 }
 uint8_t Telit_xE910::Get_Manufacturer(void) {
-	
+
+	// Declare Variable
+	uint8_t _Manufacturer;
+
+	// Get IMEI Number
+	GMI(_Manufacturer);
+
 	// End Function
-	return(Variables.Manufacturer);
-	
+	return(_Manufacturer);
+
 }
 uint8_t Telit_xE910::Get_Model(void) {
 
+	// Declare Variable
+	uint8_t _Model;
+
+	// Get IMEI Number
+	GMM(_Model);
+
 	// End Function
-	return(Variables.Model);
+	return(_Model);
 	
 }
 char * Telit_xE910::Get_Firmware(void) {
-	
+
+	// Declare Variable
+	char * _Firmware;
+
+	// Get IMEI Number
+	GMR(_Firmware);
+
 	// End Function
-	return(Variables.Firmware);
-	
-}
-uint8_t Telit_xE910::Get_Signal_Level(void) {
-	
-	// End Function
-	return(Variables.RSSI);
-	
+	return(_Firmware);
+
 }
 uint16_t Telit_xE910::Get_Operator(void) {
-	
+
+	// Declare Variable
+	uint16_t _Operator;
+
+	// Get IMEI Number
+	SERVINFO(_Operator);
+
 	// End Function
-	return(Variables.Operator);
-	
-}
-uint16_t Telit_xE910::Get_Connection_Time(void) {
-	
-	// End Function
-	return(Variables.Connection_Time);
-	
+	return(_Operator);
+
 }
 char * Telit_xE910::Get_IP_Address(void) {
 
@@ -1681,7 +1788,12 @@ void Telit_xE910::Set_Communication(const bool _State) {
 	if (!_State) PORTJ |= 0b00010000;
 
 }
-void Telit_xE910::Set_OnOff(const uint16_t _Time, const bool _Terminal, const uint8_t _X, const uint8_t _Y) {
+void Telit_xE910::Set_OnOff(const uint16_t _Time) {
+
+	// Define Modem Structure
+	struct _Struct_Terminal {
+		const uint8_t Power_Bar[2]		= {20,10};
+	} _Debug;
 
 	// Set On/Off Signal HIGH [PJ6]
 	PORTJ |= 0b01000000;
@@ -1696,7 +1808,7 @@ void Telit_xE910::Set_OnOff(const uint16_t _Time, const bool _Terminal, const ui
 		delay(_Delay); 
 
 		// Terminal Bar
-		if (_Terminal) Terminal.Text(_X, _Y + i, WHITE, String(F("▒")));
+		if (_Debug_Mon) Terminal.Text(_Debug.Power_Bar[0] , _Debug.Power_Bar[1] + i, WHITE, String(F("▒")));
 
 	}
 
@@ -1704,7 +1816,7 @@ void Telit_xE910::Set_OnOff(const uint16_t _Time, const bool _Terminal, const ui
 	PORTJ &= 0b10111111;
 
 	// Clear Bar
-	if (_Terminal) for (uint8_t i = 0; i < 100; i++) Terminal.Text(_X, _Y + i, WHITE, String(F(" ")));
+	if (_Debug_Mon) for (uint8_t i = 0; i < 100; i++) Terminal.Text(_Debug.Power_Bar[0], _Debug.Power_Bar[1] + i, WHITE, String(F(" ")));
 
 }
 void Telit_xE910::Set_ShutDown(const uint16_t _Time) {
@@ -1743,7 +1855,7 @@ bool Telit_xE910::Get_PowerMonitor(void) {
 	if ((PINJ & (1 << PINJ3)) == (1 << PINJ3)) {
 
 		// Set Variable
-		Modem.Power_Monitor = POWERED;
+		Modem.Power_Monitor = true;
 
 		// Power Monitor 3V3 HIGH
 		return (true);
@@ -1751,7 +1863,7 @@ bool Telit_xE910::Get_PowerMonitor(void) {
 	} else {
 
 		// Set Variable
-		Modem.Power_Monitor = NOT_POWERED;
+		Modem.Power_Monitor = false;
 
 		// Power Monitor 3V3 LOW
 		return (false);
@@ -1779,8 +1891,8 @@ bool Telit_xE910::Power_ON(const bool _Power_Switch, const bool _LED_Switch, con
 	if (Get_PowerMonitor()) {
 
 		// Set Variable
-		Modem.Power_Monitor = POWERED;
-		Modem.Connection_Status = NOT_CONNECTED;
+		Modem.Power_Monitor = true;
+		Modem.Connection_Status = false;
 
 		// End Function
 		return (true);
@@ -1788,14 +1900,14 @@ bool Telit_xE910::Power_ON(const bool _Power_Switch, const bool _LED_Switch, con
 	} else {
 
 		// Send On Off Signal
-		Set_OnOff(5000, true, 20, 10);
+		Set_OnOff(5000);
 
 		// Control for PWMon (PH7)
 		if (Get_PowerMonitor()) {
 
 			// Set Variable
-			Modem.Power_Monitor = POWERED;
-			Modem.Connection_Status = NOT_CONNECTED;
+			Modem.Power_Monitor = true;
+			Modem.Connection_Status = false;
 
 			// End Function
 			return (true);
@@ -1810,8 +1922,8 @@ bool Telit_xE910::Power_ON(const bool _Power_Switch, const bool _LED_Switch, con
 	}
 
 	// Set Variable
-	Modem.Power_Monitor = NOT_POWERED;
-	Modem.Connection_Status = NOT_CONNECTED;
+	Modem.Power_Monitor = false;
+	Modem.Connection_Status = false;
 
 	// End Function
 	return (false);
@@ -1832,8 +1944,8 @@ bool Telit_xE910::Power_OFF(const bool _Power_Switch, const bool _LED_Switch, co
 	if (_Power_Switch) Set_Power_Switch(false);
 
 	// Set Variable
-	Modem.Power_Monitor = NOT_POWERED;
-	Modem.Connection_Status = NOT_CONNECTED;
+	Modem.Power_Monitor = false;
+	Modem.Connection_Status = false;
 	Modem.Initialize_Status = false;
 
 	// Command Delay
@@ -2173,7 +2285,7 @@ bool Telit_xE910::CPIN(void) {
 	return (Modem.SIM_Status);
 
 }
-bool Telit_xE910::CGSN(void) {
+bool Telit_xE910::CGSN(char * _IMEI) {
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -2221,9 +2333,6 @@ bool Telit_xE910::CGSN(void) {
 
 	}
 
-	// Clear Variables
-	memset(Variables.IMEI, 0, 17);
-
 	// Control for Buffer
 	for (uint8_t i = 0; i < _Buffer.Read_Order; i++) {
 
@@ -2231,7 +2340,7 @@ bool Telit_xE910::CGSN(void) {
 		if (_Buffer.Buffer[i] < 58 and _Buffer.Buffer[i] > 47) {
 
 			// Get Data
-			Variables.IMEI[_Buffer.Data_Order] = _Buffer.Buffer[i];
+			_IMEI[_Buffer.Data_Order] = _Buffer.Buffer[i];
 
 			// Increase Data Order
 			_Buffer.Data_Order++;
@@ -2244,7 +2353,7 @@ bool Telit_xE910::CGSN(void) {
 	return(true);
 
 }
-bool Telit_xE910::GSN(void) {
+bool Telit_xE910::GSN(char * _Serial_Number) {
 
 	// Clear UART Buffer
     _Clear_UART_Buffer();
@@ -2292,9 +2401,6 @@ bool Telit_xE910::GSN(void) {
 
 	}
 
-	// Clear Variables
-	memset(Variables.Serial_Number, 0, 11);
-
 	// Control for Buffer
 	for (uint8_t i = 0; i < _Buffer.Read_Order; i++) {
 
@@ -2302,7 +2408,7 @@ bool Telit_xE910::GSN(void) {
 		if (_Buffer.Buffer[i] < 58 and _Buffer.Buffer[i] > 47) {
 
 			// Get Data
-			Variables.Serial_Number[_Buffer.Data_Order] = _Buffer.Buffer[i];
+			_Serial_Number[_Buffer.Data_Order] = _Buffer.Buffer[i];
 
 			// Increase Data Order
 			_Buffer.Data_Order++;
@@ -2315,7 +2421,7 @@ bool Telit_xE910::GSN(void) {
 	return(true);
 
 }
-bool Telit_xE910::CCID(void) {
+bool Telit_xE910::CCID(char * _ICCID) {
 
 	// Control for SIM Module
 	if (Modem.SIM_Status) {
@@ -2366,9 +2472,6 @@ bool Telit_xE910::CCID(void) {
 
 		}
 
-		// Clear Variables
-		memset(Variables.ICCID, 0, 21);
-
 		// Control for Buffer
 		for (uint8_t i = 0; i < _Buffer.Read_Order; i++) {
 
@@ -2376,7 +2479,7 @@ bool Telit_xE910::CCID(void) {
 			if (_Buffer.Buffer[i] < 58 and _Buffer.Buffer[i] > 47) {
 
 				// Get Data
-				Variables.ICCID[_Buffer.Data_Order] = _Buffer.Buffer[i];
+				_ICCID[_Buffer.Data_Order] = _Buffer.Buffer[i];
 
 				// Increase Data Order
 				_Buffer.Data_Order++;
@@ -2396,7 +2499,7 @@ bool Telit_xE910::CCID(void) {
 	}
 
 }
-bool Telit_xE910::GMI(void) {
+bool Telit_xE910::GMI(uint8_t &_Manufacturer) {
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -2448,12 +2551,15 @@ bool Telit_xE910::GMI(void) {
 	if (strstr(_Buffer.Buffer, "Telit") != NULL) {
 
 		// Set Manufacturer Variable
-		Variables.Manufacturer = 1;
+		_Manufacturer = 1;
 
 		// End Function
 		return (true);
 
 	} else {
+
+		// Set Manufacturer Variable
+		_Manufacturer = 0;
 
 		// End Function
 		return (false);
@@ -2464,7 +2570,7 @@ bool Telit_xE910::GMI(void) {
 	return(true);
 
 }
-bool Telit_xE910::GMM(void) {
+bool Telit_xE910::GMM(uint8_t &_Model) {
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -2516,12 +2622,15 @@ bool Telit_xE910::GMM(void) {
 	if (strstr(_Buffer.Buffer, "GE910-QUAD") != NULL) {
 
 		// Set Model Variable
-		Variables.Model = 1;
+		_Model = 1;
 
 		// End Function
 		return (true);
 
 	} else {
+
+		// Set Model Variable
+		_Model = 0;
 
 		// End Function
 		return (false);
@@ -2532,7 +2641,7 @@ bool Telit_xE910::GMM(void) {
 	return(true);
 
 }
-bool Telit_xE910::GMR(void) {
+bool Telit_xE910::GMR(char * _Firmware) {
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -2580,9 +2689,6 @@ bool Telit_xE910::GMR(void) {
 
 	}
 
-	// Clear Variables
-	memset(Variables.Firmware, '\0', 10);
-
 	// Control for Buffer
 	for (uint8_t i = 0; i < _Buffer.Read_Order; i++) {
 
@@ -2590,7 +2696,7 @@ bool Telit_xE910::GMR(void) {
 		if ((_Buffer.Buffer[i] < 58 and _Buffer.Buffer[i] > 47) or _Buffer.Buffer[i] == 46) {
 
 			// Get Data
-			Variables.Firmware[_Buffer.Data_Order] = _Buffer.Buffer[i];
+			_Firmware[_Buffer.Data_Order] = _Buffer.Buffer[i];
 
 			// Increase Data Order
 			_Buffer.Data_Order++;
@@ -2867,7 +2973,7 @@ bool Telit_xE910::CREG(const bool _Mode) {
 	uint8_t _Error_WD = 0;
 
 	// Reset CREG Variable
-	Modem.CREG_Status = NOT_REGISTERED;
+	Modem.CREG_Status = 0;
 
 	// Define Control Variable
 	bool _Control = false;
@@ -2924,7 +3030,7 @@ bool Telit_xE910::CREG(const bool _Mode) {
 		if (_Stat == 48) {
 
 			// Set Variable
-			Modem.CREG_Status = NOT_REGISTERED;
+			Modem.CREG_Status = 0;
 
 			// Set Control Variable
 			_Control = false;
@@ -2939,7 +3045,7 @@ bool Telit_xE910::CREG(const bool _Mode) {
 		if (_Stat == 49) {
 
 			// Set Variable
-			Modem.CREG_Status = HOME_REGISTERED;
+			Modem.CREG_Status = 1;
 
 			// Set Control Variable
 			_Control = true;
@@ -2948,7 +3054,7 @@ bool Telit_xE910::CREG(const bool _Mode) {
 		if (_Stat == 50) {
 
 			// Set Variable
-			Modem.CREG_Status = SEARCHING;
+			Modem.CREG_Status = 2;
 
 			// Set Control Variable
 			_Control = false;
@@ -2963,7 +3069,7 @@ bool Telit_xE910::CREG(const bool _Mode) {
 		if (_Stat == 51) {
 
 			// Set Variable
-			Modem.CREG_Status = DENIED;
+			Modem.CREG_Status = 3;
 
 			// Set Control Variable
 			_Control = false;
@@ -2978,7 +3084,7 @@ bool Telit_xE910::CREG(const bool _Mode) {
 		if (_Stat == 52) {
 
 			// Set Variable
-			Modem.CREG_Status = UNKNOWN;
+			Modem.CREG_Status = 4;
 
 			// End Function
 			return (false);
@@ -2987,7 +3093,7 @@ bool Telit_xE910::CREG(const bool _Mode) {
 		if (_Stat == 53) {
 
 			// Set Variable
-			Modem.CREG_Status = ROAMING_REGISTERED;
+			Modem.CREG_Status = 5;
 
 			// Set Control Variable
 			_Control = true;
@@ -3006,7 +3112,7 @@ bool Telit_xE910::CREG(const bool _Mode) {
 bool Telit_xE910::CGREG(const bool _Mode) {
 
 	// Control for CREG
-	if (Modem.CREG_Status == HOME_REGISTERED or Modem.CREG_Status == ROAMING_REGISTERED) {
+	if (Modem.CREG_Status == 1 or Modem.CREG_Status == 5) {
 	
 		// Clear UART Buffer
 		_Clear_UART_Buffer();
@@ -3056,7 +3162,7 @@ bool Telit_xE910::CGREG(const bool _Mode) {
 		uint8_t _Error_WD = 0;
 
 		// Reset CGREG Variable
-		Modem.CGREG_Status = NOT_REGISTERED;
+		Modem.CGREG_Status = 0;
 
 		// Define Control Variable
 		bool _Control = false;
@@ -3113,7 +3219,7 @@ bool Telit_xE910::CGREG(const bool _Mode) {
 			if (_Stat == 48) {
 
 				// Set Variable
-				Modem.CGREG_Status = NOT_REGISTERED;
+				Modem.CGREG_Status = 0;
 
 				// Set Control Variable
 				_Control = false;
@@ -3128,7 +3234,7 @@ bool Telit_xE910::CGREG(const bool _Mode) {
 			if (_Stat == 49) {
 
 				// Set Variable
-				Modem.CGREG_Status = HOME_REGISTERED;
+				Modem.CGREG_Status = 1;
 
 				// Set Control Variable
 				_Control = true;
@@ -3137,7 +3243,7 @@ bool Telit_xE910::CGREG(const bool _Mode) {
 			if (_Stat == 50) {
 
 				// Set Variable
-				Modem.CGREG_Status = SEARCHING;
+				Modem.CGREG_Status = 2;
 
 				// Set Control Variable
 				_Control = false;
@@ -3152,7 +3258,7 @@ bool Telit_xE910::CGREG(const bool _Mode) {
 			if (_Stat == 51) {
 
 				// Set Variable
-				Modem.CGREG_Status = DENIED;
+				Modem.CGREG_Status = 3;
 
 				// Set Control Variable
 				_Control = false;
@@ -3167,7 +3273,7 @@ bool Telit_xE910::CGREG(const bool _Mode) {
 			if (_Stat == 52) {
 
 				// Set Variable
-				Modem.CGREG_Status = UNKNOWN;
+				Modem.CGREG_Status = 4;
 
 				// End Function
 				return (false);
@@ -3176,7 +3282,7 @@ bool Telit_xE910::CGREG(const bool _Mode) {
 			if (_Stat == 53) {
 
 				// Set Variable
-				Modem.CGREG_Status = ROAMING_REGISTERED;
+				Modem.CGREG_Status = 5;
 
 				// Set Control Variable
 				_Control = true;
@@ -3608,7 +3714,7 @@ bool Telit_xE910::ICMP(const uint8_t _Mode) {
 	return (true);
 
 }
-bool Telit_xE910::CSQ(void) {
+bool Telit_xE910::CSQ(uint8_t &_RSSI) {
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -3656,11 +3762,9 @@ bool Telit_xE910::CSQ(void) {
 
 	}
 
-	// Clear Variables
-	Variables.RSSI = 0;
-
 	// Declare Response Data
 	char _CSQ[2]; 
+	memset(_CSQ, '\0', 3);
 
 	// Declare Handle Data
 	bool _Handle = true;
@@ -3685,13 +3789,13 @@ bool Telit_xE910::CSQ(void) {
 	}
 
 	// Set Signal Variable
-	Variables.RSSI = atoi(_CSQ);
+	_RSSI = atoi(_CSQ);
 
 	// End Function
 	return (true);
 
 }
-bool Telit_xE910::SERVINFO(void) {
+bool Telit_xE910::SERVINFO(uint16_t &_Operator) {
 
 	// Clear UART Buffer
 	_Clear_UART_Buffer();
@@ -3740,11 +3844,10 @@ bool Telit_xE910::SERVINFO(void) {
 	}
 
 	// Control Operator ID
-	Variables.Operator = 0;														// Unknown Operator
-	if (strstr(_Buffer.Buffer, "28601") != NULL) Variables.Operator = 28601;	// Turkcell
-	if (strstr(_Buffer.Buffer, "28602") != NULL) Variables.Operator = 28602;	// Vodafone
-	if (strstr(_Buffer.Buffer, "28603") != NULL) Variables.Operator = 28603;	// Turk Telecom
-	if (strstr(_Buffer.Buffer, "28604") != NULL) Variables.Operator = 28604;	// Turk Telecom
+	if (strstr(_Buffer.Buffer, "28601") != NULL) _Operator = 28601;	// Turkcell
+	if (strstr(_Buffer.Buffer, "28602") != NULL) _Operator = 28602;	// Vodafone
+	if (strstr(_Buffer.Buffer, "28603") != NULL) _Operator = 28603;	// Turk Telecom
+	if (strstr(_Buffer.Buffer, "28604") != NULL) _Operator = 28604;	// Turk Telecom
 
 	// End Function
 	return (true);
