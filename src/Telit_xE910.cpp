@@ -1178,13 +1178,13 @@ bool Telit_xE910::Connect(uint8_t &_Connection_Time) {
 		if (_Debug_Mon) Terminal.Text(_Debug.Connection_Time[0], _Debug.Connection_Time[1], CYAN, String(_Connection_Time));
 
 		// Control for IP Address
-		if (sizeof(Variables.IP_Address) >= 7 and Modem.CREG_Status and Modem.CGREG_Status) {
+		if (sizeof(IP_Address) >= 7 and Modem.CREG_Status and Modem.CGREG_Status) {
 
 			// Set Variable
 			Modem.Connection_Status = true;
 
 			// Debug Output
-			if (_Debug_Mon) Terminal.Text(_Debug.IP[0], _Debug.IP[1], CYAN, String(Variables.IP_Address));
+			if (_Debug_Mon) Terminal.Text(_Debug.IP[0], _Debug.IP[1], CYAN, String(IP_Address));
 
 		} else {
 
@@ -1291,70 +1291,6 @@ bool Telit_xE910::Connect(uint8_t &_Connection_Time) {
 
 	}
 	
-
-}
-uint8_t Telit_xE910::Get_RSSI(void) {
-
-	// Declare Watchdog Variable
-	uint8_t _Error_WD = 0;
-
-	// Set Response Variable
-	bool _Response = false;
-
-	// Declare Variable
-	uint8_t _RSSI;
-
-	// Process Command
-	while (!_Response) {
-
-		// Get RSSI 
-		_Response = CSQ(_RSSI);
-
-		// Set WD Variable
-		_Error_WD++;
-
-		// Control for WD
-		if (_Error_WD > 1) break;
-
-		// Delay
-		delay(100);
-
-	}
-
-	// End Function
-	return(_RSSI);
-
-}
-uint8_t Telit_xE910::Get_Signal(void) {
-
-	// Declare Watchdog Variable
-	uint8_t _Error_WD = 0;
-
-	// Set Response Variable
-	bool _Response = false;
-
-	// Declare Variable
-	uint8_t _RSSI;
-
-	// Process Command
-	while (!_Response) {
-
-		// Get RSSI 
-		_Response = CSQ(_RSSI);
-
-		// Set WD Variable
-		_Error_WD++;
-
-		// Control for WD
-		if (_Error_WD > 1) break;
-
-		// Delay
-		delay(100);
-
-	}
-
-	// End Function
-	return(_Signal_Strength(_RSSI));
 
 }
 bool Telit_xE910::Connection_Control(void) {
@@ -1642,6 +1578,166 @@ bool Telit_xE910::Socket_Send(char * _Data_Pack) {
 }
 
 // Variable Functions
+uint8_t Telit_xE910::Get_Manufacturer(void) {
+
+	// Declare Watchdog Variable
+	uint8_t _Error_WD = 0;
+
+	// Set Response Variable
+	bool _Response = false;
+
+	// Declare Variable
+	uint8_t _Manufacturer;
+
+	// Process Command
+	while (!_Response) {
+
+		// Get RSSI 
+		_Response = GMI(_Manufacturer);
+
+		// Set WD Variable
+		_Error_WD++;
+
+		// Control for WD
+		if (_Error_WD > 1) break;
+
+		// Delay
+		delay(100);
+
+	}
+
+	// End Function
+	return(_Manufacturer);
+
+}
+uint8_t Telit_xE910::Get_Model(void) {
+
+	// Declare Watchdog Variable
+	uint8_t _Error_WD = 0;
+
+	// Set Response Variable
+	bool _Response = false;
+
+	// Declare Variable
+	uint8_t _Model;
+
+	// Process Command
+	while (!_Response) {
+
+		// Get RSSI 
+		_Response = GMM(_Model);
+
+		// Set WD Variable
+		_Error_WD++;
+
+		// Control for WD
+		if (_Error_WD > 1) break;
+
+		// Delay
+		delay(100);
+
+	}
+
+	// End Function
+	return(_Model);
+	
+}
+uint16_t Telit_xE910::Get_Operator(void) {
+
+	// Declare Watchdog Variable
+	uint8_t _Error_WD = 0;
+
+	// Set Response Variable
+	bool _Response = false;
+
+	// Declare Variable
+	uint16_t _Operator;
+
+	// Process Command
+	while (!_Response) {
+
+		// Get RSSI 
+		_Response = SERVINFO(_Operator);
+
+		// Set WD Variable
+		_Error_WD++;
+
+		// Control for WD
+		if (_Error_WD > 1) break;
+
+		// Delay
+		delay(100);
+
+	}
+
+	// End Function
+	return(_Operator);
+
+}
+uint8_t Telit_xE910::Get_RSSI(void) {
+
+	// Declare Watchdog Variable
+	uint8_t _Error_WD = 0;
+
+	// Set Response Variable
+	bool _Response = false;
+
+	// Declare Variable
+	uint8_t _RSSI;
+
+	// Process Command
+	while (!_Response) {
+
+		// Get RSSI 
+		_Response = CSQ(_RSSI);
+
+		// Set WD Variable
+		_Error_WD++;
+
+		// Control for WD
+		if (_Error_WD > 1) break;
+
+		// Delay
+		delay(100);
+
+	}
+
+	// End Function
+	return(_RSSI);
+
+}
+uint8_t Telit_xE910::Get_Signal(void) {
+
+	// Declare Watchdog Variable
+	uint8_t _Error_WD = 0;
+
+	// Set Response Variable
+	bool _Response = false;
+
+	// Declare Variable
+	uint8_t _RSSI;
+
+	// Process Command
+	while (!_Response) {
+
+		// Get RSSI 
+		_Response = CSQ(_RSSI);
+
+		// Set WD Variable
+		_Error_WD++;
+
+		// Control for WD
+		if (_Error_WD > 1) break;
+
+		// Delay
+		delay(100);
+
+	}
+
+	// End Function
+	return(_Signal_Strength(_RSSI));
+
+}
 char * Telit_xE910::Get_IMEI(void) {
 	
 	// Declare Variable
@@ -1678,30 +1774,6 @@ char * Telit_xE910::Get_ICCID(void) {
 	return(_ICCID);
 
 }
-uint8_t Telit_xE910::Get_Manufacturer(void) {
-
-	// Declare Variable
-	uint8_t _Manufacturer;
-
-	// Get IMEI Number
-	GMI(_Manufacturer);
-
-	// End Function
-	return(_Manufacturer);
-
-}
-uint8_t Telit_xE910::Get_Model(void) {
-
-	// Declare Variable
-	uint8_t _Model;
-
-	// Get IMEI Number
-	GMM(_Model);
-
-	// End Function
-	return(_Model);
-	
-}
 char * Telit_xE910::Get_Firmware(void) {
 
 	// Declare Variable
@@ -1714,22 +1786,10 @@ char * Telit_xE910::Get_Firmware(void) {
 	return(_Firmware);
 
 }
-uint16_t Telit_xE910::Get_Operator(void) {
-
-	// Declare Variable
-	uint16_t _Operator;
-
-	// Get IMEI Number
-	SERVINFO(_Operator);
-
-	// End Function
-	return(_Operator);
-
-}
 char * Telit_xE910::Get_IP_Address(void) {
 
 	// End Function
-	return(Variables.IP_Address);
+	return(IP_Address);
 
 }
 
@@ -3422,7 +3482,7 @@ bool Telit_xE910::SGACT(const uint8_t _Cid, const bool _Stat) {
 	}
 
 	// Clear Variables
-	memset(Variables.IP_Address, '\0', 16);
+	memset(IP_Address, '\0', 20);
 
 	// Control for Buffer
 	for (uint8_t i = 0; i < _Buffer.Read_Order; i++) {
@@ -3431,7 +3491,7 @@ bool Telit_xE910::SGACT(const uint8_t _Cid, const bool _Stat) {
 		if (((_Buffer.Buffer[i] < 58 and _Buffer.Buffer[i] > 47) or _Buffer.Buffer[i] == 46)) {
 
 			// Get Data
-			Variables.IP_Address[_Buffer.Data_Order] = _Buffer.Buffer[i];
+			IP_Address[_Buffer.Data_Order] = _Buffer.Buffer[i];
 
 			// Increase Data Order
 			_Buffer.Data_Order++;
@@ -3633,7 +3693,7 @@ bool Telit_xE910::CGPADDR(const uint8_t _Cid) {
 //	Terminal.Text(40, 0, CYAN, String(_Buffer.Buffer));
 
 	// Clear Variables
-	memset(Variables.IP_Address, '\0', 16);
+	memset(IP_Address, '\0', 20);
 
 	// Declare Handle Variable
 	bool _Handle = false;
@@ -3645,7 +3705,7 @@ bool Telit_xE910::CGPADDR(const uint8_t _Cid) {
 		if (((_Buffer.Buffer[i] < 58 and _Buffer.Buffer[i] > 47) or _Buffer.Buffer[i] == 46) and _Handle == true) {
 
 			// Get Data
-			Variables.IP_Address[_Buffer.Data_Order] = _Buffer.Buffer[i];
+			IP_Address[_Buffer.Data_Order] = _Buffer.Buffer[i];
 
 			// Increase Data Order
 			_Buffer.Data_Order++;
@@ -3991,7 +4051,7 @@ bool Telit_xE910::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool
 	uint32_t _Time = millis();
 
 	// Command Delay
-	delay(100);
+	delay(50);
 
 	// Read UART Response
 	while (!_Buffer.Response) {
@@ -4046,6 +4106,14 @@ bool Telit_xE910::NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool
 	Time.Hour = (((_Serial_Time_Buffer[6] - 48) * 10) + (_Serial_Time_Buffer[7] - 48));
 	Time.Minute = (((_Serial_Time_Buffer[8] - 48) * 10) + (_Serial_Time_Buffer[9] - 48));
 	Time.Second = (((_Serial_Time_Buffer[10] - 48) * 10) + (_Serial_Time_Buffer[11] - 48));
+
+	// Control for Variable
+	if (Time.Year > 30 or Time.Year < 21) return(false);
+	if (Time.Month > 12 or Time.Month < 0) return(false);
+	if (Time.Day > 31 or Time.Day < 0) return(false);
+	if (Time.Hour > 24 or Time.Hour < 0) return(false);
+	if (Time.Minute > 60 or Time.Minute < 0) return(false);
+	if (Time.Second > 60 or Time.Second < 0) return(false);
 
 	// End Function
 	return (true);

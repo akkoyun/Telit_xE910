@@ -27,12 +27,13 @@ class Telit_xE910 {
 		// Stream Object Definition
 		Stream *_GSM_Serial;
 
-		// Define Modem Structure
+		// Define Modem Variables
 		bool _Debug_Mon = false;
+		char IP_Address[16]	= "";	// IP Addres
+		const char Version[9] = "02.00.02";	// Version
 
 		// Define Modem Structure
 		struct _Struct_Modem {
-			const char Version[9]		= "02.00.00";	// Version
 			bool Power_Monitor			= false;		// Power Monitor
 			bool SIM_Status				= false;		// SIM Status
 			bool Initialize_Status		= false;		// Initialize Status
@@ -40,20 +41,6 @@ class Telit_xE910 {
 			bool CREG_Status			= false;		// CREG Status
 			bool CGREG_Status			= false;		// CGREG Status
 		} Modem;
-
-		// Define Variable Structure
-		struct _Struct_Variables {
-//			char IMEI[17]				= "";	// IMEI Variable
-//			char Serial_Number[11]		= "";	// Serial Number Variable
-//			char ICCID[21]				= "";	// ICCID Variable
-//			uint8_t Manufacturer		= 0;	// Manufacturer Variable	
-//			uint8_t Model				= 0;	// Model Variable
-//			char Firmware[10]			= "";	// Modem Firmware Version Variable
-//			uint8_t RSSI				= 0;	// Signal Variable
-//			uint16_t Operator			= 0;	// Operator Variable
-//			uint8_t Connection_Time		= 0;	// Connection Time
-			char IP_Address[16]			= "";	// IP Addres
-		} Variables;
 
 		// Define Time Structure
 		struct _Struct_Time {
