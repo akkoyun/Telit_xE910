@@ -15,50 +15,47 @@
 #include <Arduino.h>
 #endif
 
-// Define VT100 Terminal
-#ifndef __Console__
-#include <Console.h>
+#include <string.h>
+
+// Debug Parameters
+#define Debug
+#ifdef Debug
+
+	// Terminal Coordinates
+	#define Debug_Initialize_X 5
+	#define Debug_Initialize_Y 33
+	#define Debug_Connect_X 5
+	#define Debug_Connect_Y 73
+	#define Debug_Boot_X 20
+	#define Debug_Boot_Y 10
+
+	// Define VT100 Terminal
+	#ifndef __Console__
+	#include <Console.h>
+	#endif
+
 #endif
+
+// GSM Command Parameters
+#define _OK_ "OK\r\n"
+#define _READY_ "READY"
+#define _SEND_DATA_ ">>>"
+#define _RECIEVE_DATA_ "<<<"
+#define _OK_RESPONSE_ "{\"Event\":500}"
+
+// Serial Communications Definations
+#define _GSM_Serial Serial3
 
 class Telit_xE910 {
 
 	private:
-
-		// Stream Object Definition
-		Stream *_GSM_Serial;
-
-		// Define Modem Variables
-		bool _Debug_Mon = false;
-		char IP_Address[16]	= "";	// IP Addres
-		const char Version[9] = "02.00.02";	// Version
-
-		// Define Modem Structure
-		struct _Struct_Modem {
-			bool Power_Monitor			= false;		// Power Monitor
-			bool SIM_Status				= false;		// SIM Status
-			bool Initialize_Status		= false;		// Initialize Status
-			bool Connection_Status		= false;		// Connection Status
-			bool CREG_Status			= false;		// CREG Status
-			bool CGREG_Status			= false;		// CGREG Status
-		} Modem;
-
-		// Define Time Structure
-		struct _Struct_Time {
-			uint8_t Year				= 0;
-			uint8_t Month				= 0;
-			uint8_t Day					= 0;
-			uint8_t Hour				= 0;
-			uint8_t Minute				= 0;
-			uint8_t Second				= 0;
-		} Time;
 
 		// Define Serial Buffer Structure
 		struct Struct_Serial_Buffer {
 			bool Response;
 			uint8_t Read_Order;
 			uint8_t Data_Order;
-			char Buffer[255];
-			uint16_t Time_Out;
+			const uint16_t Time_Out;
 		};
 
 		// Hardware Functions
@@ -80,14 +77,14 @@ class Telit_xE910 {
 		bool FCLASS(const uint8_t _FCLASS);
 		bool K(const uint8_t _K);
 		bool CPIN(void);
-		bool CGSN(char * _IMEI);
-		bool GSN(char * _Serial_Number);
-		bool CCID(char * _ICCID);
-		bool GMI(uint8_t &_Manufacturer);
-		bool GMM(uint8_t &_Model);
-		bool GMR(char * _Firmware);
-		bool CSQ(uint8_t &_RSSI);
-		bool SERVINFO(uint16_t &_Operator);
+		bool CGSN(void);
+		bool GSN(void);
+		bool CCID(void);
+		bool GMI(void);
+		bool GMM(void);
+		bool GMR(void);
+		bool CSQ(void);
+		bool SERVINFO(void);
 		bool SLED(const uint8_t _SLED);
 		bool E2SLRI(const uint16_t _Pulse_Duration);
 		bool TXMONMODE(const uint8_t _TXMONMODE);
@@ -131,11 +128,47 @@ class Telit_xE910 {
 
 	public:
 
+		// Define Modem Structure
+		struct _Struct_Modem {
+			bool Initialize_Status		= false;	// Initialize Status
+			bool Connection_Status		= false;	// Connection Status
+			bool Time_Status			= false;	// Time Status
+			bool Power_Monitor			= false;	// Power Monitor
+			bool SIM_Status				= false;	// SIM Status
+			bool CREG_Status			= false;	// CREG Status
+			bool CGREG_Status			= false;	// CGREG Status
+		} Modem;
+
+		// Define Variable Structure
+		struct _Struct_Variables {
+			char IMEI[17]				= "";		// IMEI Variable
+			char Serial_Number[11]		= "";		// Serial Number Variable
+			char ICCID[21]				= "";		// ICCID Variable
+			uint8_t Manufacturer		= 0;		// Manufacturer Variable	
+			uint8_t Model				= 0;		// Model Variable
+			char Firmware[10]			= "";		// Modem Firmware Version Variable
+			uint8_t RSSI				= 0;		// Signal Variable
+			uint16_t Operator			= 0;		// Operator Variable
+			uint8_t Connection_Time		= 0;		// Connection Time
+			char IP_Address[16]			= "";		// IP Addres
+		} Variables;
+
+		// Define Time Structure
+		struct _Struct_Time {
+			uint8_t Year				= 0;
+			uint8_t Month				= 0;
+			uint8_t Day					= 0;
+			uint8_t Hour				= 0;
+			uint8_t Minute				= 0;
+			uint8_t Second				= 0;
+		} Time;
+
 		// Public Functions
-		bool Begin(Stream &_Serial, const bool _Debug_Monitor);
+		bool Begin(void);
 		bool Set_Modem(void);
-		bool Connect(uint8_t &_Connection_Time);
-		uint8_t Get_RSSI(void);
+		bool Connect(void);
+		bool Time_Update(void);
+		bool Get_RSSI(void);
 		uint8_t Get_Signal(void);
 		bool Connection_Control(void);
 		bool Send_Data_Pack(const uint8_t _Pack_Type, const char *_Data);
@@ -147,25 +180,7 @@ class Telit_xE910 {
 		bool Socket_Listen(void);
 		uint8_t Socket_Status(void);
 		uint16_t Socket_Answer(void);
-		bool Socket_Send(char * _Data_Pack);
-
-		// Variable Functions
-		char * Get_IMEI(void);
-		char * Get_Serial_ID(void);
-		char * Get_ICCID(void);
-		uint8_t Get_Manufacturer(void);
-		uint8_t Get_Model(void);
-		char * Get_Firmware(void);
-		uint16_t Get_Operator(void);
-		char * Get_IP_Address(void);
-
-		// Time Funcrions
-		uint8_t Get_Year(void);
-		uint8_t Get_Month(void);
-		uint8_t Get_Day(void);
-		uint8_t Get_Hour(void);
-		uint8_t Get_Minute(void);
-		uint8_t Get_Second(void);
+		bool Socket_Send(const char * _Data_Pack);
 
 		// Status Functions
 		uint8_t Get_Connection_Status(void);
