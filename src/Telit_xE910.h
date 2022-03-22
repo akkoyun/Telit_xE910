@@ -10,1056 +10,183 @@
 #ifndef __Telit_xE910__
 #define __Telit_xE910__
 
-// Define Library Structures
-#ifndef __Telit_xE910_Structures__
-#include <Telit_xE910_Structures.h>
+// Define Arduino Library
+#ifndef __Arduino__
+#include <Arduino.h>
 #endif
 
-/**
- * @brief GSM Modem global function class
- * @version 01.00.00
- */
-class xE910_GSM {
+#include <string.h>
 
-	public:
+// Debug Parameters
+#define Debug
+#ifdef Debug
 
-		/**
-		* Library global variables declarations.
-		*/
-		const char 	Version[9] 					= "01.10.08";		// Library Version
-		bool		Debug_Mode					= false;			// Debug Mode Variable
+	// Terminal Coordinates
+	#define Debug_Initialize_X 5
+	#define Debug_Initialize_Y 33
+	#define Debug_Connect_X 5
+	#define Debug_Connect_Y 73
+	#define Debug_Boot_X 20
+	#define Debug_Boot_Y 10
 
-		/**
-		 * @brief Power ON procedure of GSM modem.
-		 * @param _Power_Switch Enable GSM modem main power switch.
-		 * @param _LED_Switch Enable GSM modem LED inducator power switch.
-		 * @param _Communication_Switch Enable GSM modem voltage translator.
-		 * @version 01.00.00
-		 */
+	// Define VT100 Terminal
+	#ifndef __Console__
+	#include <Console.h>
+	#endif
+
+#endif
+
+// GSM Command Parameters
+#define _OK_ "OK\r\n"
+#define _READY_ "READY"
+#define _SEND_DATA_ ">>>"
+#define _RECIEVE_DATA_ "<<<"
+#define _OK_RESPONSE_ "{\"Event\":500}"
+
+// Serial Communications Definations
+#define _GSM_Serial Serial3
+
+class Telit_xE910 {
+
+	private:
+
+		// Define Serial Buffer Structure
+		struct Struct_Serial_Buffer {
+			bool Response;
+			uint8_t Read_Order;
+			uint8_t Data_Order;
+			const uint16_t Time_Out;
+		};
+
+		// Hardware Functions
+		void Set_Communication(const bool _State);
+		void Set_OnOff(const uint16_t _Time);
+		void Set_ShutDown(const uint16_t _Time);
+		void Set_Power_Switch(const bool _State);
+		void Set_LED(const bool _State);
+		bool Get_PowerMonitor(void);
+
+		// Hardware Batch Functions
 		bool Power_ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch);
+		bool Power_OFF(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch);
 
-		/**
-		 * @brief Power OFF procedure of GSM modem.
-		 * @param _Power_Switch Disable GSM modem main power switch.
-		 * @param _LED_Switch Disable GSM modem LED inducator power switch.
-		 * @param _Communication_Switch Disable GSM modem voltage translator.
-		 * @param _Clear_Variables Clear library control variables.
-		 * @version 01.00.00
-		 */
-		bool Power_OFF(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch, const bool _Clear_Variables);
-
-		/**
-		 * @brief GSM Modem initialize function
-		 * @param _Debug Enable debug mode 
-		 * @version 01.00.01
-		 */
-		bool Begin(const bool _Debug);
-
-		/**
-		 * @brief GSM Modem connection function
-		 * @version 01.00.00
-		 */
-		bool Connect(void);
-
-		/**
-		 * @brief RSSI function
-		 * @version 01.00.00
-		 */
-		bool RSSI_Refresh(void);
-
-		bool Connection_Control(void);
-
-		/**
-		 * @brief Signal Strength x/4
-		 * @version 01.00.01
-		 */
-		uint8_t Signal_Strength(void);
-
-		/**
-		 * @brief Data send procedure.
-		 * @version 01.00.01
-		 */
-		bool Send_Data_Pack(const uint8_t _Pack_Type, const String _Data);
-
-		/**
-		 * @brief Socket Listen batch
-		 * 
-		 * @return true 
-		 * @return false 
-		 */
-		bool Socket_Listen(void);
-
-		bool Socket_Open(void);
-		bool Socket_Close(void);
-		bool Socket_Control(void);
-
-	private:
-	
-};
-
-/**
- * @brief GSM Modem hardware function class.
- * @version 01.00.00
- */
-class xE910_HARDWARE {
-
-	public:
-
-		/**
- 		* Library global variables declarations.
-		 */
-		bool		Power_Monitor				= false;			/// GSM Power Monitor Signal
-
-		/**
-		 * @brief Enable or disable voltage translator buffer.
-		 * @version 01.00.00
-		 * @param _State Buffer state
-		 * @return true - Buffer enabled
-		 * @return false - Buffer disabled
-		 */
-		bool Communication(const bool _State);
-
-		/**
-		 * @brief Controls GSM modem power monitor signal.
-		 * @version 01.00.00
-		 * @return true - GSM powered
-		 * @return false - GSM not powered
-		 */
-		bool PowerMonitor(void);
-
-		/**
-		 * @brief On or off GSM modem.
-		 * @version 01.00.00
-		 * @param _Time Signal time
-		 */
-		void OnOff(const uint16_t _Time);
-
-		/**
-		 * @brief Shut down GSM modem.
-		 * @version 01.00.00
-		 * @param _Time Signal time
-		 */
-		void ShutDown(const uint16_t _Time);
-
-		/**
-		 * @brief GSM modem main power switch control.
-		 * @version 01.00.00
-		 * @param _State Power state
-		 */
-		void Power_Switch(const bool _State);
-
-		/**
-		 * @brief GSM modem LED inducators power switch control.
-		 * @version 01.00.00
-		 * @param _State LED state
-		 */
-		void LED(const bool _State);
-
-	private:
-
-};
-
-/**
- * @brief GSM Modem AT command set function class.
- * @version 01.00.00
- */
-class xE910_AT {
-
-	public:
-
-		/**
- 		* Library global variables declarations.
-		 */
-		char		IMEI[17]					= "";				// IMEI Variable
-		char		Serial_Number[11]			= "";				// Serial Number Variable
-		char		ICCID[21]					= "";				// ICCID Variable
-		uint8_t 	Manufacturer 				= 0;				// Modem Manufacturer Variable
-		uint8_t 	Model 						= 0;				// Modem Model Variable
-		char		Modem_Firmware[10]			= "";				// Modem Firmware Version Variable
-		bool		Initialization_Status		= false;			// Initialization Status
-		bool		SIM_PIN_Status				= false;			// SIM Pin Status
-
-		uint8_t		Connection_Time				= 0;				// CREG and CGREG time Variable
-		uint16_t 	Operator 					= 0;				// Operator Variable
-		uint8_t 	Signal_RSSI 				= 0;				// Signal Variable
-		uint8_t		CREG_Status					= 0;				// CREG Status Variable
-		uint8_t		CGREG_Status				= 0;				// CGREG Status Variable
-		uint8_t		SGACT_Status				= 0;				// SGACT Status Variable
-		char		IP_Address[16]				= "";				// IP Address Variable
-		bool		Connection_Status			= false;			// Connection Status
-		uint16_t	Remote_Command				= 0;				// Remote Server Command
-		uint16_t	Server_Response				= 0;				// Server Response Command
-
-		uint8_t 	RTC_Day						= 29;				// Day Variable
-		uint8_t 	RTC_Month					= 10;				// Month Variable
-		uint16_t 	RTC_Year					= 1923;				// Year Variable
-		uint8_t 	RTC_Hour					= 0;				// Hour Variable
-		uint8_t 	RTC_Minute					= 0;				// Minute Variable
-		uint8_t 	RTC_Second					= 0;				// Second Variable
-
-		String		JSON						= "";				// JSON Pack
-
-		/**
-		 * @brief AT Function
-		 * @details AT Command : AT\r\n (4 Byte)
-		 * @details AT Response : AT\r\n\r\nOK\r\n (10 Byte)
-		 * 
-		 * @version 01.00.02
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
+		// AT Command Set
 		bool AT(void);
-
-		/**
-		 * @brief Set function to enable or disable the command echo.
-		 * @details AT Command : ATE[<n>]\r\n (6 Byte)
-		 * @details AT Response : ATE[<n>]\r\n\r\nOK\r\n (12 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @param _ECHO Command echo state
-		 * TRUE : Echo ON [Factory Default]
-		 * FALSE : Echo OFF
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool ATE(const bool _ECHO);
-
-		/**
-		 * @brief Set command enables/disables the report of result code.
-		 * @details AT Command : AT+CMEE[<n>]\r\n (10 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @param _CMEE Enable flag
-		 * 0 - disable +CME ERROR:<err> reports, use only ERROR report.
-		 * 1 - enable +CME ERROR:<err> reports, with <err> in numeric format 
-		 * 2 - enable +CME ERROR: <err> reports, with <err> in verbose format
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool CMEE(const uint8_t _CMEE);
-
-		/**
-		 * @brief Set command sets the wireless module in specified connection 
-		 * mode (data, fax, voice), hence all the calls done afterwards 
-		 * will be data or voice.
-		 * @details AT Command : AT+FCLASS[<n>]\r\n (12 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.01
-		 *  
-		 * @param _FCLASS Parameter flag
-		 * 0 - data
-		 * 1 - fax class 1 
-		 * 8 - voice
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool FCLASS(const uint8_t _FCLASS);
-
-		/**
-		 * @brief Set command controls the RS232 flow control behaviour.
-		 * @details AT Command : AT&K[<n>]\r\n (7 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @param _K Parameter flag
-		 * 0 - no flow control
-		 * 1 - hardware mono-directional flow control (only CTS active)
-		 * 2 - software mono-directional flow control (XON/XOFF)
-		 * 3 - hardware bi-directional flow control (both RTS/CTS active) (factory default) 
-		 * 4 - software bi-directional with filtering (XON/XOFF)
-		 * 5 - pass through: software bi-directional without filtering (XON/XOFF)
-		 * 6 - both hardware bi-directional flow control (both RTS/CTS active) and 
-		 * software bi-directional flow control (XON/XOFF) with filtering
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool K(const uint8_t _K);
-
-		/**
-		 * @brief Set command sends to the device a password which is necessary 
-		 * before it can be operated (SIM PIN, SIM PUK, PH-SIM PIN, etc.).
-		 * If the PIN required is SIM PUK or SIM PUK2, the <newpin> is required. 
-		 * This second pin, <newpin> will replace the old pin in the SIM.
-		 * The command may be used to change the SIM PIN by sending it with 
-		 * both parameters <pin> and <newpin>.
-		 * @details AT Command : AT+CPIN?\r\n (10 Byte)
-		 * @details AT Response : \r\n+CPIN: READY\r\n\r\nOK\r\n (22 Byte)
-		 * 
-		 * @version 01.00.01
-		 *  
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool CPIN(void);
-
-		/**
-		 * @brief Execution command returns the product serial number, identified 
-		 * as the IMEI of the mobile, without command echo.
-		 * @details AT Command : AT+CGSN\r\n (9 Byte)
-		 * @details AT Response : \r\n351732055366390\r\n\r\nOK\r\n (25 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool CGSN(void);
-
-		/**
-		 * @brief Execution command returns the device board serial number.
-		 * @details AT Command : AT+GSN\r\n (8 Byte)
-		 * @details AT Response : \r\n0000328245\r\n\r\nOK\r\n (20 Byte)
-		 * 
-		 * @version 01.00.03
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool GSN(void);
-
-		/**
-		 * @brief Execution command reads on SIM the ICCID (card identification 
-		 * number that provides a unique identification number for the SIM)
-		 * @details AT Command : AT#CCID\r\n (9 Byte)
-		 * @details AT Response : \r\n#CCID: 8990011916180288209\r\n\r\nOK\r\n (36 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool CCID(void);
-
-		/**
-		 * @brief Execution command returns the manufacturer identification.
-		 * @details AT Command : AT+GMI\r\n (8 Byte)
-		 * @details AT Response : \r\nTelit\r\n\r\nOK\r\n (15 Byte)
-		 * 
-		 * 0 - No manufacturer 
-		 * 1 - "Telit"
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool GMI(void);
-
-		/**
-		 * @brief Execution command returns the model identification.
-		 * @details AT Command : AT+GMM\r\n (8 Byte)
-		 * @details AT Response : \r\nGE910-QUAD\r\n\r\nOK\r\n (20 Byte)
-		 * 
-		 * 0 - No model
-		 * 1 - "GE910-QUAD"
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool GMM(void);
-
-		/**
-		 * @brief Execution command returns the model identification.
-		 * @details AT Command : AT+GMR\r\n (8 Byte)
-		 * @details AT Response : \r\n13.00.007\r\n\r\nOK\r\n (19 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool GMR(void);
-
-		/**
-		 * @brief Execution command reports received signal quality indicators in the form.
-		 * @details AT Command : AT+CSQ\r\n (8 Byte)
-		 * @details AT Response : \r\n+CSQ: xx,x\r\n\r\nOK\r\n (19 Byte)
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool CSQ(void);
-
-		/**
-		 * @brief Execution command reports information about serving cell, in the format.
-		 * @details AT Command : AT#SERVINFO\r\n (13 Byte)
-		 * @details AT Response : \r\n#SERVINFO: 3,-81,"Turkcell","28601",52,855E,04,1,,"II",01,6\r\n\r\nOK\r\n (69 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool SERVINFO(void);
-
-		/**
-		 * @brief Set command sets the behaviour of the STAT_LED GPIO
-		 * @details AT Command : AT#SLED=[<n>]\r\n (11 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @param _SLED Enable flag
-		 * 0 - GPIO tied Low
-		 * 1 - GPIO tied High
-		 * 2 - GPIO handled by Module Software
-		 * 3 - GPIO is turned on and off alternatively
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool SLED(const uint8_t _SLED);
-
-		/**
-		 * @brief Set TXMON pin behaviour.
-		 * @details AT Command : AT#TXMONMODE=[<n>]\r\n (16 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @param _TXMONMODE Enable flag
-		 * 0 - TXMON pin goes high when a call is started and it drops down when
-		 * the call is ended. It also goes high when a location update starts, 
-		 * and it drops down when the location update procedure stops. Finally 
-		 * it goes high during SMS transmission and receiving. Even if the 
-		 * TXMON in this case is set as GPIO in output, the read command 
-		 * AT#GPIO=5,2 returns #GPIO:2,0, as the GPIO is in alternate mode.
-		 * 1 - TXMON is set in alternate mode and the Timer unit controls its state. 
-		 * TXMON goes high before power ramps start raising and drops down after 
-		 * power ramps stop falling down. This behaviour is repeated for every 
-		 * transmission burst.
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool TXMONMODE(const uint8_t _TXMONMODE);
-
-		/**
-		 * @brief There are situations in which the presentation of the URCs controlled by 
-		 * either +CREG and +CGREG are slightly different from ETSI specifications. 
-		 * We identified this behaviour and decided to maintain it as default for backward 
-		 * compatibility issues, while we’re offering a more formal ‘Enhanced Operation Mode’ 
-		 * through #REGMODE.
-		 * @details AT Command : AT#REGMODE=[<mode>]\r\n (14 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * 0 - basic operation mode
-		 * 1 - enhanced operation mode
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool REGMODE(const uint8_t _REGMODE);
-
-		/**
-		 * @brief Set command enables/disables network registration 
-		 * reports depending on the parameter <mode>.
-		 * @details AT Command : AT+CREG=[<mode>]\r\n (11 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 02.00.01
-		 * 
-		 * @param _Mode 
-		 * 
-		 * 0 - disable network registration unsolicited result code (factory default) 
-		 * 1 - enable network registration unsolicited result code
-		 * 2 - enable network registration unsolicited result code with network Cell identification data
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool CREG(const bool _Mode);
-
-		/**
-		 * @brief Set command controls the presentation of an unsolicited result code
-		 * @details AT Command : AT+CGREG=[<mode>]\r\n (11 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 02.00.01
-		 * 
-		 * @param _Mode 
-		 * 
-		 * 0 - disable network registration unsolicited result code
-		 * 1 - enable network registration unsolicited result code; if there is a change in the
-		 * terminal GPRS network registration status, it is issued the unsolicited result code.
-		 * 2 - enable network registration and location information unsolicited result code; 
-		 * if there is a change of the network cell, it is issued the unsolicited result code.
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool CGREG(const bool _Mode);
-
-		/**
-		 * @brief Set command specifies PDP context parameter values for a 
-		 * PDP context identified by the (local) context identification parameter, <cid>
-		 * @details AT Command : AT+CGDCONT=[<cid>],[<PDP_type>],[<APN>],[<PDP_addr>],[<d_comp>],[<h_comp>]\r\n (37 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Cid (PDP Context Identifier) 
-		 * numeric parameter which specifies a particular PDP context definition.
-		 * @param _PDP_Type (Packet Data Protocol type) 
-		 * a string parameter which specifies the type of packet data protocol
-		 * @param _APN (Access Point Name) 
-		 * a string parameter which is a logical name that is used to select the 
-		 * GGSN or the external packet data network. If the value is empty (“”) 
-		 * or omitted, then the subscription value will be requested.
-		 * @param _PDP_Addr 
-		 * a string parameter that identifies the terminal in the address space 
-		 * applicable to the PDP. The allocated address may be read using the +CGPADDR command.
-		 * @param _D_Comp numeric parameter that controls PDP data compression
-		 * 0 - off (default if value is omitted)
-		 * 1 - on
-		 * @param _H_Comp numeric parameter that controls PDP header compression
-		 * 0 - off (default if value is omitted)
-		 * 1 - on
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp);
-		
-		/**
-		 * @brief Set command sets the socket configuration parameters.
-		 * @details AT Command : AT#SCFG=[<conn_id>],[<cid>],[<pktsz>],[<maxto>],[<connto>],[<txto>]\r\n (27 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Conn_ID socket connection identifier (1-6)
-		 * @param _Cid PDP context identifier
-		 * 0 - specifies the GSM context
-		 * 1..5 - numeric parameter which specifies a particular PDP context definition
-		 * @param _Pkt_Sz packet size to be used by the TCP/UDP/IP stack for data sending.
-		 * 0 - select automatically default value(300).
-		 * 1..1500 - packet size in bytes.
-		 * @param _Max_To exchange timeout (or socket inactivity timeout); if there’s 
-		 * no data exchange within this timeout period the connection is closed.
-		 * 0 - no timeout
-		 * 1..65535 - timeout value in seconds (default 90 s.)
-		 * @param _Conn_To connection timeout; if we can’t establish a connection to the remote
-		 * within this timeout period, an error is raised.
-		 * 10..1200 - timeout value in hundreds of milliseconds (default 600)
-		 * @param _TX_To data sending timeout; after this period data are sent also 
-		 * if they’re less than max packet size.
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _Pkt_Sz, const uint16_t _Max_To, const uint16_t _Conn_To, const uint8_t _TX_To);
-
-		/**
-		 * @brief Set command sets the socket configuration extended parameters.
-		 * @details AT Command : AT#SCFGEXT=[<conn_id>],[<srmode>],[<recvdatamode>],[<keepalive>],[<listenautorsp>],[<senddatamode>]\r\n (24 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Conn_ID socket connection identifier (1-6)
-		 * @param _Sr_Mode SRing unsolicited mode
-		 * 0 - Normal (default)
-		 * 1 – Data amount
-		 * 2 - Data view
-		 * 3 – Data view with UDP datagram informations
-		 * @param _Recv_Data_Mode data view mode for received data
-		 * 0- text mode (default)
-		 * 1- hexadecimal mode
-		 * @param _Keep_Alive Set the TCP Keepalive value in minutes
-		 * 0 – Deactivated (default)
-		 * 1 – 240 – Keepalive time in minutes
-		 * @param _Listen_Auto_Rsp Set the listen auto-response mode, that affects the commands AT#SL and AT#SLUDP
-		 * 0 - Deactivated (default)
-		 * 1 – Activated
-		 * @param _Send_Data_Mode data mode for sending data in command mode(AT#SSEND)
-		 * 0 - data represented as text (default)
-		 * 1 - data represented as sequence of hexadecimal numbers (from 00 to FF)
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uint8_t _Recv_Data_Mode, const uint8_t _Keep_Alive, const uint8_t _Listen_Auto_Rsp, const uint8_t _Send_Data_Mode);
-
-		/**
-		 * @brief Set command sets the socket configuration extended parameters 
-		 * for features not included in #SCFGEXT command.
-		 * @details AT Command : AT#SCFGEXT2=[<conn_id>],[<bufferstart>],[<abortconnattemp>],[<sringlen>],[<sringto>],[<nocarriermode>]\r\n (26 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Conn_ID socket connection identifier (1-6)
-		 * @param _Buffer_Start Set the sending timeout method based on new data received from the serial port. 
-		 * (<txTo> timeout value is set by #SCFG command) Restart of transmission timer will be done when new 
-		 * data are received from the serial port.
-		 * 0 - old behaviour for transmission timer
-		 * 1 - new behaviour for transmission timer
-		 * @param _Abort_Conn_Attempt Enable connection attempt(#SD/#SKTD/#SKTOP) abort before 
-		 * CONNECT(online mode) or OK(command mode)
-		 * 0 – Not possible to interrupt connection attempt
-		 * 1 – It is possible to interrupt the connection attempt
-		 * @param _SRing_Len this parameter sets the length of data received in one 
-		 * SRING URC in sring mode 2 or 3 ( see AT#SCFGEXT )
-		 * 0 – factory default, means 64 bytes
-		 * 1 – means that the length is equal to the maximum TCP payload size accepted 
-		 * in download in case of TCP connections, same as 0 in case of UDP connections
-		 * @param _SRing_To this parameter sets the delay among one SRING URC and 
-		 * the other, in sring mode 2 or 3 ( see AT#SCFGEXT )
-		 * 0 – factory default, means 10 hundreds of milliseconds 
-		 * 1..10: value in hundreds of milliseconds
-		 * @param _No_Carrier_Mode this parameter permits to choose NO CARRIER 
-		 * indication format when the socket is closed as follows
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, const uint8_t _Abort_Conn_Attempt, const uint8_t _SRing_Len, const uint8_t _SRing_To, const uint8_t _No_Carrier_Mode);
-
-		/**
-		 * @brief Set command sets the socket configuration extended parameters 
-		 * for features not included in #SCFGEXT command nor in #SCFGEXT2 command.
-		 * @details AT Command : AT#SCFGEXT3=[<conn_id>],[<immrsp>],[<closuretypecmdmodeenabling>]\r\n (19 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Conn_ID socket connection identifier (1-6)
-		 * @param _Imm_Rsp Enables AT#SD command mode immediate response
-		 * 0 – factory default, means that AT#SD in command mode (see AT#SD) returns after the socket is connected
-		 * 1 – means that AT#SD in command mode returns immediately. Then the state of the connection can be read by the AT command AT#SS
-		 * @param _Closure_Type_Cmd_Mode_Enabling Setting this parameter, successive #SD or #SL with 
-		 * <closureType> parameter 255 setting takes effect in command mode. It has been introduced 
-		 * due to retrocompatibility reason regarding <closureType> behaviour in command mode.
-		 * 0 – #SD or #SL <closureType> 255 in command mode has no effect 
-		 * 1 – #SD or #SL <closureType> 255 in command mode takes effect
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const uint8_t _Closure_Type_Cmd_Mode_Enabling);
-
-		/**
-		 * @brief Execution command is used to activate or deactivate either the 
-		 * GSM context or the specified PDP context.
-		 * @details AT Command : AT#SGACT=<cid>,<stat>,[<userid>],[<password>]\r\n (20 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.01
-		 * 
-		 * @param _Cid PDP context identifier
-		 * 0 - specifies the GSM context
-		 * 1..5 - numeric parameter which specifies a particular PDP context definition
-		 * @param _Stat status identifier
-		 * 0 - deactivate the context
-		 * 1 - activate the context
-		 * @param _User_ID string type, used only if the context requires it
-		 * @param _Password string type, used only if the context requires it
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SGACT(const uint8_t _Cid);
-
-		/**
-		 * @brief Execution command is used to enable or disable the automatic activation/reactivation of the 
-		 * context for the specified PDP context, to set the maximum number of attempts and to set the delay 
-		 * between an attempt and the next one. The context is activated automatically after every GPRS Attach 
-		 * or after a NW PDP CONTEXT deactivation if at least one IPEasy socket is configured to this context.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Cid PDP context identifier
-		 * 0 - specifies the GSM context
-		 * 1..5 - numeric parameter which specifies a particular PDP context definition
-		 * @param _Retry numeric parameter which specifies the maximum number of context activation attempts 
-		 * in case of activation failure. The value belongs to the following range: 0 - 15
-		 * 0 - disable the automatic activation/reactivation of the context (default)
-		 * @param _Delay numeric parameter which specifies the delay in seconds between an attempt 
-		 * and the next one. The value belongs to the following range: 180 - 3600
-		 * @param _UrcMode URC presentation mode
-		 * 0 - disable unsolicited result code (default)
-		 * 1 - enable unsolicited result code, after an automatic activation/reactivation, 
-		 * of the local IP address obtained from the network.
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SGACTCFG(const uint8_t _Cid, const uint8_t _Retry, const uint16_t _Delay, const bool _UrcMode);
-
-		/**
-		 * @brief Execution command is used to activate or deactivate the specified PDP context(s)
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _State indicates the state of PDP context activation
-		 * 0 - deactivated
-		 * 1 - activated
-		 * @param _Cid a numeric parameter which specifies a particular PDP context definition
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool CGACT(const uint8_t _State, const bool _Cid);
-
-		/**
-		 * @brief Execution command returns a list of PDP addresses for the specified context identifiers.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Cid a numeric parameter which specifies a particular PDP context
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool CGPADDR(const uint8_t _Cid);
-
-		/**
-		 * @brief This command enables and disables automatic time zone update via NITZ.
-		 * @details AT Command : AT+CTZU=[<state>]\r\n (9 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @param _State Parameter
-		 * 0 Disable automatic time zone update via NITZ (default) 
-		 * 1 Enable automatic time zone update via NITZ
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool CTZU(const bool _State);
-
-		/**
-		 * @brief Set command enables/disables automatic date/time updating and Network Timezone 
-		 * unsolicited indication. Date and time information can be sent by the network after 
-		 * GSM registration or after GPRS attach.
-		 * @details AT Command : AT+NITZ=[<state>]\r\n (11 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @param _State Parameter
-		 * 0 - disables automatic set (factory default)
-		 * 1 - enables automatic set
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool NITZ(const bool _State);
-
-		/**
-		 * @brief This command permits to calculate and update date and time through 
-		 * NTP protocol(RFC2030), sending a request to a NTP server.
-		 * @details AT Command : AT#NTP="<NTPserver>",<NTPport>,<updatemodule>,<timeout>\r\n (x Byte)
-		 * @details AT Response : \r\n#NTP: 20/10/16,08:55:58\r\nOK\r\n (31 byte)
-		 * 
-		 * @param _NTP_Addr address of the NTP server, string type.
-		 * @param _NTP_Port NTP server port to contact
-		 * @param _Update_Module_Clock 
-		 * 0 - no update module clock 
-		 * 1 – update module clock
-		 * @param _Time_Out waiting timeout for server response in seconds (1-10 sec)
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _Update_Module_Clock, const uint8_t _Time_Out);
-
-		/**
-		 * @brief Set command sets the real-time clock of the ME.
-		 * @details AT Command : AT+CCLK?\r\n (10 Byte)
-		 * @details AT Response : \r\n+CCLK: "21/12/30,12:37:34"\r\nOK\r\n (34 byte)
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool CCLK(void);
-
-		/**
-		 * @brief Execution command causes device detach from the network and shut down. 
-		 * Before definitive shut down an OK response is returned.
-		 * @details AT Command : AT#SHDN\r\n (9 Byte)
-		 * @details AT Response : \r\nOK\r\n (6 Byte)
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SHDN(void);
-
-		/**
-		 * @brief Execution command opens a remote connection via socket.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Cid socket connection identifier 1..6
-		 * @param _Pro transmission protocol
-		 * 0 - TCP
-		 * 1 - UDP
-		 * @param _Port remote host port to contact 1..65535
-		 * @param _IP ddress of the remote host, string type.
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const char *_IP, const uint8_t _Closure_Type, uint16_t _IPort, const bool _Conn_Mode, const char *_Data);
-
-		/**
-		 * @brief Execution command reports the current status of the socket
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _ConnID socket connection identifier 1..6
-		 * 
-		 * @return uint8_t actual state of the socket:
-		 * 0 - Socket Closed.
-		 * 1 - Socket with an active data transfer connection.
-		 * 2 - Socket suspended.
-		 * 3 - Socket suspended with pending data.
-		 * 4 - Socket listening.
-		 * 5 - Socket with an incoming connection. Waiting for the user accept or shutdown command.
-		 * 6 - Socket resolving DNS
-		 * 7 - Socket connecting
-		 */
-		uint8_t SS(const uint8_t _ConnID);
-	
-		/**
-		 * @brief This command opens/closes a socket listening for an incoming TCP connection on a specified port.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _ConnID socket connection identifier 1..6
-		 * @param _Listen_State 
-		 * 0 - closes socket listening
-		 * 1 - starts socket listening
-		 * @param _Listen_Port local listening port 1..65535
-		 * @param _Closure_Type socket closure behaviour for TCP when remote host has closed
-		 * 0 - local host closes immediately (default)
-		 * 255 - local host closes after an AT#SH or immediately in case of an abortive disconnect from remote.
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_t _Listen_Port, const uint8_t _Closure_Type);
-
-		/**
-		 * @brief Execution command accepts an incoming socket connection after an URC
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _ConnID socket connection identifier 1..6
-		 * @param _ConnMode Connection mode, as for command #SD.
-		 * 0 - online mode connection (default) 
-		 * 1 - command mode connection
-
-		 * @return uint16_t Recieved byt count
-		 */
-		uint16_t SA(const uint8_t _ConnID, const uint8_t _ConnMode);
-
-		/**
-		 * @brief This command is used to close a socket.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _ConnID socket connection identifier 1..6
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool SH(const uint8_t _ConnID);
-
-		/**
-		 * @brief Execution command permits the user to read data arrived through a 
-		 * connected socket, but buffered and not yet read because the module entered 
-		 * command mode before reading them; the module is notified of these data by a 
-		 * SRING URC, whose presentation format depends on the last #SCFGEXT setting.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _ConnID socket connection identifier 1..6
-		 * @param _MaxByte max number of bytes to read 1..1500
-		 * 
-		 * @return uint16_t 
-		 */
-		uint16_t SRECV(const uint8_t _ConnID, const uint16_t _MaxByte);
-		
-		
-		bool SSEND(const uint8_t _ConnID, const String _Data_Pack);
-
-		/**
-		 * @brief Execution command controls the internal firewall settings.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Action command action
-		 * 0 - remove selected chain
-		 * 1 - add an ACCEPT chain
-		 * 2 - remove all chains
-		 * @param _IP_Addr remote address to be added into the ACCEPT chain.
-		 * @param _Net_Mask mask to be applied on the <ip_addr>
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool FRWL(const uint8_t _Action, const char *_IP_Addr, const char *_Net_Mask);
-
-		/**
-		 * @brief This command sets the parameters needed to the HTTP connection.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _ProfID Numeric parameter indicating the profile identifier.
-		 * @param _HTTP_Server String parameter indicating the IP address of the HTTP server.
-		 * @param _Port Numeric parameter indicating the TCP remote port of the HTTP server to connect to.
-		 * @param _AuthType Numeric parameter indicating the HTTP authentication type.
-		 * 0 – no authentication (default) 
-		 * 1 – basic authentication
-		 * @param _Username String parameter indicating authentication user identification string for HTTP.
-		 * @param _Password String parameter indicating authentication password for HTTP.
-		 * @param _SSL Numeric parameter indicating if the SSL encryption is enabled.
-		 * 0 – SSL encryption disabled (default) 
-		 * 1 – SSL encryption enabled
-		 * @param _TimeOut Numeric parameter indicating the time interval in seconds to wait for receiving data from HTTP server.
-		 * Range: (1- 65535). Default: 120.
-		 * @param _Cid Numeric parameter indicating the PDP Context Identifier.
-		 * Range: (1-5). Default: 1
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool HTTPCFG(const uint8_t _ProfID, const char *_HTTP_Server, const uint8_t _Port, const uint8_t _AuthType, const char *_Username, const char *_Password, const uint8_t _SSL, const uint8_t _TimeOut, const uint8_t _Cid);
-		
-		/**
-		 * @brief Execution command performs a POST or PUT request to HTTP server and starts sending data to the server.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _ProfID Numeric parameter indicating the profile identifier. Range: 0-2
-		 * @param _Command Numeric parameter indicating the command requested to HTTP server:
-		 * 0 – POST
-		 * 1 – PUT
-		 * @param _URL String parameter indicating the HTTP resource (uri), object of the request.
-		 * @param Data Post container.
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool HTTPSND(const uint8_t _ProfID, const uint8_t _Command, const char *_URL, const uint8_t _TimeOut, const String _Data);
-
-		/**
-		 * @brief Execution command permits the user to read data from HTTP server in response to a previous HTTP module request.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _ProfID Numeric parameter indicating the profile identifier.
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
-		bool HTTPRCV(const uint8_t _ProfID);
-
-		/**
-		 * @brief Set command enables/disables the Ring Indicator pin response to a Socket Listen connect and, 
-		 * if enabled, the duration of the negative going pulse generated on receipt of connect.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Pulse_Duration duration in ms of this pulse 50..1150 mS
-		 * 
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
 		bool E2SLRI(const uint16_t _Pulse_Duration);
-
-		/**
-		 * @brief Set command enables/disables the ICMP Ping support.
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Mode 
-		 * 0 - disable ICMP Ping support (default)
-		 * 1 - enable firewalled ICMP Ping support: the module is sending a proper 
-		 * ECHO_REPLY only to a subset of IP Addresses pinging it; this subset of IP 
-		 * Addresses has been previously specified through #FRWL (see) 
-		 * 2 - enable free ICMP Ping support; the module is sending a proper
-		 * ECHO_REPLY to every IP Address pinging it.
-
-		 * @return true - Command successful
-		 * @return false - Command fails
-		 */
+		bool TXMONMODE(const uint8_t _TXMONMODE);
+		bool REGMODE(const uint8_t _REGMODE);
+		bool CREG(const bool _Mode);
+		bool CGREG(const bool _Mode);
+		bool CGDCONT(const uint8_t _Cid, const char *_PDP_Type, const char *_APN, const char *_PDP_Addr, const bool _D_Comp, const bool _H_Comp);
+		bool SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _Pkt_Sz, const uint16_t _Max_To, const uint16_t _Conn_To, const uint8_t _TX_To);
+		bool SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uint8_t _Recv_Data_Mode, const uint8_t _Keep_Alive, const uint8_t _Listen_Auto_Rsp, const uint8_t _Send_Data_Mode);
+		bool SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, const uint8_t _Abort_Conn_Attempt, const uint8_t _SRing_Len, const uint8_t _SRing_To, const uint8_t _No_Carrier_Mode);
+		bool SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const uint8_t _Closure_Type_Cmd_Mode_Enabling);
+		bool CGACT(const uint8_t _State, const bool _Cid);
+		bool CGPADDR(const uint8_t _Cid);
+		bool FRWL(const uint8_t _Action, const char *_IP_Addr);
 		bool ICMP(const uint8_t _Mode);
+		bool CTZU(const bool _State);
+		bool NITZ(const bool _State);
+		bool NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _Update_Module_Clock, const uint8_t _Time_Out);
+		bool CCLK(void);
+		bool SHDN(void);
+		bool SGACT(const uint8_t _Cid, const bool _Stat);
 
-		char _Serial_Buffer[255];
+		// Data Functions
+		bool HTTPCFG(const char *_HTTP_Server, const uint8_t _Port);
+		bool HTTPSND(const char *_URL, const char *_Data);
+		bool HTTPRCV(void);
 
-		/**
-		 * @brief Clear GSM serial communication buffer.
-		 * @version 01.00.00
-		 */
+		// Socket Functions
+		bool SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_t _Listen_Port, const uint8_t _Closure_Type);
+		uint16_t SA(const uint8_t _ConnID, const uint8_t _ConnMode);
+		bool SH(const uint8_t _ConnID);
+		bool SO(const uint8_t _ConnID);
+		bool SD(const uint8_t _Cid, const uint8_t _Pro, const uint8_t _Port, const uint8_t _Closure_Type, uint16_t _IPort, const bool _Conn_Mode, const char *_IP, const char *_URL, const char *_Data);
+		uint8_t SS(const uint8_t _ConnID);
+		uint16_t SRECV(const uint8_t _ConnID, const uint16_t _MaxByte);
+		bool SSEND(const uint8_t _ConnID, const char * _Data_Pack);
+
+		// Tool Functions
 		void _Clear_UART_Buffer(void);	
-
-		void _Clear_Buffer_Variable(void);
-
-		/**
- 		* @brief Waits serial stream message for specified length.
- 		* @version 01.00.00
- 		* @param _Length - Message length to wait.
- 		* @param _TimeOut - Wait time out.
- 		* @return true - Message recieved.
- 		* @return false - Message can not recieved.
- 		*/
-		bool _Response_Wait(uint16_t _Length, uint32_t _TimeOut);
-
-		/**
-		 * @brief Response header print
-		 * 
-		 * @version 01.00.00
-		 */
-		void _Response_Headers(void);
-		void _Request_Headers(uint16_t _Size);
-		/**
-		 * @brief Response message print
-		 * 
-		 * @version 01.00.00
-		 * 
-		 * @param _Response_Code Response code.
-		 */
-		void _Response_Message(const uint16_t _Response_Code);
-
-	private:
-
-};
-
-/**
- * @brief GSM Modem RTC function class.
- * @version 01.00.00
- */
-class xE910_RTC {
+		uint8_t _Signal_Strength(uint16_t _CSQ);
 
 	public:
 
-		bool Time_Update(void);
+		// Define Modem Structure
+		struct _Struct_Modem {
+			bool Initialize_Status		= false;	// Initialize Status
+			bool Connection_Status		= false;	// Connection Status
+			bool Time_Status			= false;	// Time Status
+			bool Power_Monitor			= false;	// Power Monitor
+			bool SIM_Status				= false;	// SIM Status
+			bool CREG_Status			= false;	// CREG Status
+			bool CGREG_Status			= false;	// CGREG Status
+		} Modem;
 
-	private:
+		// Define Variable Structure
+		struct _Struct_Variables {
+			char IMEI[17]				= "";		// IMEI Variable
+			char Serial_Number[11]		= "";		// Serial Number Variable
+			char ICCID[21]				= "";		// ICCID Variable
+			uint8_t Manufacturer		= 0;		// Manufacturer Variable	
+			uint8_t Model				= 0;		// Model Variable
+			char Firmware[10]			= "";		// Modem Firmware Version Variable
+			uint8_t RSSI				= 0;		// Signal Variable
+			uint16_t Operator			= 0;		// Operator Variable
+			uint8_t Connection_Time		= 0;		// Connection Time
+			char IP_Address[16]			= "";		// IP Addres
+		} Variables;
+
+		// Define Time Structure
+		struct _Struct_Time {
+			uint8_t Year				= 0;
+			uint8_t Month				= 0;
+			uint8_t Day					= 0;
+			uint8_t Hour				= 0;
+			uint8_t Minute				= 0;
+			uint8_t Second				= 0;
+		} Time;
+
+		// Public Functions
+		bool Begin(void);
+		bool Set_Modem(void);
+		bool Connect(void);
+		bool Time_Update(void);
+		bool Get_RSSI(void);
+		uint8_t Get_Signal(void);
+		bool Connection_Control(void);
+		bool Send_Data_Pack(const uint8_t _Pack_Type, const char *_Data);
+		bool Set_Firewall(void);
+
+		// Socket Functions
+		bool Socket_Close(void);
+		bool Socket_Open(void);
+		bool Socket_Listen(void);
+		uint8_t Socket_Status(void);
+		uint16_t Socket_Answer(void);
+		bool Socket_Send(const char * _Data_Pack);
+
+		// Status Functions
+		uint8_t Get_Connection_Status(void);
 
 };
 
-extern xE910_GSM GSM;
-extern xE910_HARDWARE GSM_HARDWARE;
-extern xE910_AT GSM_AT;
-extern xE910_RTC GSM_RTC;
+extern Telit_xE910 GSM;
 
 #endif /* defined(__Telit_xE910__) */
