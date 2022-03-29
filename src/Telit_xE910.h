@@ -22,11 +22,11 @@
 #ifdef Debug
 
 	// Terminal Coordinates
-	#define Debug_Initialize_X 5
+	#define Debug_Initialize_X 14
 	#define Debug_Initialize_Y 33
-	#define Debug_Connect_X 5
+	#define Debug_Connect_X 14
 	#define Debug_Connect_Y 73
-	#define Debug_Boot_X 20
+	#define Debug_Boot_X 29
 	#define Debug_Boot_Y 10
 
 	// Define VT100 Terminal
@@ -43,12 +43,12 @@
 #define _RECIEVE_DATA_ "<<<"
 #define _OK_RESPONSE_ "{\"Event\":500}"
 
-// Serial Communications Definations
-#define _GSM_Serial Serial3
-
 class Telit_xE910 {
 
 	private:
+
+		// Stream Object Definition
+		Stream *_GSM_Serial;
 
 		// Define Serial Buffer Structure
 		struct Struct_Serial_Buffer {
@@ -65,10 +65,6 @@ class Telit_xE910 {
 		void Set_Power_Switch(const bool _State);
 		void Set_LED(const bool _State);
 		bool Get_PowerMonitor(void);
-
-		// Hardware Batch Functions
-		bool Power_ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch);
-		bool Power_OFF(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch);
 
 		// AT Command Set
 		bool AT(void);
@@ -163,8 +159,12 @@ class Telit_xE910 {
 			uint8_t Second				= 0;
 		} Time;
 
+		// Hardware Batch Functions
+		bool Power_ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch);
+		bool Power_OFF(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch);
+
 		// Public Functions
-		bool Begin(void);
+		bool Begin(Stream &_Serial);
 		bool Set_Modem(void);
 		bool Connect(void);
 		bool Time_Update(void);
@@ -180,7 +180,7 @@ class Telit_xE910 {
 		bool Socket_Listen(void);
 		uint8_t Socket_Status(void);
 		uint16_t Socket_Answer(void);
-		bool Socket_Send(const char * _Data_Pack);
+		bool Socket_Send(char * _Data_Pack);
 
 		// Status Functions
 		uint8_t Get_Connection_Status(void);
