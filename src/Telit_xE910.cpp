@@ -1433,13 +1433,14 @@ bool Telit_xE910::Send_Data_Pack(const uint8_t _Pack_Type, const char *_Data) {
 	bool _Response = false;
 
 	// Close Socket Command
-	if (_Pack_Type != 1) GSM.Socket_Close();
+	if (_Pack_Type != 1) this->Socket_Close();
 
 	// Send Pack
-	if (HTTPSND("/api/v1.1/p402", _Data)) _Response = HTTPRCV();
+	this->HTTPSND("/api/v1.1/p402", _Data);
+	_Response = HTTPRCV();
 
 	// Open Socket Command
-	if (_Pack_Type != 1) GSM.Socket_Open();
+	if (_Pack_Type != 1) this->Socket_Open();
 
 	// End Function
 	return(_Response);

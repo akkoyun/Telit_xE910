@@ -1,22 +1,29 @@
 // Define Ovoo Libraries
 #include "Telit_xE910.h"
 
+// Define Global Variables
 bool Interrupt = false;
 bool Interrupt_Control = false;
 
 void setup() {
 
-    // Start Terminal
-    Serial.begin(115200);
+	// Start GSM Serial
+    Serial3.begin(115200);
 
 	// Start Console
 	#ifdef Debug
+
+    	// Start Terminal
+	    Serial.begin(115200);
+
+		// Start Console
 	    Terminal.Begin(Serial);
 		Terminal.Telit_xE910();
+
 	#endif
 
 	// Start GSM
-	if (GSM.Begin()) {
+	if (GSM.Begin(Serial3)) {
 
 		// GSM Details
 		#ifdef Debug
