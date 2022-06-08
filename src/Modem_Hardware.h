@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #endif
 
+// Modem Hardware Class
 class Modem_Hardware {
 
 	private:

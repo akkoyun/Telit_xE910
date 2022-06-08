@@ -20,11 +20,16 @@
 #include "Definition.h"
 #endif
 
+// Define Socket Command Library
+#ifndef __GSM_Socket__
+#include "Socket.h"
+#endif
+
 // Define Objects
 Modem_Hardware Hardware;
 AT_Command_Set AT(Serial_GSM);
 
-class Telit_xE910{
+class Telit_xE910 {
 
 	private:
 
@@ -764,6 +769,11 @@ class Telit_xE910{
 				// Set Variable
 				this->Status.Initialize = true;
 
+			} else {
+
+				// Power ON Modem
+				this->Power(true);
+
 			}
 
 			// End Function
@@ -1307,6 +1317,11 @@ class Telit_xE910{
 				// Set Variable
 				this->Status.Connection = true;
 
+			} else {
+
+				// Initialise Modem
+				this->Initialize();
+
 			}
 
 			// End Function
@@ -1334,7 +1349,6 @@ class Telit_xE910{
 				while (!_Response) {
 
 					// Send Command
-//					_Response = AT.NTP(_AT_NTP_Server_, _AT_NTP_Port_, true, _AT_NTP_TO_, this->Time.Year, this->Time.Month, this->Time.Day, this->Time.Hour, this->Time.Minute, this->Time.Second);
 					_Response = AT.CCLK(this->Time.Year, this->Time.Month, this->Time.Day, this->Time.Hour, this->Time.Minute, this->Time.Second);
 
 					// Set WD Variable
@@ -1365,6 +1379,11 @@ class Telit_xE910{
 				// End Function
 				return(this->Status.Time_Update);
 
+			} else {
+
+				// Connect Modem
+				this->Connect();
+
 			}
 
 			// End Function
@@ -1372,386 +1391,11 @@ class Telit_xE910{
 
 		}
 
-		bool Socket_Config(const uint8_t _Cid) {
-
-			// Declare Watchdog Variable
-			uint8_t _Error_WD = 0;
-
-			// Declare Response Status
-			bool _Response = false;
-
-			// Control for Initialization Monitor
-			if (this->Status.Connection) {
-
-				// Handle Socket ID
-				if (_Cid == 2) {
-
-					// SCFG Command Socket 2
-					#ifdef _SCFG_2_
-
-						// Declare Watchdog Variable
-						_Error_WD = 0;
-
-						// Set Response Variable
-						_Response = false;
-
-						// Print Command State
-						#ifdef GSM_Debug
-							Terminal.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
-						#endif
-
-						// Process Command
-						while (!_Response) {
-
-							// Process Command
-							_Response = AT.SCFG(2, _AT_SCFG2_Cid_, _AT_SCFG2_PktSz_, _AT_SCFG2_MaxTo_, _AT_SCFG2_ConnTo_, _AT_SCFG2_TXTo_);
-
-							// Set WD Variable
-							_Error_WD++;
-
-							// Control for WD
-							if (_Error_WD > 5) break;
-
-						}
-
-						// End Function
-						if (!_Response) return (false);
-
-						// Declare Watchdog Variable
-						_Error_WD = 0;
-
-						// Set Response Variable
-						_Response = false;
-
-						// Process Command
-						while (!_Response) {
-
-							// Process Command
-							_Response = AT.SCFGEXT(2, _AT_SCFGEXT2_SrMode_, _AT_SCFGEXT2_RcvDataMode_, _AT_SCFGEXT2_KeepAlive_, _AT_SCFGEXT2_AutoResp_, _AT_SCFGEXT2_SndDataMode_);
-
-							// Set WD Variable
-							_Error_WD++;
-
-							// Control for WD
-							if (_Error_WD > 5) break;
-
-						}
-			
-						// Print Command State
-						#ifdef GSM_Debug
-							Terminal.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
-						#endif
-					
-						// End Function
-						if (!_Response) return (false);
-
-					#endif
-
-				} else if (_Cid == 3) {
-
-					// SCFG Command Socket 3
-					#ifdef _SCFG_3_
-
-						// Declare Watchdog Variable
-						_Error_WD = 0;
-
-						// Set Response Variable
-						_Response = false;
-
-						// Print Command State
-						#ifdef GSM_Debug
-							Terminal.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
-						#endif
-
-						// Process Command
-						while (!_Response) {
-
-							// Process Command
-							_Response = AT.SCFG(3, _AT_SCFG3_Cid_, _AT_SCFG3_PktSz_, _AT_SCFG3_MaxTo_, _AT_SCFG3_ConnTo_, _AT_SCFG3_TXTo_);
-
-							// Set WD Variable
-							_Error_WD++;
-
-							// Control for WD
-							if (_Error_WD > 5) break;
-
-						}
-
-						// End Function
-						if (!_Response) return (false);
-
-						// Declare Watchdog Variable
-						_Error_WD = 0;
-
-						// Set Response Variable
-						_Response = false;
-
-						// Process Command
-						while (!_Response) {
-
-							// Process Command
-							_Response = AT.SCFGEXT(3, _AT_SCFGEXT3_SrMode_, _AT_SCFGEXT3_RcvDataMode_, _AT_SCFGEXT3_KeepAlive_, _AT_SCFGEXT3_AutoResp_, _AT_SCFGEXT3_SndDataMode_);
-
-							// Set WD Variable
-							_Error_WD++;
-
-							// Control for WD
-							if (_Error_WD > 5) break;
-
-						}
-			
-						// Print Command State
-						#ifdef GSM_Debug
-							Terminal.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
-						#endif
-					
-						// End Function
-						if (!_Response) return (false);
-
-					#endif
-
-				}
-
-				// End Function
-				return(true);
-
-			}
-
-			// End Function
-			return(false);
-
-		}
-
-
-
-
-
-
-
-
-
-
-		bool Socket_Send_Pack(const uint8_t _Conn_ID, const char *_IP, const char *_URL, const char *_Data, char *_Response) {
-
-			// Declare Status Variable
-			uint8_t Socket_Status;
-
-			// Open Connection
-			if (AT.SD(_Conn_ID, 0, 80, 0, 88, 1, _IP)) {
-
-				// Send Data Pack
-				AT.SSEND(_Conn_ID, 2, _IP, _URL, _Data);
-
-				// Declare Ring Status
-				uint8_t Ring_ID;
-				uint16_t Length;
-
-				// Get Ring Port
-				if (AT.Send_SRING(Ring_ID, Length)) {
-
-					// Get Request Data
-					AT.SRECV(Ring_ID, Length, _Response);
-
-					// Close Socket
-					AT.SH(Ring_ID);
-
-					// End Function
-					return(true);
-					
-				}
-
-				// End Function
-				return(false);
-
-			}
-
-			// End Function
-			return(false);
-
-		}
-
-
-
-		uint16_t Handle_JSON_Send_Response(const char *_Data) {
-
-			// Declare JSON Object
-			StaticJsonDocument<40> Incomming_JSON;
-
-			// Deserialize the JSON document
-			deserializeJson(Incomming_JSON, _Data);
-
-			// Fetch values.
-			uint16_t Event = Incomming_JSON["Event"];
-
-			// End Function
-			return(Event);
-
-		}
-		uint16_t Handle_JSON_Request(const char *_Data) {
-
-			// Declare JSON Object
-			StaticJsonDocument<40> Incomming_JSON;
-
-			// Deserialize the JSON document
-			deserializeJson(Incomming_JSON, _Data);
-
-			// Fetch values.
-			uint16_t Event = Incomming_JSON["Request"]["Event"];
-
-			// End Function
-			return(Event);
-
-		}
-
-
-
-		bool Socket(const uint8_t _ConnID, const bool _State, const uint8_t _Port) {
-
-			// Control for Initialization Monitor
-			if (this->Status.Connection) {
-
-			
-				// Get Socket State
-				AT.SS(_ConnID, this->Status.Socket);
-
-				// Handle State
-				if (_State) {
-
-					// Control Current State
-					if (this->Status.Socket != 4) AT.SL(_ConnID, 1, _Port, 255);
-
-					// Command Delay
-					delay(20);
-
-					// Get Socket State
-					AT.SS(_ConnID, this->Status.Socket);
-
-					// Command Delay
-					delay(20);
-
-					// Control Socket
-					if (this->Status.Socket != 4) return(false);
-
-				} else {
-
-					// Control Current State
-					if (this->Status.Socket != 0) AT.SL(_ConnID, 0, _Port, 255);
-
-					// Command Delay
-					delay(20);
-
-					// Get Socket State
-					AT.SS(_ConnID, this->Status.Socket);
-
-					// Command Delay
-					delay(20);
-
-					// Control Socket
-					if (this->Status.Socket != 0) return(false);
-
-				}
-
-				// Print Command State
-				#ifdef GSM_Debug
-					Terminal.Text(17, 108, CYAN, "         ");
-					if (this->Status.Socket == 0) Terminal.Text(17, 108, CYAN, "Closed   ");
-					if (this->Status.Socket == 1) Terminal.Text(17, 108, CYAN, "Transfer ");
-					if (this->Status.Socket == 2) Terminal.Text(17, 108, CYAN, "Suspend  ");
-					if (this->Status.Socket == 3) Terminal.Text(17, 108, CYAN, "Suspend  ");
-					if (this->Status.Socket == 4) Terminal.Text(17, 108, CYAN, "Listening");
-					if (this->Status.Socket == 5) Terminal.Text(17, 108, CYAN, "Incomming");
-					if (this->Status.Socket == 6) Terminal.Text(17, 108, CYAN, "DNS      ");
-					if (this->Status.Socket == 7) Terminal.Text(17, 108, CYAN, "Conecting");
-				#endif
-
-				// End Function
-				return(true);
-
-			}
-
-			// End Function
-			return(false);
-
-		}
-		bool Socket_Answer(char * _JSON_Data) {
-
-			// Declare RING
-			uint8_t RING;
-			
-			// Get Ring Port
-			AT.Recieve_SRING(RING);
-
-			// Control for <SRING:n>
-			if (RING == 1 or RING == 2 or RING == 3) {
-
-				// Declare Request Length
-				uint16_t Request_Length;
-
-				// Answer Socket
-				AT.SA(RING, 1, Request_Length);
-
-				// Get Request Data
-				AT.SRECV(RING, Request_Length, _JSON_Data);
-
-				// End Function
-				return(true);
-
-			}
-
-			// End Function
-			return(false);
-
-		}
-		bool Socket_Send_Response(const uint8_t _ConnID, char * _JSON_Data) {
-
-			// Send Socket Answer
-			if (AT.SSEND(_ConnID, 1, "", "", _JSON_Data)) {
-
-				// Command Delay
-				delay(20);
-
-				// Close Socket
-				if (AT.SH(_ConnID)) {
-
-					// Command Delay
-					delay(20);
-
-					// ReOpen Socket
-					bool Socket_Open = this->Socket(_ConnID, true, 80);
-
-					// End Function
-					return(Socket_Open);
-
-				} else {
-
-					// End Function
-					return(false);
-
-				}
-
-			} else {
-
-				// End Function
-				return(false);
-
-			}
-			
-		}
-		uint8_t Socket_Status(const uint8_t _Conn_ID) {
-
-			// Declare Status Variable
-			uint8_t Socket_Status;
-
-			// Get Socket Status
-			AT.SS(_Conn_ID, Socket_Status);
-
-			// End Function
-			return(Socket_Status);
-
-		}
-
-
-
+		/**
+		 * @brief RSSI to Signal strength converter
+		 * @param _CSQ RSSI
+		 * @return uint8_t Signal Strength
+		 */
 		uint8_t Signal_Strength(uint16_t _CSQ) {
 
 			// Declare RSSI Variable

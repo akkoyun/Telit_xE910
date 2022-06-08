@@ -184,25 +184,6 @@
 
 
 
-// SCFG - Socket Configuration Parameters
-#define _AT_SCFG1_Conn_ID_			(uint8_t)1
-#define _AT_SCFG1_Cid_				(uint8_t)1
-#define _AT_SCFG1_PktSz_			(uint16_t)1500
-#define _AT_SCFG1_MaxTo_			(uint8_t)90
-#define _AT_SCFG1_ConnTo_			(uint16_t)600
-#define _AT_SCFG1_TXTo_				(uint8_t)50
-
-
-
-// HTTPCFG -
-#define _AT_Server_IP_				"54.216.226.171"
-#define _AT_Server_URL_				"/api/v1.1/p402"
-#define _AT_Server_Port_			(uint8_t)80
-
-// NTP -
-#define _AT_NTP_Server_				"0.tr.pool.ntp.org"
-#define _AT_NTP_Port_				(uint8_t)123
-#define _AT_NTP_TO_					(uint8_t)3
 
 // Debug Parameters
 #define GSM_Debug

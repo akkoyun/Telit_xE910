@@ -1,6 +1,6 @@
 {
 	"name": "Telit_xE910",
-	"version": "3.0.0",
+	"version": "3.1.0",
 	"keywords": "GSM, modem, gprs, iot, telit",
 	"description": "Telit xE910 series GSM modem library.",
 	"authors":

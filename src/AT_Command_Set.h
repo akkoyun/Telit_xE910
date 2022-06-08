@@ -3180,6 +3180,19 @@ class AT_Command_Set {
 			// Handle State
 			_State = (Buffer_Variable[7] - 48);
 
+			// Print Command State
+			#ifdef GSM_Debug
+				Terminal.Text(17, 108, CYAN, "         ");
+				if (_State == 0) Terminal.Text(17, 108, RED, "Closed   ");
+				if (_State == 1) Terminal.Text(17, 108, WHITE, "Transfer ");
+				if (_State == 2) Terminal.Text(17, 108, YELLOW, "Suspend  ");
+				if (_State == 3) Terminal.Text(17, 108, YELLOW, "Suspend  ");
+				if (_State == 4) Terminal.Text(17, 108, GREEN, "Listening");
+				if (_State == 5) Terminal.Text(17, 108, WHITE, "Incomming");
+				if (_State == 6) Terminal.Text(17, 108, RED, "DNS      ");
+				if (_State == 7) Terminal.Text(17, 108, WHITE, "Conecting");
+			#endif
+
 			// End Function
 			return (true);
 
@@ -3857,6 +3870,11 @@ class AT_Command_Set {
 
 		}
 
+		/**
+		 * @brief Detect SRING Response.
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
 		bool Recieve_SRING(uint8_t & _Ring) {
 
 			// Declare Buffer Object
