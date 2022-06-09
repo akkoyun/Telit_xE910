@@ -363,56 +363,6 @@ class GSM_Socket_Outgoing {
 
 		} Parameter;
 
-		bool Socket(const bool _State) {
-
-			// Declare Status Variable
-			uint8_t Socket_Status;
-
-			// Get Socket Status
-			_AT.SS(this->Parameter.Port, Socket_Status);
-
-			// Handle State
-			if (_State) {
-
-				// Control Current State
-				if (Socket_Status != 4) _AT.SL(this->Parameter.Port, 1, this->Parameter.Server.Port, 255);
-
-				// Command Delay
-				delay(20);
-
-				// Get Socket Status
-				_AT.SS(this->Parameter.Port, Socket_Status);
-
-				// Command Delay
-				delay(20);
-
-				// Control Socket
-				if (Socket_Status != 4) return(false);
-
-			} else {
-
-				// Control Current State
-				if (Socket_Status != 0) _AT.SL(this->Parameter.Port, 0, this->Parameter.Server.Port, 255);
-
-				// Command Delay
-				delay(20);
-
-				// Get Socket Status
-				_AT.SS(this->Parameter.Port, Socket_Status);
-
-				// Command Delay
-				delay(20);
-
-				// Control Socket
-				if (Socket_Status != 0) return(false);
-
-			}
-
-			// End Function
-			return(true);
-
-		}
-
 		/**
 		 * @brief Handle Send Response
 		 * @param _Data Recieved Response
@@ -436,6 +386,12 @@ class GSM_Socket_Outgoing {
 
 	public:
 
+		/**
+		 * @brief Construct a new gsm socket outgoing object
+		 * @param _Port Socket Port
+		 * @param _Server Server Address (IP)
+		 * @param _End_Point Server URL (EndPoint)
+		 */
 		GSM_Socket_Outgoing(uint8_t _Port, char * _Server, char * _End_Point) {
 
 			// Set Socket Port
@@ -449,6 +405,11 @@ class GSM_Socket_Outgoing {
 
 		}
 
+		/**
+		 * @brief Configure Socket
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
 		bool Configure(void) {
 
 			// Declare Watchdog Variable
@@ -512,6 +473,12 @@ class GSM_Socket_Outgoing {
 
 		}
 
+		/**
+		 * @brief Send Data Batch Function
+		 * @param _Data Sended Data
+		 * @param _Response Recieved Data
+		 * @return uint16_t Server Request Command
+		 */
 		uint16_t Send(const char *_Data, char *_Response) {
 
 			// Declare Status Variable

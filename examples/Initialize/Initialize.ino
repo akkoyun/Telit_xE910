@@ -9,6 +9,10 @@ GSM_Socket_Outgoing Outgoing_Socket(3, "54.216.226.171", "/api/v1.1/p402");
 
 // Declare Global Variable
 bool Interrupt = false;
+uint32_t Timer_Counter = 0;
+bool Command_Clear = false;
+bool Listen_Control = false;
+bool Timer_Display = false;
 
 void setup() {
 
@@ -58,12 +62,27 @@ void setup() {
 	PCICR |= (1 << PCIE1);
 	PCMSK1 |= (1 << PCINT11) | (1 << PCINT12);
 
+	AVR_Timer_1sn();
+
 }
 
 void loop() {
 
 	// Print Command State
-	if (millis() % 2 == 0) Terminal.Text(23, 115, CYAN, "   ");
+	if (Command_Clear) {
+		Terminal.Text(23, 115, CYAN, "   ");
+		Command_Clear = false;
+	}
+	if (Listen_Control) {
+		Terminal.Text(23, 115, CYAN, "1");
+		Listen_Control = false;
+	}
+
+	if (Timer_Display) {
+		Terminal.Text(2, 2, WHITE, String(millis()));
+		Timer_Display = false;
+	}
+
 
 	if (Interrupt) {
 
@@ -100,6 +119,39 @@ void loop() {
 
 }
 
+void AVR_Timer_1sn(void) {
+
+	// Timer-0 : 8-bit		- Delay, Millis, Micros, AnalogWrite(5,6)
+	// Timer-1 : 16-bit		- Servo functions, AnalogWrite(9,10)
+	// Timer-2 : 8-bit		- Tone, AnalogWrite(3,11)
+	// Timer-3 : 16-bit
+	// Timer-4 : 16-bit
+	// Timer-5 : 16-bit	 	- Module Timer
+
+	// Set Timer Interval 1 Sn
+	uint8_t _Interval = 1;
+
+	// Clear Registers
+	TCCR5A = 0x00;
+	TCCR5B = 0x00;
+
+	// Clear Counter
+	TCNT5 = 0;
+
+	// Set Counter Value
+	OCR5A = (F_CPU / ((1 / _Interval) * 1024)) - 1;
+
+	// Set CTC Mod
+	TCCR5B |= (1 << WGM52);
+
+	// Set Prescalar (1024)
+	TCCR5B |= (1 << CS52) | (1 << CS50);
+
+	// Start Timer
+	TIMSK5 |= (1 << OCIE5A);
+
+}
+
 // GSM Ring Interrupt
 ISR(PCINT1_vect) {
 
@@ -118,5 +170,22 @@ ISR(PCINT1_vect) {
 			Interrupt = false;
 
 		}
+
+}
+
+// Timer Interrupt
+ISR(TIMER5_COMPA_vect) {
+
+	// Set Timer Counter
+	Timer_Counter += 1;
+
+	// Handle Max
+	if (Timer_Counter == 65534) Timer_Counter = 0;
+
+	if (Timer_Counter % 5) Command_Clear = true;
+
+	if (Timer_Counter % 60) Listen_Control = true;
+
+	if (Timer_Counter % 10) Timer_Display = true;
 
 }
