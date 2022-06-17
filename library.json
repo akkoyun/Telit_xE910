@@ -33,9 +33,9 @@
 	"examples": [
 		{
 			"name": "Modem Details",
-			"base": "examples/test",
+			"base": "examples/Initialize",
 			"files": [
-				"test.ino"
+				"Initialize.ino"
 			]
 		}
 	]
