@@ -3182,15 +3182,15 @@ class AT_Command_Set {
 
 			// Print Command State
 			#ifdef GSM_Debug
-				Terminal.Text(17, 108, CYAN, "         ");
-				if (_State == 0) Terminal.Text(17, 108, RED, "Closed   ");
-				if (_State == 1) Terminal.Text(17, 108, WHITE, "Transfer ");
-				if (_State == 2) Terminal.Text(17, 108, YELLOW, "Suspend  ");
-				if (_State == 3) Terminal.Text(17, 108, YELLOW, "Suspend  ");
-				if (_State == 4) Terminal.Text(17, 108, GREEN, "Listening");
-				if (_State == 5) Terminal.Text(17, 108, WHITE, "Incomming");
-				if (_State == 6) Terminal.Text(17, 108, RED, "DNS      ");
-				if (_State == 7) Terminal.Text(17, 108, WHITE, "Conecting");
+				Terminal.Text(26, 108, CYAN, "         ");
+				if (_State == 0) Terminal.Text(26, 108, RED, "Closed   ");
+				if (_State == 1) Terminal.Text(26, 108, WHITE, "Transfer ");
+				if (_State == 2) Terminal.Text(26, 108, YELLOW, "Suspend  ");
+				if (_State == 3) Terminal.Text(26, 108, YELLOW, "Suspend  ");
+				if (_State == 4) Terminal.Text(26, 108, GREEN, "Listening");
+				if (_State == 5) Terminal.Text(26, 108, WHITE, "Incomming");
+				if (_State == 6) Terminal.Text(26, 108, RED, "DNS      ");
+				if (_State == 7) Terminal.Text(26, 108, WHITE, "Conecting");
 			#endif
 
 			// End Function
@@ -3727,7 +3727,7 @@ class AT_Command_Set {
 			bool Data_Handle = false;
 
 			// Control for Buffer
-			for (uint16_t i = 0; i < Buffer.Read_Order - 2; i++) {
+			for (uint8_t i = 0; i < Buffer.Read_Order - 2; i++) {
 
 				// Handle JSON Data
 				if (Buffer_Variable[i] == '{') Data_Handle = true;

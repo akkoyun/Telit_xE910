@@ -27,11 +27,6 @@ class Modem_Hardware {
 			// Enable Communication 
 			if (_State) {
 
-				// Terminal Bar
-				#ifdef GSM_Debug
-					Terminal.Text(23, 48, WHITE, F("X"));
-				#endif
-
 				// Set Port				
 				PORTJ &= 0b11101111;
 
@@ -39,11 +34,6 @@ class Modem_Hardware {
 
 			// Disable Communication
 			if (!_State) {
-
-				// Terminal Bar
-				#ifdef GSM_Debug
-					Terminal.Text(23, 48, WHITE, F("-"));
-				#endif
 
 				// Set Port
 				PORTJ |= 0b00010000;
@@ -113,11 +103,6 @@ class Modem_Hardware {
 			// Set GSM Power Enable
 			if (_State) {
 				
-				// Terminal Bar
-				#ifdef GSM_Debug
-					Terminal.Text(23, 14, WHITE, F("X"));
-				#endif
-
 				// Set Port				
 				PORTH |= 0b00000100;
 
@@ -125,11 +110,6 @@ class Modem_Hardware {
 
 			// Set GSM Power Disable
 			if (!_State) {
-
-				// Terminal Bar
-				#ifdef GSM_Debug
-					Terminal.Text(23, 14, WHITE, F("-"));
-				#endif
 
 				// Set Port
 				PORTH &= 0b11111011;
@@ -147,11 +127,6 @@ class Modem_Hardware {
 			// Set GSM LED Power Enable
 			if (_State) {
 				
-				// Terminal Bar
-				#ifdef GSM_Debug
-					Terminal.Text(23, 28, WHITE, F("X"));
-				#endif
-
 				// Set Port
 				PORTH &= 0b11101111;
 				
@@ -159,11 +134,6 @@ class Modem_Hardware {
 
 			// Set GSM LED Power Disable
 			if (!_State) {
-
-				// Terminal Bar
-				#ifdef GSM_Debug
-					Terminal.Text(23, 28, WHITE, F("-"));
-				#endif
 
 				// Set Port
 				PORTH |= 0b00010000;
@@ -184,11 +154,6 @@ class Modem_Hardware {
 			// Control for PWMon (PJ3)
 			if ((PINJ & (1 << PINJ3)) == (1 << PINJ3)) {
 
-				// Terminal Bar
-				#ifdef GSM_Debug
-					Terminal.Text(23, 61, WHITE, F("X"));
-				#endif
-
 				// Response Delay
 				delay(10);
 
@@ -196,11 +161,6 @@ class Modem_Hardware {
 				return (true);
 
 			} else {
-
-				// Terminal Bar
-				#ifdef GSM_Debug
-					Terminal.Text(23, 61, WHITE, F("-"));
-				#endif
 
 				// Response Delay
 				delay(10);
@@ -222,15 +182,6 @@ class Modem_Hardware {
 		 */
 		bool ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch) {
 
-			// Terminal Bar
-			#ifdef GSM_Debug
-				Terminal.Text(23, 14, YELLOW, F("*"));
-				Terminal.Text(23, 28, YELLOW, F("*"));
-				Terminal.Text(23, 48, YELLOW, F("*"));
-				Terminal.Text(23, 61, YELLOW, F("*"));
-				Terminal.Text(23, 79, YELLOW, F("*"));
-			#endif
-
 			// Send Shut Down Signal
 			this->ShutDown(500);
 
@@ -246,11 +197,6 @@ class Modem_Hardware {
 			// Turn On Modem
 			if (this->PowerMonitor()) {
 
-				// Terminal Bar
-				#ifdef GSM_Debug
-					Terminal.Text(23, 79, WHITE, F("X"));
-				#endif
-
 				// End Function
 				return (true);
 
@@ -262,20 +208,10 @@ class Modem_Hardware {
 				// Control for PWMon (PH7)
 				if (this->PowerMonitor()) {
 
-					// Terminal Bar
-					#ifdef GSM_Debug
-						Terminal.Text(23, 79, WHITE, F("X"));
-					#endif
-
 					// End Function
 					return(true);
 
 				} else {
-
-					// Terminal Bar
-					#ifdef GSM_Debug
-						Terminal.Text(23, 79, WHITE, F("-"));
-					#endif
 
 					// Send Shut Down Signal
 					this->ShutDown(200);

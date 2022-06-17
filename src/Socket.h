@@ -481,9 +481,6 @@ class GSM_Socket_Outgoing {
 		 */
 		uint16_t Send(const char *_Data, char *_Response) {
 
-			// Declare Status Variable
-			uint8_t Socket_Status;
-
 			// Open Connection
 			if (_AT.SD(this->Parameter.Port, 0, this->Parameter.Server.Port, 0, 88, 1, this->Parameter.Server.Address)) {
 
