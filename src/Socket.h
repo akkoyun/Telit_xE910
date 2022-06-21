@@ -305,21 +305,6 @@ class GSM_Socket_Incomming {
 			// Handle JSON Data
 			Event = this->Handle_JSON_Request(Data);
 
-			// Define JSON
-			StaticJsonDocument<40> OutGoing_JSON;
-
-			// Define Device Section
-			JsonObject JSON_Response = OutGoing_JSON.createNestedObject(F("Response"));
-
-			// Set Response Variable
-			JSON_Response[F("Event")] = 200;
-
-			// Serialize JSON	
-			serializeJson(OutGoing_JSON, Response);
-
-			// Send Socket Answer
-			this->Response(Response);
-
 			// End Function
 			return(Event);
 
