@@ -33,6 +33,8 @@ class Telit_xE910 {
 
 	private:
 
+	public:
+
 		// Define Modem Status Structure
 		struct Struct_Status {
 			bool 		Power 				= false;
@@ -43,8 +45,6 @@ class Telit_xE910 {
 			bool		Time_Update			= false;
 			uint8_t		Socket				= 0;
 		} Status;
-
-	public:
 
 		// Define Modem Structure
 		struct Struct_Modem {
