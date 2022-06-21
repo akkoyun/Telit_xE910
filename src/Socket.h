@@ -53,14 +53,22 @@ class GSM_Socket_Incomming {
 		 */
 		uint16_t Handle_JSON_Request(const char *_Data) {
 
+			// Declare Variable
+			uint16_t Event = 0;
+
 			// Declare JSON Object
 			StaticJsonDocument<40> Incomming_JSON;
 
 			// Deserialize the JSON document
-			deserializeJson(Incomming_JSON, _Data);
+			DeserializationError Error = deserializeJson(Incomming_JSON, _Data);
 
-			// Fetch values.
-			uint16_t Event = Incomming_JSON["Request"]["Event"];
+			// Handle JSON
+			if (!DeserializationError::Ok) {
+
+				// Fetch values.
+				Event = Incomming_JSON["Request"]["Event"];
+
+			}
 
 			// End Function
 			return(Event);
