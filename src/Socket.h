@@ -63,12 +63,7 @@ class GSM_Socket_Incomming {
 			DeserializationError Error = deserializeJson(Incomming_JSON, _Data);
 
 			// Handle JSON
-			if (!DeserializationError::Ok) {
-
-				// Fetch values.
-				Event = Incomming_JSON["Request"]["Event"];
-
-			}
+			if (!Error) Event = Incomming_JSON["Request"]["Event"];
 
 			// End Function
 			return(Event);
