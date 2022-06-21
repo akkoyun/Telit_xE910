@@ -1,6 +1,6 @@
 {
 	"name": "Telit_xE910",
-	"version": "2.1.2",
+	"version": "4.0.8",
 	"keywords": "GSM, modem, gprs, iot, telit",
 	"description": "Telit xE910 series GSM modem library.",
 	"authors":
@@ -33,9 +33,9 @@
 	"examples": [
 		{
 			"name": "Modem Details",
-			"base": "examples/test",
+			"base": "examples/Initialize",
 			"files": [
-				"test.ino"
+				"Initialize.ino"
 			]
 		}
 	]

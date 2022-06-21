@@ -1,153 +1,191 @@
 // Define Ovoo Libraries
 #include "Telit_xE910.h"
+#include <ArduinoJson.h>
 
-// Define Global Variables
+// Define Object
+Telit_xE910 GSM;
+GSM_Socket_Incomming Incomming_Socket(2);
+GSM_Socket_Outgoing Outgoing_Socket(3, "54.216.226.171", "/api/v1.1/p402");
+
+// Declare Global Variable
 bool Interrupt = false;
-bool Interrupt_Control = false;
+uint32_t Timer_Counter = 0;
+bool Command_Clear = false;
+bool Listen_Control = false;
+bool Timer_Display = false;
 
 void setup() {
 
+	/*  PORT J
+		PJ0 - RXD3
+		PJ1 - TXD3
+		PJ2 - Input / Pull Down [GSM Ring]		- PCINT11	- [-]
+		PJ3 - Input / Pull Down [GSM PwrMon]	- PCINT12	- [-]
+		PJ4 - Output / Pull Down [GSM CommEn]	- PCINT13	- [-]
+		PJ5 - Output / Pull Down [GSM ShtDwn]	- PCINT14	- [-]
+		PJ6 - Output / Pull Down [GSM On Off]	- PCINT15	- [-]
+		PJ7 - Output / Pull Down [NC]			-  			- [-]
+	*/
+	DDRJ &= 0b11110011; PORTJ |= 0b00000100;
+	DDRJ |= 0b11110000; PORTJ &= 0b00000111;
+
 	// Start GSM Serial
-    Serial3.begin(115200);
+	Serial3.begin(115200);
+
+	// Start Terminal
+	Serial.begin(115200);
 
 	// Start Console
-	#ifdef Debug
+	Terminal.Begin(Serial);
+	Terminal.Telit_xE910();
 
-    	// Start Terminal
-	    Serial.begin(115200);
+	// GSM Begin
+	GSM.Power(true);
 
-		// Start Console
-	    Terminal.Begin(Serial);
-		Terminal.Telit_xE910();
-
-	#endif
-
-	// Start GSM
-	if (GSM.Begin(Serial3)) {
-
-		// GSM Details
-		#ifdef Debug
-			Terminal.Text(5, 116, CYAN, String(GSM.Variables.Manufacturer));
-			Terminal.Text(6, 116, CYAN, String(GSM.Variables.Model));
-			Terminal.Text(7, 108, CYAN, String(GSM.Variables.Firmware));
-			Terminal.Text(8, 102, CYAN, String(GSM.Variables.IMEI));
-			Terminal.Text(9, 107, CYAN, String(GSM.Variables.Serial_Number));
-			Terminal.Text(10, 98, CYAN, String(GSM.Variables.ICCID));
-		#endif
-
-		// Print Initialize Status
-		#ifdef Debug
-			if (GSM.Modem.Initialize_Status) Terminal.Text(23, 105, CYAN, String(F("Initialized    ")));
-		#endif
-
-		// Connect
-		if (GSM.Connect()) {
-
-			// GSM Details
-			#ifdef Debug
-				Terminal.Text(13, 113, CYAN, String(GSM.Variables.Connection_Time));
-				Terminal.Text(14, 115, CYAN, String(GSM.Variables.RSSI));
-				Terminal.Text(15, 112, CYAN, String(GSM.Variables.Operator));
-				Terminal.Text(16, 102, CYAN, String(GSM.Variables.IP_Address));
-			#endif
-
-			// Print Initialize Status
-			#ifdef Debug
-				if (GSM.Modem.Connection_Status) Terminal.Text(23, 105, CYAN, String(F("Connected      ")));
-			#endif
-
-			// Update Time
-			if (GSM.Time_Update()) {
-
-				// Handle TimeStamp
-				#ifdef Debug
-					char _Time_Stamp[25];
-					sprintf(_Time_Stamp, "%02hhu-%02hhu-%02hhu  %02hhu:%02hhu:%02hhu", GSM.Time.Year, GSM.Time.Month, GSM.Time.Day, GSM.Time.Hour, GSM.Time.Minute, GSM.Time.Second);
-					Terminal.Text(2, 3, CYAN, String(_Time_Stamp));
-				#endif
-
-				// Print Initialize Status
-				#ifdef Debug
-					if (GSM.Modem.Time_Status) Terminal.Text(23, 105, CYAN, String(F("Time Updated   ")));
-				#endif
-
-				// Socket Open
-				if (GSM.Socket_Open()) {
-
-					// Print Initialize Status
-					#ifdef Debug
-						Terminal.Text(23, 105, CYAN, String(F("Socket Opened  ")));
-					#endif
-
-				} else {
-				
-					#ifdef Debug
-						Terminal.Text(23, 105, RED, String(F("Socket Error   ")));
-					#endif
-			
-				}
-
-			} else {
-			
-				#ifdef Debug
-					Terminal.Text(23, 105, RED, String(F("Not Updated    ")));
-				#endif
-			
-			}
-
-		} else {
-		
-			#ifdef Debug
-				Terminal.Text(23, 105, RED, String(F("Not Connected  ")));
-			#endif
-		
-		}
-
-	} else {
+	// Initialize Modem
+	GSM.Initialize();
 	
-		#ifdef Debug
-			Terminal.Text(23, 105, RED, String(F("Not Initialized")));
-		#endif
-	
-	}
+	// Connect Modem
+	GSM.Connect();
 
-	// Interupt Definations
-	cli();
-	PCICR	|= 0b00000111;	// Set All Interrupt
-	PCMSK1	|= 0b00001000;	// GSM Ring Interrupt Defination
-	sei();
+	// Socket Config
+	Incomming_Socket.Configure();
+	Outgoing_Socket.Configure();
 
-	Interrupt_Control = true;
+	// Listen Socket
+	Incomming_Socket.Listen(true);
+
+	// Time Update
+	GSM.Time_Update();
+
+	// Set Pin Change Interrupt Mask 1
+	PCICR |= (1 << PCIE1);
+	PCMSK1 |= (1 << PCINT11) | (1 << PCINT12);
+
+	AVR_Timer_1sn();
 
 }
 
 void loop() {
 
+	// Print Command State
+	if (Command_Clear) {
+		Terminal.Text(23, 115, CYAN, "   ");
+		Command_Clear = false;
+	}
+	if (Listen_Control) {
+		Terminal.Text(23, 115, CYAN, "1");
+		Listen_Control = false;
+	}
+
+	if (Timer_Display) {
+		Terminal.Text(2, 2, WHITE, String(millis()));
+		Timer_Display = false;
+	}
+
+
 	if (Interrupt) {
 
-		// Set Interrupt Variable
-		Interrupt_Control = false;
-
 		// Get Command
-		uint16_t Command = GSM.Socket_Answer();
+		uint16_t Command = Incomming_Socket.Get();
 
-		// Send Response
-		GSM.Socket_Send("{\"Response\":{\"Event\":500,\"TimeStamp\":\"2022-03-17  09:06:32\"}}");
+		// Command Handle
+		if (Command == 157) Terminal.Beep();
+
+		// Print Command State
+		Terminal.Text(23, 115, CYAN, String(Command));
+
+		// Command Delay
+		delay(1000);
+
+		// Data Send Variable Declaration
+		char _Data[600] = "{\"Device\":{\"Type\":\"402-P01\",\"ID\":\"E10000011D00DB70\",\"Hardware\":\"03.00.00\",\"Firmware\":\"04.06.01\"},\"Power\":{\"Battery\":{\"IV\":4.13,\"T\":28.4,\"AC\":0.16,\"SOC\":80.41,\"FB\":2000,\"IB\":1200,\"Charge\":3}},\"IoT\":{\"GSM\":{\"Module\":{\"Manufacturer\":1,\"Model\":1,\"Firmware\":\"13.00.007\",\"Serial\":\"0001770243\",\"IMEI\":\"353613080366878\"},\"SIM\":{\"SIM_Type\":1,\"Iccid\":\"8990011916180288944\"},\"Operator\":{\"Code\":28601,\"RSSI\":8}}},\"Data\":{\"DeviceStatus\":240,\"FaultStatus\":500,\"TimeStamp\":\"2022-06-06 11:12:54\",\"Temperature\":28.78915,\"Humidity\":34.7837}}";
+		char _Response[50];
+		memset(_Response, '\0', 50);
+
+		// Send Data Pack
+		uint16_t Send_Response = Outgoing_Socket.Send(_Data, _Response);
+
+		// Print Command State
+		Terminal.Text(23, 115, CYAN, String(Send_Response));
+
+		// Command Delay
+		delay(1000);
 
 		// Set Interrupt Variable
 		Interrupt = false;
 
-		// Set Interrupt Variable
-		Interrupt_Control = true;
-
 	}
+
+}
+
+void AVR_Timer_1sn(void) {
+
+	// Timer-0 : 8-bit		- Delay, Millis, Micros, AnalogWrite(5,6)
+	// Timer-1 : 16-bit		- Servo functions, AnalogWrite(9,10)
+	// Timer-2 : 8-bit		- Tone, AnalogWrite(3,11)
+	// Timer-3 : 16-bit
+	// Timer-4 : 16-bit
+	// Timer-5 : 16-bit	 	- Module Timer
+
+	// Set Timer Interval 1 Sn
+	uint8_t _Interval = 1;
+
+	// Clear Registers
+	TCCR5A = 0x00;
+	TCCR5B = 0x00;
+
+	// Clear Counter
+	TCNT5 = 0;
+
+	// Set Counter Value
+	OCR5A = (F_CPU / ((1 / _Interval) * 1024)) - 1;
+
+	// Set CTC Mod
+	TCCR5B |= (1 << WGM52);
+
+	// Set Prescalar (1024)
+	TCCR5B |= (1 << CS52) | (1 << CS50);
+
+	// Start Timer
+	TIMSK5 |= (1 << OCIE5A);
 
 }
 
 // GSM Ring Interrupt
 ISR(PCINT1_vect) {
 
-	// Set Interrupt Variable
-	if (Interrupt_Control) Interrupt = true;
+		// Control Ring Interrupt [PJ2]
+		if ((PINJ & (1 << PINJ2)) == (1 << PINJ2)) {
+			
+			// Set Interrupt Variable
+			Interrupt = true;
+
+			// Interrupt Delay
+			delay(75);
+
+		} else {
+			
+			// Set Interrupt Variable
+			Interrupt = false;
+
+		}
+
+}
+
+// Timer Interrupt
+ISR(TIMER5_COMPA_vect) {
+
+	// Set Timer Counter
+	Timer_Counter += 1;
+
+	// Handle Max
+	if (Timer_Counter == 65534) Timer_Counter = 0;
+
+	if (Timer_Counter % 5) Command_Clear = true;
+
+	if (Timer_Counter % 60) Listen_Control = true;
+
+	if (Timer_Counter % 10) Timer_Display = true;
 
 }
