@@ -44,6 +44,8 @@ class Telit_xE910 {
 			uint8_t		Socket				= 0;
 		} Status;
 
+	public:
+
 		// Define Modem Structure
 		struct Struct_Modem {
 			uint8_t 	PIN 				= 0;
@@ -67,8 +69,6 @@ class Telit_xE910 {
 			uint8_t 	Minute				= 0;
 			uint8_t 	Second				= 0;
 		} Time;
-
-	public:
 
 		/**
 		 * @brief Construct a new Telit_xE910 object
