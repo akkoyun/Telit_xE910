@@ -1410,47 +1410,41 @@ class Telit_xE910 {
 
 		/**
 		 * @brief Get RSSI Function
-		 * @return uint8_t GSM RSSI Value
 		 */
-		uint8_t Get_RSSI(void) {
+		void Get_RSSI(void) {
 
-			// CSQ Command
-			#ifdef _AT_CSQ_
+			// Declare Watchdog Variable
+			uint8_t _Error_WD = 0;
 
-				// Declare Watchdog Variable
-				uint8_t _Error_WD = 0;
+			// Declare Response Status
+			bool _Response = false;
 
-				// Declare Response Status
-				bool _Response = false;
+			// Declare Watchdog Variable
+			_Error_WD = 0;
 
-				// Declare Watchdog Variable
-				_Error_WD = 0;
+			// Set Response Variable
+			_Response = false;
 
-				// Set Response Variable
-				_Response = false;
+			// Clear RSSI
+			this->Modem.RSSI = 0;
 
-				// Process Command
-				while (!_Response) {
+			// Process Command
+			while (!_Response) {
 
-					// Send Command
-					_Response = AT.CSQ(this->Modem.RSSI);
+				// Send Command
+				_Response = AT.CSQ(this->Modem.RSSI);
 
-					// Set WD Variable
-					_Error_WD++;
+				// Set WD Variable
+				_Error_WD++;
 
-					// Control for WD
-					if (_Error_WD > 5) break;
+				// Control for WD
+				if (_Error_WD > 5) break;
 
-				}
+			}
 
-				// End Function
-				if (!_Response) return (false);
-
-				// Print Command State
-				#ifdef GSM_Debug
-					Terminal.Text(23, 115, CYAN, String(this->Modem.RSSI));
-				#endif
-
+			// Print Command State
+			#ifdef GSM_Debug
+				Terminal.Text(23, 115, CYAN, String(this->Modem.RSSI));
 			#endif
 
 		}
