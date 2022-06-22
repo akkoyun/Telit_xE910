@@ -3588,7 +3588,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool SSEND(const uint8_t _ConnID, const uint8_t _Send_Type, const uint8_t _Response_Code, const char * _IP, const char * _URL, const char * _Data_Pack) {
+		bool SSEND(const uint8_t _ConnID, const uint8_t _Send_Type, const uint16_t _Response_Code, const char * _IP, const char * _URL, const char * _Data_Pack) {
 
 			// Clear UART Buffer
 			Clear_UART_Buffer();
