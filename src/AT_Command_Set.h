@@ -3573,13 +3573,22 @@ class AT_Command_Set {
 
 		/**
 		 * @brief Execution command permits, while the module is in command mode, to send data through a connected socket.
-		 * @param _Conn_ID Parameter. 
+		 * @param _ConnID Parameter. 
 		 * Socket connection identifier
+		 * @param _Send_Type Parameter. 
+		 * Pack Send type (Get / Post)
+		 * @param _Response_Code Parameter. 
+		 * HTTP Response Code
+		 * @param _IP Parameter. 
+		 * Server IP
+		 * @param _URL Parameter. 
+		 * Server End Point
 		 * @param _Data_Pack Parameter. 
+		 * Data Payload
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool SSEND(const uint8_t _ConnID, const uint8_t _Send_Type, const char * _IP, const char * _URL, const char * _Data_Pack) {
+		bool SSEND(const uint8_t _ConnID, const uint8_t _Send_Type, const uint8_t _Response_Code, const char * _IP, const char * _URL, const char * _Data_Pack) {
 
 			// Clear UART Buffer
 			Clear_UART_Buffer();
@@ -3626,7 +3635,7 @@ class AT_Command_Set {
 			delay(10);
 
 			// Print HTTP Header
-			this->Send_Header(_Send_Type, _IP, _URL, _Data_Pack);
+			this->Send_Header(_Send_Type, _Response_Code, _IP, _URL, _Data_Pack);
 
 			// Send Data Pack
 			GSM_Serial->print(_Data_Pack);
@@ -3933,16 +3942,25 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool Send_Header(const uint8_t _Header_Type, const char *_IP, const char *_URL, const char *_Data) {
+		bool Send_Header(const uint8_t _Header_Type, const uint8_t _Response_Code, const char *_IP, const char *_URL, const char *_Data) {
 
 			// Handle Type
 			if (_Header_Type == 1) {
 
-				// Print HTTP Header
-				GSM_Serial->print(F("HTTP/1.1 200 OK\r\n"));
+				// Select Response Code
+				if (_Response_Code == 200) GSM_Serial->print(F("HTTP/1.1 200 OK\r\n"));
+				if (_Response_Code == 400) GSM_Serial->print(F("HTTP/1.1 400 Bad Request\r\n"));
+
+				// Print Connection Header
 				GSM_Serial->print(F("Connection: close\r\n"));
+
+				// Print Content Type
 				GSM_Serial->print(F("Content-Type: application/json\r\n"));
+
+				// Print User Agent
 				GSM_Serial->print(F("User-Agent: STF\r\n"));
+
+				// End of Header
 				GSM_Serial->print(F("\r\n"));
 
 				// End Function
@@ -3952,11 +3970,23 @@ class AT_Command_Set {
 
 				// Print HTTP Header
 				GSM_Serial->print(F("POST ")); GSM_Serial->print(_URL); GSM_Serial->print(F(" HTTP/1.1\r\n"));
+
+				// Print Host
 				GSM_Serial->print(F("Host: ")); GSM_Serial->print(_IP); GSM_Serial->print(F("\r\n"));
+
+				// Print Content Length
 				GSM_Serial->print(F("Content-Length: ")); GSM_Serial->print(String(_Data).length()); GSM_Serial->print(F("\r\n"));
+
+				// Print Connection Header
 				GSM_Serial->print(F("Connection: close\r\n"));
+
+				// Print Content Type
 				GSM_Serial->print(F("Content-Type: application/json\r\n"));
+
+				// Print User Agent
 				GSM_Serial->print(F("User-Agent: STF-PowerStat\r\n"));
+
+				// End of Header
 				GSM_Serial->print(F("\r\n"));
 
 				// End Function

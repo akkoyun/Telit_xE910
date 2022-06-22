@@ -6,11 +6,6 @@
 #include <Arduino.h>
 #endif
 
-// Define AT Definition
-#ifndef __AT_Definition__
-#include "Definition.h"
-#endif
-
 // Define Objects
 AT_Command_Set _AT(Serial_GSM);
 
@@ -249,10 +244,10 @@ class GSM_Socket_Incomming {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool Response(char * _Data) {
+		bool Response(uint8_t _Response_Code, char * _Data) {
 
 			// Send Socket Answer
-			if (_AT.SSEND(this->Parameter.Port, 1, "", "", _Data)) {
+			if (_AT.SSEND(this->Parameter.Port, 1, _Response_Code, "", "", _Data)) {
 
 				// Command Delay
 				delay(20);
@@ -473,7 +468,7 @@ class GSM_Socket_Outgoing {
 			if (_AT.SD(this->Parameter.Port, 0, this->Parameter.Server.Port, 0, 88, 1, this->Parameter.Server.Address)) {
 
 				// Send Data Pack
-				_AT.SSEND(this->Parameter.Port, 2, this->Parameter.Server.Address, this->Parameter.Server.EndPoint, _Data);
+				_AT.SSEND(this->Parameter.Port, 2, 0, this->Parameter.Server.Address, this->Parameter.Server.EndPoint, _Data);
 
 				// Declare Ring Status
 				uint8_t Ring_ID;
