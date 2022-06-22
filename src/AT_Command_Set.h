@@ -6,6 +6,12 @@
 #include <Arduino.h>
 #endif
 
+// Define AT Definition
+#ifndef __AT_Definition__
+	#include "Definition.h"
+#endif
+
+
 class AT_Command_Set {
 	
 	
@@ -3942,7 +3948,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool Send_Header(const uint8_t _Header_Type, const uint8_t _Response_Code, const char *_IP, const char *_URL, const char *_Data) {
+		bool Send_Header(const uint8_t _Header_Type, const uint16_t _Response_Code, const char *_IP, const char *_URL, const char *_Data) {
 
 			// Handle Type
 			if (_Header_Type == 1) {
