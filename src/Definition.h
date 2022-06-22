@@ -161,8 +161,8 @@
 #endif
 
 // Define Console Library
+#include "Console_Parameters.h"
 #ifndef __Console__
-	#include "Console_Parameters.h"
 	#include <Console.h>
 #endif
 
