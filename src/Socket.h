@@ -3,7 +3,12 @@
 
 // Define Arduino Library
 #ifndef __Arduino__
-#include <Arduino.h>
+	#include <Arduino.h>
+#endif
+
+// Define AT Command Library
+#ifndef __AT_Command_Set__
+	#include "AT_Command_Set.h"
 #endif
 
 // Define Objects
@@ -244,7 +249,7 @@ class GSM_Socket_Incomming {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool Response(uint8_t _Response_Code, char * _Data) {
+		bool Response(uint16_t _Response_Code, char * _Data) {
 
 			// Send Socket Answer
 			if (_AT.SSEND(this->Parameter.Port, 1, _Response_Code, "", "", _Data)) {
