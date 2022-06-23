@@ -4,7 +4,7 @@
 
 // Define Object
 Telit_xE910 GSM;
-GSM_Socket_Incomming Incomming_Socket(2);
+GSM_Socket_Incoming Incomming_Socket(2);
 GSM_Socket_Outgoing Outgoing_Socket(3, "54.216.226.171", "/api/v1.1/p402");
 
 // Declare Global Variable

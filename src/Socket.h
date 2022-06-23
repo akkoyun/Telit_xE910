@@ -19,15 +19,15 @@
 // Define Objects
 AT_Command_Set _AT(Serial_GSM);
 
-// Data Incomming Class
-class GSM_Socket_Incomming {
+// Data Incoming Class
+class GSM_Socket_Incoming {
 
 	private:
 
 		// Define Socket Status Structure
 		struct Socket_Status {
 			
-			// Incomming Socket Port Defination
+			// Incoming Socket Port Definations
 			uint8_t Port = 2;
 			uint8_t Cid = 1;
 			uint8_t Server_Port = 80;
@@ -44,7 +44,7 @@ class GSM_Socket_Incomming {
 			struct SCFGEXT_Structure {
 				uint8_t SrMode = 1;
 				uint8_t RecvDataMode = 0;
-				uint8_t KeepAlieve = 1;
+				uint8_t KeepAlive = 1;
 				uint8_t AutoResp = 0;
 				uint8_t SendDataMode = 0;
 			} SCFGEXT;
@@ -62,13 +62,13 @@ class GSM_Socket_Incomming {
 			uint16_t Event = 0;
 
 			// Declare JSON Object
-			StaticJsonDocument<40> Incomming_JSON;
+			StaticJsonDocument<40> Incoming_JSON;
 
 			// Deserialize the JSON document
-			DeserializationError Error = deserializeJson(Incomming_JSON, _Data);
+			DeserializationError Error = deserializeJson(Incoming_JSON, _Data);
 
 			// Handle JSON
-			if (!Error) Event = Incomming_JSON["Request"]["Event"];
+			if (!Error) Event = Incoming_JSON["Request"]["Event"];
 
 			// End Function
 			return(Event);
@@ -78,10 +78,10 @@ class GSM_Socket_Incomming {
 	public:
 
 		/**
-		 * @brief Construct a new gsm socket incomming object
+		 * @brief Construct a new gsm socket incoming object
 		 * @param _Port Socket Port
 		 */
-		GSM_Socket_Incomming(uint8_t _Port) {
+		GSM_Socket_Incoming(uint8_t _Port) {
 
 			// Set Socket Port
 			this->Parameter.Port = _Port;
@@ -133,7 +133,7 @@ class GSM_Socket_Incomming {
 				while (!_Response) {
 
 					// Process Command
-					_Response = _AT.SCFGEXT(this->Parameter.Cid, this->Parameter.SCFGEXT.SrMode, this->Parameter.SCFGEXT.RecvDataMode, this->Parameter.SCFGEXT.KeepAlieve, this->Parameter.SCFGEXT.AutoResp, this->Parameter.SCFGEXT.SendDataMode);
+					_Response = _AT.SCFGEXT(this->Parameter.Cid, this->Parameter.SCFGEXT.SrMode, this->Parameter.SCFGEXT.RecvDataMode, this->Parameter.SCFGEXT.KeepAlive, this->Parameter.SCFGEXT.AutoResp, this->Parameter.SCFGEXT.SendDataMode);
 
 					// Set WD Variable
 					_Error_WD++;
@@ -214,7 +214,7 @@ class GSM_Socket_Incomming {
 
 		/**
 		 * @brief Socket Answer Function
-		 * @param _JSON_Data Incomming JSON Pack
+		 * @param _JSON_Data Incoming JSON Pack
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
@@ -224,7 +224,7 @@ class GSM_Socket_Incomming {
 			uint8_t RING;
 
 			// Get Ring Port
-			_AT.Recieve_SRING(RING);
+			_AT.Receive_SRING(RING);
 
 			// Control for <SRING:n>
 			if (RING == 1 or RING == 2 or RING == 3) {
@@ -341,7 +341,7 @@ class GSM_Socket_Outgoing {
 			struct SCFGEXT_Structure {
 				uint8_t SrMode = 1;
 				uint8_t RecvDataMode = 0;
-				uint8_t KeepAlieve = 1;
+				uint8_t KeepAlive = 1;
 				uint8_t AutoResp = 0;
 				uint8_t SendDataMode = 0;
 			} SCFGEXT;
@@ -350,19 +350,19 @@ class GSM_Socket_Outgoing {
 
 		/**
 		 * @brief Handle Send Response
-		 * @param _Data Recieved Response
+		 * @param _Data Received Response
 		 * @return uint16_t Command
 		 */		
 		uint16_t Handle_JSON_Send_Response(const char *_Data) {
 
 			// Declare JSON Object
-			StaticJsonDocument<40> Incomming_JSON;
+			StaticJsonDocument<40> Incoming_JSON;
 
 			// Deserialize the JSON document
-			deserializeJson(Incomming_JSON, _Data);
+			deserializeJson(Incoming_JSON, _Data);
 
 			// Fetch values.
-			uint16_t Event = Incomming_JSON["Event"];
+			uint16_t Event = Incoming_JSON["Event"];
 
 			// End Function
 			return(Event);
@@ -435,7 +435,7 @@ class GSM_Socket_Outgoing {
 				while (!_Response) {
 
 					// Process Command
-					_Response = _AT.SCFGEXT(this->Parameter.Cid, this->Parameter.SCFGEXT.SrMode, this->Parameter.SCFGEXT.RecvDataMode, this->Parameter.SCFGEXT.KeepAlieve, this->Parameter.SCFGEXT.AutoResp, this->Parameter.SCFGEXT.SendDataMode);
+					_Response = _AT.SCFGEXT(this->Parameter.Cid, this->Parameter.SCFGEXT.SrMode, this->Parameter.SCFGEXT.RecvDataMode, this->Parameter.SCFGEXT.KeepAlive, this->Parameter.SCFGEXT.AutoResp, this->Parameter.SCFGEXT.SendDataMode);
 
 					// Set WD Variable
 					_Error_WD++;
@@ -461,7 +461,7 @@ class GSM_Socket_Outgoing {
 		/**
 		 * @brief Send Data Batch Function
 		 * @param _Data Sended Data
-		 * @param _Response Recieved Data
+		 * @param _Response Received Data
 		 * @return uint16_t Server Request Command
 		 */
 		uint16_t Send(const char *_Data, char *_Response) {

@@ -171,7 +171,7 @@ class AT_Command_Set {
 
 		/**
 		 * @brief Set command enables/disables the report of result code.
-		 * @param _CMEE Parameter. 0:Disable, 1:Numeric Format, 2:Verbos Format
+		 * @param _CMEE Parameter. 0:Disable, 1:Numeric Format, 2:Verbose Format
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
@@ -2023,7 +2023,7 @@ class AT_Command_Set {
 		 * @brief Set command enables/disables the ICMP Ping support.
 		 * @param _Mode Parameter. 
 		 * 0 - disable ICMP Ping support (default)
-		 * 1 - enable firewalled ICMP Ping support: the module is sending a proper
+		 * 1 - enable firewall ICMP Ping support: the module is sending a proper
 		 * ECHO_REPLY only to a subset of IP Addresses pinging it; this subset of IP
 		 * Addresses has been previously specified through #FRWL (see) 
 		 * 2 - enable free ICMP Ping support; the module is sending a proper
@@ -3194,9 +3194,9 @@ class AT_Command_Set {
 				if (_State == 2) Terminal.Text(26, 108, YELLOW, "Suspend  ");
 				if (_State == 3) Terminal.Text(26, 108, YELLOW, "Suspend  ");
 				if (_State == 4) Terminal.Text(26, 108, GREEN, "Listening");
-				if (_State == 5) Terminal.Text(26, 108, WHITE, "Incomming");
+				if (_State == 5) Terminal.Text(26, 108, WHITE, "Incoming ");
 				if (_State == 6) Terminal.Text(26, 108, RED, "DNS      ");
-				if (_State == 7) Terminal.Text(26, 108, WHITE, "Conecting");
+				if (_State == 7) Terminal.Text(26, 108, WHITE, "Connecting");
 			#endif
 
 			// End Function
@@ -3382,7 +3382,7 @@ class AT_Command_Set {
 		 * @param _Length Parameter. 
 		 * @return true Function is success.
 		 * @return false Function fail.
-		 * TODO:Develeopment
+		 * TODO:Development
 		 */
 		bool SA(const uint8_t _ConnID, const uint8_t _ConnMode, uint16_t & _Length) {
 
@@ -3890,7 +3890,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool Recieve_SRING(uint8_t & _Ring) {
+		bool Receive_SRING(uint8_t & _Ring) {
 
 			// Declare Buffer Object
 			Serial_Buffer Buffer = {false, 0, 0, 15000};
