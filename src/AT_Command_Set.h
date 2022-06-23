@@ -3964,7 +3964,7 @@ class AT_Command_Set {
 				GSM_Serial->print(F("Content-Type: application/json\r\n"));
 
 				// Print User Agent
-				GSM_Serial->print(F("User-Agent: STF\r\n"));
+				GSM_Serial->print(F("User-Agent: STF-PowerStat\r\n"));
 
 				// End of Header
 				GSM_Serial->print(F("\r\n"));
