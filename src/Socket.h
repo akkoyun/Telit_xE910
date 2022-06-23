@@ -294,24 +294,16 @@ class GSM_Socket_Incomming {
 		 * @brief Get Server Command Batch Function
 		 * @return uint16_t Server Request Command
 		 */
-		uint16_t Get(void) {
-
-			// Declare Data Variable
-			char Data[50];
-			memset(Data, '\0', 50);
-
-			// Declare Response Variable
-			char Response[40];
-			memset(Response, '\0', 40);
+		uint16_t Get(char * _Request) {
 
 			// Declare Command Variable
 			uint16_t Event;
 
 			// Answer Socket Connection
-			this->Answer(Data);
+			this->Answer(_Request);
 
 			// Handle JSON Data
-			Event = this->Handle_JSON_Request(Data);
+			Event = this->Handle_JSON_Request(_Request);
 
 			// End Function
 			return(Event);
