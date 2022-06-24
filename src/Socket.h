@@ -103,7 +103,7 @@ class GSM_Socket_Incoming {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
 				#endif
 
 				// Process Command
@@ -145,7 +145,7 @@ class GSM_Socket_Incoming {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
 				#endif
 			
 				// End Function
@@ -405,7 +405,7 @@ class GSM_Socket_Outgoing {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
 				#endif
 
 				// Process Command
@@ -447,7 +447,7 @@ class GSM_Socket_Outgoing {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
 				#endif
 			
 				// End Function

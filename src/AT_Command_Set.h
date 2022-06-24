@@ -3188,15 +3188,15 @@ class AT_Command_Set {
 
 			// Print Command State
 			#ifdef GSM_Debug
-				Terminal.Text(26, 108, CYAN, "         ");
-				if (_State == 0) Terminal.Text(26, 108, RED, "Closed   ");
-				if (_State == 1) Terminal.Text(26, 108, WHITE, "Transfer ");
-				if (_State == 2) Terminal.Text(26, 108, YELLOW, "Suspend  ");
-				if (_State == 3) Terminal.Text(26, 108, YELLOW, "Suspend  ");
-				if (_State == 4) Terminal.Text(26, 108, GREEN, "Listening");
-				if (_State == 5) Terminal.Text(26, 108, WHITE, "Incoming ");
-				if (_State == 6) Terminal.Text(26, 108, RED, "DNS      ");
-				if (_State == 7) Terminal.Text(26, 108, WHITE, "Connecting");
+				Terminal_GSM.Text(26, 108, CYAN, "         ");
+				if (_State == 0) Terminal_GSM.Text(26, 108, RED, "Closed   ");
+				if (_State == 1) Terminal_GSM.Text(26, 108, WHITE, "Transfer ");
+				if (_State == 2) Terminal_GSM.Text(26, 108, YELLOW, "Suspend  ");
+				if (_State == 3) Terminal_GSM.Text(26, 108, YELLOW, "Suspend  ");
+				if (_State == 4) Terminal_GSM.Text(26, 108, GREEN, "Listening");
+				if (_State == 5) Terminal_GSM.Text(26, 108, WHITE, "Incoming ");
+				if (_State == 6) Terminal_GSM.Text(26, 108, RED, "DNS      ");
+				if (_State == 7) Terminal_GSM.Text(26, 108, WHITE, "Connecting");
 			#endif
 
 			// End Function

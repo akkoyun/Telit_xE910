@@ -166,6 +166,11 @@
 	#include <Console.h>
 #endif
 
+/**
+ * @brief Console library object definition.
+ */
+Console Terminal_GSM;
+
 // Define Modem Hardware Library
 #ifndef __Modem_Hardware__
 	#include "Modem_Hardware.h"
