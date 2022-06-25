@@ -19,6 +19,7 @@
 // Define Objects
 Modem_Hardware GSM_Hardware;
 AT_Command_Set AT(Serial_GSM);
+Console Terminal_GSM(Serial_Terminal);
 
 class Telit_xE910 {
 

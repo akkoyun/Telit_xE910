@@ -1,11 +1,12 @@
-// Define Ovoo Libraries
+// Define Libraries
 #include "Telit_xE910.h"
 #include <ArduinoJson.h>
 
 // Define Object
 Telit_xE910 GSM;
-GSM_Socket_Incoming Incomming_Socket(2);
+GSM_Socket_Incoming Incoming_Socket(2);
 GSM_Socket_Outgoing Outgoing_Socket(3, "54.216.226.171", "/api/v1.1/p402");
+Console Terminal_GSM(Serial);
 
 // Declare Global Variable
 bool Interrupt = false;
@@ -36,8 +37,8 @@ void setup() {
 	Serial.begin(115200);
 
 	// Start Console
-	Terminal.Begin(Serial);
-	Terminal.Telit_xE910();
+	Terminal_GSM.Begin();
+	Terminal_GSM.Telit_xE910();
 
 	// GSM Begin
 	GSM.Power(true);
@@ -49,11 +50,11 @@ void setup() {
 	GSM.Connect();
 
 	// Socket Config
-	Incomming_Socket.Configure();
+	Incoming_Socket.Configure();
 	Outgoing_Socket.Configure();
 
 	// Listen Socket
-	Incomming_Socket.Listen(true);
+	Incoming_Socket.Listen(true);
 
 	// Time Update
 	GSM.Time_Update();
@@ -70,30 +71,33 @@ void loop() {
 
 	// Print Command State
 	if (Command_Clear) {
-		Terminal.Text(23, 115, CYAN, "   ");
+		Terminal_GSM.Text(23, 115, CYAN, "   ");
 		Command_Clear = false;
 	}
 	if (Listen_Control) {
-		Terminal.Text(23, 115, CYAN, "1");
+		Terminal_GSM.Text(23, 115, CYAN, "1");
 		Listen_Control = false;
 	}
 
 	if (Timer_Display) {
-		Terminal.Text(2, 2, WHITE, String(millis()));
+		Terminal_GSM.Text(2, 2, WHITE, String(millis()));
 		Timer_Display = false;
 	}
 
 
 	if (Interrupt) {
 
+		// Declare Variable
+		char _Response[50];
+
 		// Get Command
-		uint16_t Command = Incomming_Socket.Get();
+		uint16_t Command = Incoming_Socket.Get(_Response);
 
 		// Command Handle
-		if (Command == 157) Terminal.Beep();
+		if (Command == 157) Terminal_GSM.Beep();
 
 		// Print Command State
-		Terminal.Text(23, 115, CYAN, String(Command));
+		Terminal_GSM.Text(23, 115, CYAN, String(Command));
 
 		// Command Delay
 		delay(1000);
@@ -107,7 +111,7 @@ void loop() {
 		uint16_t Send_Response = Outgoing_Socket.Send(_Data, _Response);
 
 		// Print Command State
-		Terminal.Text(23, 115, CYAN, String(Send_Response));
+		Terminal_GSM.Text(23, 115, CYAN, String(Send_Response));
 
 		// Command Delay
 		delay(1000);
@@ -144,7 +148,7 @@ void AVR_Timer_1sn(void) {
 	// Set CTC Mod
 	TCCR5B |= (1 << WGM52);
 
-	// Set Prescalar (1024)
+	// Set Rescale (1024)
 	TCCR5B |= (1 << CS52) | (1 << CS50);
 
 	// Start Timer

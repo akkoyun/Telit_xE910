@@ -3,14 +3,8 @@
 
 // Define Arduino Library
 #ifndef __Arduino__
-#include <Arduino.h>
+	#include <Arduino.h>
 #endif
-
-// Define AT Definition
-#ifndef __AT_Definition__
-	#include "Definition.h"
-#endif
-
 
 // Modem Hardware Class
 class Modem_Hardware {

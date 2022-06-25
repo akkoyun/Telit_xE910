@@ -6,16 +6,6 @@
 	#include <Arduino.h>
 #endif
 
-// Define AT Command Library
-#ifndef __AT_Command_Set__
-	#include "AT_Command_Set.h"
-#endif
-
-// Define AT Definition
-#ifndef __AT_Definition__
-	#include "Definition.h"
-#endif
-
 // Define Objects
 AT_Command_Set _AT(Serial_GSM);
 

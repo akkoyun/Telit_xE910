@@ -2,6 +2,7 @@
 #define __AT_Definition__
 
 // Serial Communications Definations
+#define Serial_Terminal 			Serial
 #define Serial_GSM 					Serial3
 
 // At Command Set Settings
@@ -161,15 +162,10 @@
 #endif
 
 // Define Console Library
-#include "Console_Parameters.h"
 #ifndef __Console__
 	#include <Console.h>
+	#include "Console_Parameters.h"
 #endif
-
-/**
- * @brief Console library object definition.
- */
-Console Terminal_GSM;
 
 // Define Modem Hardware Library
 #ifndef __Modem_Hardware__
