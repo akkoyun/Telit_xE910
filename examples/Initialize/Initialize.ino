@@ -1,12 +1,12 @@
 // Define Libraries
-#include "Telit_xE910.h"
+#include <Telit_xE910.h>
 #include <ArduinoJson.h>
 
 // Define Object
 Telit_xE910 GSM;
 GSM_Socket_Incoming Incoming_Socket(2);
 GSM_Socket_Outgoing Outgoing_Socket(3, "54.216.226.171", "/api/v1.1/p402");
-Console Terminal_GSM(Serial);
+Console Terminal(Serial);
 
 // Declare Global Variable
 bool Interrupt = false;
@@ -37,8 +37,8 @@ void setup() {
 	Serial.begin(115200);
 
 	// Start Console
-	Terminal_GSM.Begin();
-	Terminal_GSM.Telit_xE910();
+	Terminal.Begin();
+	Terminal.Telit_xE910();
 
 	// GSM Begin
 	GSM.Power(true);
@@ -71,16 +71,16 @@ void loop() {
 
 	// Print Command State
 	if (Command_Clear) {
-		Terminal_GSM.Text(23, 115, CYAN, "   ");
+		Terminal.Text(23, 115, CYAN, "   ");
 		Command_Clear = false;
 	}
 	if (Listen_Control) {
-		Terminal_GSM.Text(23, 115, CYAN, "1");
+		Terminal.Text(23, 115, CYAN, "1");
 		Listen_Control = false;
 	}
 
 	if (Timer_Display) {
-		Terminal_GSM.Text(2, 2, WHITE, String(millis()));
+		Terminal.Text(2, 2, WHITE, String(millis()));
 		Timer_Display = false;
 	}
 
@@ -88,30 +88,30 @@ void loop() {
 	if (Interrupt) {
 
 		// Declare Variable
-		char _Response[50];
+		char _Response1[50];
 
 		// Get Command
-		uint16_t Command = Incoming_Socket.Get(_Response);
+		uint16_t Command = Incoming_Socket.Get(_Response1);
 
 		// Command Handle
-		if (Command == 157) Terminal_GSM.Beep();
+		if (Command == 157) Terminal.Beep();
 
 		// Print Command State
-		Terminal_GSM.Text(23, 115, CYAN, String(Command));
+		Terminal.Text(23, 115, CYAN, String(Command));
 
 		// Command Delay
 		delay(1000);
 
 		// Data Send Variable Declaration
 		char _Data[600] = "{\"Device\":{\"Type\":\"402-P01\",\"ID\":\"E10000011D00DB70\",\"Hardware\":\"03.00.00\",\"Firmware\":\"04.06.01\"},\"Power\":{\"Battery\":{\"IV\":4.13,\"T\":28.4,\"AC\":0.16,\"SOC\":80.41,\"FB\":2000,\"IB\":1200,\"Charge\":3}},\"IoT\":{\"GSM\":{\"Module\":{\"Manufacturer\":1,\"Model\":1,\"Firmware\":\"13.00.007\",\"Serial\":\"0001770243\",\"IMEI\":\"353613080366878\"},\"SIM\":{\"SIM_Type\":1,\"Iccid\":\"8990011916180288944\"},\"Operator\":{\"Code\":28601,\"RSSI\":8}}},\"Data\":{\"DeviceStatus\":240,\"FaultStatus\":500,\"TimeStamp\":\"2022-06-06 11:12:54\",\"Temperature\":28.78915,\"Humidity\":34.7837}}";
-		char _Response[50];
-		memset(_Response, '\0', 50);
+		char _Response2[50];
+		memset(_Response2, '\0', 50);
 
 		// Send Data Pack
-		uint16_t Send_Response = Outgoing_Socket.Send(_Data, _Response);
+		uint16_t Send_Response = Outgoing_Socket.Send(_Data, _Response2);
 
 		// Print Command State
-		Terminal_GSM.Text(23, 115, CYAN, String(Send_Response));
+		Terminal.Text(23, 115, CYAN, String(Send_Response));
 
 		// Command Delay
 		delay(1000);

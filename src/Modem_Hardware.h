@@ -25,20 +25,10 @@ class Modem_Hardware {
 		void Communication(const bool _State) {
 
 			// Enable Communication 
-			if (_State) {
-
-				// Set Port				
-				PORTJ &= 0b11101111;
-
-			}
+			if (_State) PORTJ &= 0b11101111;
 
 			// Disable Communication
-			if (!_State) {
-
-				// Set Port
-				PORTJ |= 0b00010000;
-
-			} 
+			if (!_State) PORTJ |= 0b00010000;
 
 		}
 
@@ -101,20 +91,10 @@ class Modem_Hardware {
 		void Power_Switch(const bool _State) {
 
 			// Set GSM Power Enable
-			if (_State) {
-				
-				// Set Port				
-				PORTH |= 0b00000100;
-
-			}
+			if (_State) PORTH |= 0b00000100;
 
 			// Set GSM Power Disable
-			if (!_State) {
-
-				// Set Port
-				PORTH &= 0b11111011;
-			
-			}
+			if (!_State) PORTH &= 0b11111011;
 		
 		}
 
@@ -125,20 +105,10 @@ class Modem_Hardware {
 		void LED(const bool _State) {
 
 			// Set GSM LED Power Enable
-			if (_State) {
-				
-				// Set Port
-				PORTH &= 0b11101111;
-				
-			}
+			if (_State) PORTH &= 0b11101111;
 
 			// Set GSM LED Power Disable
-			if (!_State) {
-
-				// Set Port
-				PORTH |= 0b00010000;
-				
-			}
+			if (!_State) PORTH |= 0b00010000;
 
 		}
 
