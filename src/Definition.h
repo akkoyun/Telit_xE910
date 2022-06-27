@@ -29,6 +29,7 @@
 	#define _AT_CGREG_
 	#define _AT_CGDCONT_
 	#define _AT_SERVINFO_
+	#define _AT_MONI_
 	#define _AT_SGACT_
 	#define _AT_CSQ_
 	#define _AT_FRWL_

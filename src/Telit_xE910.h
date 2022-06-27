@@ -50,6 +50,7 @@ class Telit_xE910 {
 			uint16_t 	TA					= 0;
 			uint16_t 	GPRS				= 0;
 			char 		LAC[5];
+			char 		Cell_ID[5];
 
 		} Modem;
 
@@ -1478,6 +1479,31 @@ class Telit_xE910 {
 					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 8, Debug_Connect_Y);
 					Terminal_GSM.Text(24, 112, CYAN, String(this->Modem.Operator));
 				#endif
+
+			#endif
+
+			// MONI Command Socket
+			#ifdef _AT_MONI_
+
+				// Declare Watchdog Variable
+				_Error_WD = 0;
+
+				// Set Response Variable
+				_Response = false;
+
+				// Process Command
+				while (!_Response) {
+
+					// Process Command
+					_Response = AT.MONI(this->Modem.LAC, this->Modem.Cell_ID);
+
+					// Set WD Variable
+					_Error_WD++;
+
+					// Control for WD
+					if (_Error_WD > 5) break;
+
+				}
 
 			#endif
 
