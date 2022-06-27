@@ -2312,8 +2312,18 @@ class AT_Command_Set {
 			// Handle Variables
 			uint8_t _Variable_Count = sscanf(Buffer_Variable, "#MONI: Turkcell BSIC:%d RxQual:%d LAC:%4c Id:%4c ARFCN:3 PWR:-94dbm TA:3OK", _BSIC, _RxQual, _LAC, _Cell_ID);
 
-			// End Function
-			return(true);
+			// Control for Variable
+			if (_Variable_Count == 4) {
+
+				// End Function
+				return(true);
+
+			} else {
+
+				// End Function
+				return(false);
+
+			}
 
 		}
 
