@@ -38,8 +38,19 @@ class Telit_xE910 {
 			uint8_t 	Model 				= 0;
 			char 		Firmware[10];
 			uint8_t 	RSSI				= 0;
-			uint16_t 	Operator			= 0;
+
+			// IP Address Variable (xxx.xxx.xxx.xxx)
 			char 		IP_Address[16];
+
+			// Servinfo Variables
+			uint16_t 	Operator			= 0;
+			uint16_t 	BARFCN				= 0;
+			uint16_t 	dBM					= 0;
+			uint16_t 	BSIC				= 0;
+			uint16_t 	TA					= 0;
+			uint16_t 	GPRS				= 0;
+			char 		LAC[5];
+
 		} Modem;
 
 		// Define Time Structure
@@ -1118,7 +1129,7 @@ class Telit_xE910 {
 					while (!_Response) {
 
 						// Process Command
-						_Response = AT.SERVINFO(this->Modem.Operator);
+						_Response = AT.SERVINFO(this->Modem.Operator, this->Modem.BARFCN, this->Modem.dBM, this->Modem.BSIC, this->Modem.TA, this->Modem.GPRS, this->Modem.LAC);
 
 						// Set WD Variable
 						_Error_WD++;

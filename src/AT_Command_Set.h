@@ -1641,6 +1641,7 @@ class AT_Command_Set {
 
 		/**
 		 * @brief Execution command is used to activate or deactivate either the GSM context or the specified PDP context.
+		 * @version 01.01.00
 		 * @param _Cid Parameter
 		 * PDP context identifier
 		 * 0 - specifies the GSM context
@@ -1698,6 +1699,10 @@ class AT_Command_Set {
 
 			}
 
+			// Declare Buffer Variable
+			char _Buffer[20];
+			memset(_Buffer, '\0', 20);
+
 			// Control for Buffer
 			for (uint8_t i = 0; i < Buffer.Read_Order; i++) {
 
@@ -1705,7 +1710,7 @@ class AT_Command_Set {
 				if (((Buffer_Variable[i] <= '9' and Buffer_Variable[i] >= '0') or Buffer_Variable[i] == '.')) {
 
 					// Get Data
-					_IP[Buffer.Data_Order] = Buffer_Variable[i] ;
+					_Buffer[Buffer.Data_Order] = Buffer_Variable[i] ;
 
 					// Increase Data Order
 					Buffer.Data_Order += 1;
@@ -1714,13 +1719,27 @@ class AT_Command_Set {
 
 			}
 
+			// Declare IP Segment Variables
+			int IP_Segment[4];
+
+			// IP : #SGACT: 178.242.19.187OK
+ 
+			// Handle IP 
+			uint8_t _Variable_Count = sscanf(_Buffer, "%d.%d.%d.%d", &IP_Segment[0], &IP_Segment[1], &IP_Segment[2], &IP_Segment[3]);
+ 
 			// Control for IP
-			if (Buffer.Data_Order >= 7) {
+			if (_Variable_Count == 4) {
+
+				// Handle TimeStamp
+				sprintf(_IP, "%03hhu.%03hhu.%03hhu.%03hhu", IP_Segment[0], IP_Segment[1], IP_Segment[2], IP_Segment[3]);
 
 				// End Function
 				return (true);
 
 			} else {
+
+				// Handle TimeStamp
+				sprintf(_IP, "%03hhu.%03hhu.%03hhu.%03hhu", 0, 0, 0, 0);
 
 				// End Function
 				return (false);
@@ -2165,12 +2184,13 @@ class AT_Command_Set {
 
 		/**
 		 * @brief Execution command reports information about serving cell.
+		 * @version 01.01.00
 		 * @param _Operator Parameter. 
 		 * string representing the network operator in numeric format: 5 or 6 digits [country code (3) + network code (2 or 3)]
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool SERVINFO(uint16_t & _Operator) {
+		bool SERVINFO(uint16_t & _Operator, uint16_t & _BARFCN, uint16_t & _dBM, uint16_t & _BSIC, uint16_t & _TA, uint16_t & _GPRS, char * _LAC) {
 
 			// Clear UART Buffer
 			Clear_UART_Buffer();
@@ -2212,25 +2232,27 @@ class AT_Command_Set {
 
 			}
 
-			// Clear Variables
-			_Operator = 0;
+			// #SERVINFO: 3,-101,"Turkcell","28601",52,855E,03,1,,"II",01,6OK
+			// 3,101,,28601,52,855,03,1,,,01,6
 
-			// Control for Buffer
-			for (uint8_t i = 0; i < Buffer.Read_Order; i++) {
+			// Handle Variables
+			uint8_t _Variable_Count = sscanf(Buffer_Variable, "#SERVINFO: %d,-%d,\"Turkcell\",\"%d\",%d,%4c,%d,%d,,\"II\",01,6OK", &_BARFCN, &_dBM, &_Operator, &_BSIC, _LAC, &_TA, &_GPRS);
 
-				// Control Operator ID
-				if (Buffer_Variable[i - 2] == '6' and Buffer_Variable[i - 1] == '0' and Buffer_Variable[i] == '1') _Operator = 28601;
-				if (Buffer_Variable[i - 2] == '6' and Buffer_Variable[i - 1] == '0' and Buffer_Variable[i] == '2') _Operator = 28602;
-				if (Buffer_Variable[i - 2] == '6' and Buffer_Variable[i - 1] == '0' and Buffer_Variable[i] == '3') _Operator = 28603;
-				if (Buffer_Variable[i - 2] == '6' and Buffer_Variable[i - 1] == '0' and Buffer_Variable[i] == '4') _Operator = 28604;
-
-			}
+			// #SERVINFO: 3,-101,"Turkcell","28601",52,855E,03,1,,"II",01,6OK
+			// #SERVINFO: <B-ARFCN>,<dBM>,<NetNameAsc>,<NetCode>,<BSIC>,<LAC>,<TA>,<GPRS>[,[<PB-ARFCN>],[<NOM>],<RAC>[,<PAT>]]
 
 			// Handle Operator
-			if (_Operator == 28601 or _Operator == 28602 or _Operator == 28603 or _Operator == 28604) return(true);
+			if (_Variable_Count == 7) {
 
-			// End Function
-			return (false);
+				// End Function
+				return (true);
+
+			} else {
+
+				// End Function
+				return (false);
+
+			}
 
 		}
 
