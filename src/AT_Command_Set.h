@@ -2327,6 +2327,60 @@ class AT_Command_Set {
 
 		}
 
+		bool OPERATORS(char * _Response) {
+
+			// Clear UART Buffer
+			Clear_UART_Buffer();
+
+			// Declare Buffer Object
+			Serial_Buffer Buffer = {false, 0, 0, 10000};
+
+			// Declare Buffer
+			char Buffer_Variable[255];
+			memset(Buffer_Variable, '\0', 255);
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Send UART Command
+			GSM_Serial->print(F("AT#MONI=7"));
+			GSM_Serial->print(F("\r\n"));
+
+			// Read Current Time
+			const uint32_t Current_Time = millis();
+
+			// Response Wait Delay
+			delay(10);
+
+			// Define Variables
+			int _BSIC;
+			int _RxQual;
+
+			// Read UART Response
+			while (!Buffer.Response) {
+
+				// Read Serial Char
+				Buffer_Variable[Buffer.Read_Order] = GSM_Serial->read();
+
+				// Control for <OK> Response
+				if (Buffer_Variable[Buffer.Read_Order - 1] == 'O' and Buffer_Variable[Buffer.Read_Order] == 'K') Buffer.Response = true;
+
+				// Increase Read Order
+				if (Buffer_Variable[Buffer.Read_Order] > 31 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
+
+				// Handle for timeout
+				if (millis() - Current_Time >= Buffer.Time_Out) return(false);
+
+			}
+
+			// Char Copy
+			strcpy(_Response, Buffer_Variable);
+
+			// End Function
+			return(true);
+
+		}
+
 		/**
 		 * @brief his command enables and disables automatic time zone update via NITZ.
 		 * @param _State Parameter. 
