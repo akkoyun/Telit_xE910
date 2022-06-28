@@ -2327,13 +2327,19 @@ class AT_Command_Set {
 
 		}
 
-		bool OPERATORS(char * _Response) {
+		/**
+		 * @brief Set command sets one cell out of seven, in a the neighbour list of the serving cell including it, from which extract GSM-related information.
+		 * @param _Cid Parameter
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
+		bool Set_MONIZIP(const uint8_t _Cid) {
 
 			// Clear UART Buffer
 			Clear_UART_Buffer();
 
 			// Declare Buffer Object
-			Serial_Buffer Buffer = {false, 0, 0, 10000};
+			Serial_Buffer Buffer = {false, 0, 0, 5000};
 
 			// Declare Buffer
 			char Buffer_Variable[255];
@@ -2343,7 +2349,8 @@ class AT_Command_Set {
 			delay(20);
 
 			// Send UART Command
-			GSM_Serial->print(F("AT#MONI=7"));
+			GSM_Serial->print(F("AT#MONIZIP="));
+			GSM_Serial->print(_Cid);
 			GSM_Serial->print(F("\r\n"));
 
 			// Read Current Time
@@ -2351,10 +2358,6 @@ class AT_Command_Set {
 
 			// Response Wait Delay
 			delay(10);
-
-			// Define Variables
-			int _BSIC;
-			int _RxQual;
 
 			// Read UART Response
 			while (!Buffer.Response) {
@@ -2373,11 +2376,68 @@ class AT_Command_Set {
 
 			}
 
-			// Char Copy
-			strcpy(_Response, Buffer_Variable);
-
 			// End Function
 			return(true);
+
+		}
+
+		bool Get_MONIZIP(uint16_t & _Operator, uint16_t _BSIC, uint16_t _QUAL, char * _LAC, char * _Cell_ID) {
+
+			// Clear UART Buffer
+			Clear_UART_Buffer();
+
+			// Declare Buffer Object
+			Serial_Buffer Buffer = {false, 0, 0, 5000};
+
+			// Declare Buffer
+			char Buffer_Variable[255];
+			memset(Buffer_Variable, '\0', 255);
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Send UART Command
+			GSM_Serial->print(F("AT#MONIZIP"));
+			GSM_Serial->print(F("\r\n"));
+
+			// Read Current Time
+			const uint32_t Current_Time = millis();
+
+			// Response Wait Delay
+			delay(10);
+
+			// Read UART Response
+			while (!Buffer.Response) {
+
+				// Read Serial Char
+				Buffer_Variable[Buffer.Read_Order] = GSM_Serial->read();
+
+				// Control for <OK> Response
+				if (Buffer_Variable[Buffer.Read_Order - 1] == 'O' and Buffer_Variable[Buffer.Read_Order] == 'K') Buffer.Response = true;
+
+				// Increase Read Order
+				if (Buffer_Variable[Buffer.Read_Order] > 31 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
+
+				// Handle for timeout
+				if (millis() - Current_Time >= Buffer.Time_Out) return(false);
+
+			}
+
+			// Handle Variables
+			uint8_t _Variable_Count = sscanf(Buffer_Variable, "#MONIZIP: %d,%d,%d,%4c,%4c,3,-96,3OK", &_Operator, &_BSIC, &_QUAL, _LAC, _Cell_ID);
+
+			// Control for Variable
+			if (_Variable_Count == 5) {
+
+				// End Function
+				return(true);
+
+			} else {
+
+				// End Function
+				return(false);
+
+			}
 
 		}
 
