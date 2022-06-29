@@ -4225,7 +4225,10 @@ class AT_Command_Set {
 
 				// Select Response Code
 				if (_Response_Code == 200) GSM_Serial->print(F("HTTP/1.1 200 OK\r\n"));
+				if (_Response_Code == 202) GSM_Serial->print(F("HTTP/1.1 202 Accepted\r\n"));
 				if (_Response_Code == 400) GSM_Serial->print(F("HTTP/1.1 400 Bad Request\r\n"));
+				if (_Response_Code == 405) GSM_Serial->print(F("HTTP/1.1 405 Method Not Allowed\r\n"));
+				if (_Response_Code == 406) GSM_Serial->print(F("HTTP/1.1 406 Not Acceptable\r\n"));
 
 				// Print Connection Header
 				GSM_Serial->print(F("Connection: close\r\n"));
