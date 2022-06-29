@@ -69,6 +69,7 @@
         "TCCR",
         "TCNT",
         "Telit",
+        "TIMADV",
         "TIMSK",
         "Turkcell",
         "TXMON",

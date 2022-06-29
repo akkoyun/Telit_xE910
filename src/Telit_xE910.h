@@ -1152,54 +1152,6 @@ class Telit_xE910 {
 
 				#endif
 
-				// Set MONI Command
-				#ifdef _AT_MONIZIP_
-
-					// Declare Watchdog Variable
-					_Error_WD = 0;
-
-					// Set Response Variable
-					_Response = false;
-
-					// Process Command
-					while (!_Response) {
-
-						// Process Command
-						_Response = AT.Set_MONIZIP(0);
-
-						// Set WD Variable
-						_Error_WD++;
-
-						// Control for WD
-						if (_Error_WD > 5) break;
-
-					}
-
-					// Declare Watchdog Variable
-					_Error_WD = 0;
-
-					// Set Response Variable
-					_Response = false;
-
-					// Process Command
-					while (!_Response) {
-
-						// Process Command
-						_Response = AT.Get_MONIZIP(this->Modem.Operator, this->Modem.BSIC, this->Modem.QUAL, this->Modem.LAC, this->Modem.Cell_ID);
-
-						// Set WD Variable
-						_Error_WD++;
-
-						// Control for WD
-						if (_Error_WD > 5) break;
-
-					}
-				
-					// End Function
-					if (!_Response) return (false);
-
-				#endif
-
 				// CSQ Command
 				#ifdef _AT_CSQ_
 
@@ -1346,6 +1298,34 @@ class Telit_xE910 {
 					#ifdef GSM_Debug
 						Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 11, Debug_Connect_Y);
 					#endif
+
+				#endif
+
+				// Set MONI Command
+				#ifdef _AT_MONI_
+
+					// Declare Watchdog Variable
+					_Error_WD = 0;
+
+					// Set Response Variable
+					_Response = false;
+
+					// Process Command
+					while (!_Response) {
+
+						// Process Command
+						_Response = AT.MONI(this->Modem.LAC, this->Modem.Cell_ID);
+
+						// Set WD Variable
+						_Error_WD++;
+
+						// Control for WD
+						if (_Error_WD > 5) break;
+
+					}
+				
+					// End Function
+					if (!_Response) return (false);
 
 				#endif
 

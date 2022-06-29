@@ -2333,7 +2333,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool Set_MONIZIP(const uint8_t _Cid) {
+		bool Set_MONIZIP(const uint8_t _Cid = 0) {
 
 			// Clear UART Buffer
 			Clear_UART_Buffer();
@@ -2381,7 +2381,91 @@ class AT_Command_Set {
 
 		}
 
+		/**
+		 * @brief Set command sets one cell out of seven, in a the neighbour list of the serving cell including it, from which extract GSM-related information.
+		 * @param _Operator 
+		 * @param _BSIC 
+		 * @param _QUAL 
+		 * @param _LAC 
+		 * @param _Cell_ID 
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
 		bool Get_MONIZIP(uint16_t & _Operator, uint16_t _BSIC, uint16_t _QUAL, char * _LAC, char * _Cell_ID) {
+
+			// Declare Variable Structure
+			struct Operator_Structure {
+				int 	Network_Code	= 0;
+				int 	BSIC			= 0;
+				int 	QUAL			= 0;
+				char	LAC[5];
+				char	CELL_ID[5];
+				int		ARFCN			= 0;
+				int		dBm				= 0;
+				int		TIMADV			= 0;
+			} Operator;
+
+			// Clear UART Buffer
+			Clear_UART_Buffer();
+
+			// Declare Buffer Object
+			Serial_Buffer Buffer = {false, 0, 0, 10000};
+
+			// Declare Buffer
+			char Buffer_Variable[255];
+			memset(Buffer_Variable, '\0', 255);
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Send UART Command
+			GSM_Serial->print(F("AT#MONIZIP"));
+			GSM_Serial->print(F("\r\n"));
+
+			// Read Current Time
+			const uint32_t Current_Time = millis();
+
+			// Response Wait Delay
+			delay(10);
+
+			// Read UART Response
+			while (!Buffer.Response) {
+
+				// Read Serial Char
+				Buffer_Variable[Buffer.Read_Order] = GSM_Serial->read();
+
+				// Control for <OK> Response
+				if (Buffer_Variable[Buffer.Read_Order - 1] == 'O' and Buffer_Variable[Buffer.Read_Order] == 'K') Buffer.Response = true;
+
+				// Increase Read Order
+				if (Buffer_Variable[Buffer.Read_Order] > 31 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
+
+				// Handle for timeout
+				if (millis() - Current_Time >= Buffer.Time_Out) return(false);
+
+			}
+
+			// #MONIZIP: 28601,23,0,855E,CCF3,60,-92,3OK
+			// #MONIZIP: 28601,23,0,855E,CCF3,60,-93,0OK
+
+			// Handle Variables
+			// uint8_t Variable_Count = sscanf(Buffer_Variable, "#MONIZIP: %u,%d,%d,%4c,%4c,%d,-%d,%dK", Operator.Network_Code, Operator.BSIC, Operator.QUAL, Operator.LAC, Operator.CELL_ID, Operator.ARFCN, Operator.dBm, Operator.TIMADV);
+
+			// Control for Variable
+//			if (_Variable_Count == 8) return(true);
+
+			// End Function
+			return(true);
+
+		}
+
+		/**
+		 * @brief Set command sets one cell out of seven, in a the neighbour list of the serving cell including it, from which extract GSM-related information.
+		 * @param _Response 
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
+		bool All_MONIZIP(char * _Response) {
 
 			// Clear UART Buffer
 			Clear_UART_Buffer();
@@ -2423,21 +2507,7 @@ class AT_Command_Set {
 
 			}
 
-			// Handle Variables
-			uint8_t _Variable_Count = sscanf(Buffer_Variable, "#MONIZIP: %d,%d,%d,%4c,%4c,3,-96,3OK", &_Operator, &_BSIC, &_QUAL, _LAC, _Cell_ID);
-
-			// Control for Variable
-			if (_Variable_Count == 5) {
-
-				// End Function
-				return(true);
-
-			} else {
-
-				// End Function
-				return(false);
-
-			}
+			strcpy(_Response, Buffer_Variable);
 
 		}
 
