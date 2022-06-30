@@ -52,7 +52,7 @@ class GSM_Socket_Incoming {
 			uint16_t Event = 0;
 
 			// Declare JSON Object
-			StaticJsonDocument<100> Incoming_JSON;
+			StaticJsonDocument<512> Incoming_JSON;
 
 			// Deserialize the JSON document
 			DeserializationError Error = deserializeJson(Incoming_JSON, _Data);
