@@ -440,7 +440,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool QSS(char * _Data) {
+		bool QSS(uint8_t & _Mode, uint8_t & _Status) {
 
 			// Clear UART Buffer
 			Clear_UART_Buffer();
@@ -482,10 +482,11 @@ class AT_Command_Set {
 
 			}
 
-strcpy(_Data, Buffer_Variable);
+			// #QSS: 0,1OK
 
-
-
+			// Handle Response
+			_Mode = Buffer_Variable[6];
+			_Status = Buffer_Variable[8];
 
 			// End Function
 			return(false);
