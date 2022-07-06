@@ -11,7 +11,6 @@
 	#include "Definition.h"
 #endif
 
-
 // Modem Hardware Class
 class Modem_Hardware {
 

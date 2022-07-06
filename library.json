@@ -1,8 +1,8 @@
 {
 	"name": "Telit_xE910",
-	"version": "4.1.8",
+	"version": "4.1.9",
 	"keywords": "GSM, Modem, GPRS, 2G, IoT, Telit, GE910, LE910",
-	"description": "Telit xE910 series GSM modem library.",
+	"description": "Enables GSM/GRPS network connection using the GSM/GPRS modules. Use this library to make/receive socket connections with Telit xE910 module.This library also allows you to connect to internet through the GPRS networks and either use HTTP(S) Web Clients and Servers.",
 	"authors":
 	{
 		"name": "Mehmet Gunce Akkoyun",

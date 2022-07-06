@@ -1,11 +1,12 @@
-// Define Ovoo Libraries
+// Define Libraries
 #include "Telit_xE910.h"
 #include <ArduinoJson.h>
 
 // Define Object
 Telit_xE910 GSM;
-GSM_Socket_Incoming Incomming_Socket(2);
+GSM_Socket_Incoming Incoming_Socket(2);
 GSM_Socket_Outgoing Outgoing_Socket(3, "54.216.226.171", "/api/v1.1/p402");
+Console Terminal(Serial);
 
 // Declare Global Variable
 bool Interrupt = false;
@@ -36,7 +37,7 @@ void setup() {
 	Serial.begin(115200);
 
 	// Start Console
-	Terminal.Begin(Serial);
+	Terminal.Begin();
 	Terminal.Telit_xE910();
 
 	// GSM Begin
@@ -49,11 +50,11 @@ void setup() {
 	GSM.Connect();
 
 	// Socket Config
-	Incomming_Socket.Configure();
+	Incoming_Socket.Configure();
 	Outgoing_Socket.Configure();
 
 	// Listen Socket
-	Incomming_Socket.Listen(true);
+	Incoming_Socket.Listen(true);
 
 	// Time Update
 	GSM.Time_Update();
@@ -86,8 +87,11 @@ void loop() {
 
 	if (Interrupt) {
 
+		// Declare Variable
+		char JSON_Income[255];
+
 		// Get Command
-		uint16_t Command = Incomming_Socket.Get();
+		uint16_t Command = Incoming_Socket.Get(JSON_Income);
 
 		// Command Handle
 		if (Command == 157) Terminal.Beep();
@@ -144,7 +148,7 @@ void AVR_Timer_1sn(void) {
 	// Set CTC Mod
 	TCCR5B |= (1 << WGM52);
 
-	// Set Prescalar (1024)
+	// Set Scale (1024)
 	TCCR5B |= (1 << CS52) | (1 << CS50);
 
 	// Start Timer

@@ -1,0 +1,16 @@
+# Custom Dictionary Words
+Telit
+DDRJ
+PORTJ
+Millis
+TCCR
+TCNT
+TIMSK
+vect
+PINJ
+COMPA
+OCIE
+PCICR
+PCMSK
+PCINT
+CMEE
