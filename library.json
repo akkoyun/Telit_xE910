@@ -28,6 +28,11 @@
 			"owner": "akkoyun",
 			"name": "Console",
 			"version": "^1.0.0"
+		},
+		{
+			"owner": "bblanchon",
+			"name": "ArduinoJson",
+			"version": "^6.19.0"
 		}
 	],
 	"examples": [

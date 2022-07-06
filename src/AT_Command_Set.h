@@ -3,18 +3,11 @@
 
 // Define Arduino Library
 #ifndef __Arduino__
-#include <Arduino.h>
+	#include <Arduino.h>
 #endif
-
-// Define AT Definition
-#ifndef __AT_Definition__
-	#include "Definition.h"
-#endif
-
 
 class AT_Command_Set {
-	
-	
+
 	private:
 
 		/**
@@ -434,6 +427,66 @@ class AT_Command_Set {
 
 			// Handle Status
 			if (_Status == 1) return(true);
+
+			// End Function
+			return(false);
+
+		}
+
+		/**
+		 * @brief Query SIM Status unsolicited indication
+		 * @param _Mode 
+		 * @param _Status 
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
+		bool QSS(uint8_t & _Mode, uint8_t & _Status) {
+
+			// Clear UART Buffer
+			Clear_UART_Buffer();
+
+			// Declare Buffer Object
+			Serial_Buffer Buffer = {false, 0, 0, 5000};
+
+			// Declare Buffer
+			char Buffer_Variable[255];
+			memset(Buffer_Variable, '\0', 255);
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Send UART Command
+			GSM_Serial->print(F("AT#QSS?"));
+			GSM_Serial->print(F("\r\n"));
+
+			// Read Current Time
+			const uint32_t Current_Time = millis();
+
+			// Response Wait Delay
+			delay(10);
+
+			// Read UART Response
+			while (!Buffer.Response) {
+
+				// Read Serial Char
+				Buffer_Variable[Buffer.Read_Order] = GSM_Serial->read();
+
+				// Control for <OK> Response
+				if (Buffer_Variable[Buffer.Read_Order - 1] == 'O' and Buffer_Variable[Buffer.Read_Order] == 'K') Buffer.Response = true;
+
+				// Increase Read Order
+				if (Buffer_Variable[Buffer.Read_Order] > 31 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
+
+				// Handle for timeout
+				if (millis() - Current_Time >= Buffer.Time_Out) return(false);
+
+			}
+
+			// #QSS: 0,1OK
+
+			// Handle Response
+			_Mode = Buffer_Variable[6];
+			_Status = Buffer_Variable[8];
 
 			// End Function
 			return(false);
@@ -1648,6 +1701,7 @@ class AT_Command_Set {
 
 		/**
 		 * @brief Execution command is used to activate or deactivate either the GSM context or the specified PDP context.
+		 * @version 01.01.00
 		 * @param _Cid Parameter
 		 * PDP context identifier
 		 * 0 - specifies the GSM context
@@ -1705,6 +1759,10 @@ class AT_Command_Set {
 
 			}
 
+			// Declare Buffer Variable
+			char _Buffer[20];
+			memset(_Buffer, '\0', 20);
+
 			// Control for Buffer
 			for (uint8_t i = 0; i < Buffer.Read_Order; i++) {
 
@@ -1712,7 +1770,7 @@ class AT_Command_Set {
 				if (((Buffer_Variable[i] <= '9' and Buffer_Variable[i] >= '0') or Buffer_Variable[i] == '.')) {
 
 					// Get Data
-					_IP[Buffer.Data_Order] = Buffer_Variable[i] ;
+					_Buffer[Buffer.Data_Order] = Buffer_Variable[i] ;
 
 					// Increase Data Order
 					Buffer.Data_Order += 1;
@@ -1721,13 +1779,27 @@ class AT_Command_Set {
 
 			}
 
+			// Declare IP Segment Variables
+			int IP_Segment[4];
+
+			// IP : #SGACT: 178.242.19.187OK
+ 
+			// Handle IP 
+			uint8_t _Variable_Count = sscanf(_Buffer, "%d.%d.%d.%d", &IP_Segment[0], &IP_Segment[1], &IP_Segment[2], &IP_Segment[3]);
+ 
 			// Control for IP
-			if (Buffer.Data_Order >= 7) {
+			if (_Variable_Count == 4) {
+
+				// Handle TimeStamp
+				sprintf(_IP, "%03hhu.%03hhu.%03hhu.%03hhu", IP_Segment[0], IP_Segment[1], IP_Segment[2], IP_Segment[3]);
 
 				// End Function
 				return (true);
 
 			} else {
+
+				// Handle TimeStamp
+				sprintf(_IP, "%03hhu.%03hhu.%03hhu.%03hhu", 0, 0, 0, 0);
 
 				// End Function
 				return (false);
@@ -2172,12 +2244,13 @@ class AT_Command_Set {
 
 		/**
 		 * @brief Execution command reports information about serving cell.
+		 * @version 01.01.00
 		 * @param _Operator Parameter. 
 		 * string representing the network operator in numeric format: 5 or 6 digits [country code (3) + network code (2 or 3)]
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
-		bool SERVINFO(uint16_t & _Operator) {
+		bool SERVINFO(uint16_t & _Operator, uint16_t & _BARFCN, uint16_t & _dBM, uint16_t & _BSIC, uint16_t & _TA, uint16_t & _GPRS, char * _LAC) {
 
 			// Clear UART Buffer
 			Clear_UART_Buffer();
@@ -2219,25 +2292,282 @@ class AT_Command_Set {
 
 			}
 
-			// Clear Variables
-			_Operator = 0;
+			// #SERVINFO: 3,-101,"Turkcell","28601",52,855E,03,1,,"II",01,6OK
+			// 3,101,,28601,52,855,03,1,,,01,6
 
-			// Control for Buffer
-			for (uint8_t i = 0; i < Buffer.Read_Order; i++) {
+			// Handle Variables
+			uint8_t _Variable_Count = sscanf(Buffer_Variable, "#SERVINFO: %d,-%d,\"Turkcell\",\"%d\",%d,%4c,%d,%d,,\"II\",01,6OK", &_BARFCN, &_dBM, &_Operator, &_BSIC, _LAC, &_TA, &_GPRS);
 
-				// Control Operator ID
-				if (Buffer_Variable[i - 2] == '6' and Buffer_Variable[i - 1] == '0' and Buffer_Variable[i] == '1') _Operator = 28601;
-				if (Buffer_Variable[i - 2] == '6' and Buffer_Variable[i - 1] == '0' and Buffer_Variable[i] == '2') _Operator = 28602;
-				if (Buffer_Variable[i - 2] == '6' and Buffer_Variable[i - 1] == '0' and Buffer_Variable[i] == '3') _Operator = 28603;
-				if (Buffer_Variable[i - 2] == '6' and Buffer_Variable[i - 1] == '0' and Buffer_Variable[i] == '4') _Operator = 28604;
+			// #SERVINFO: 3,-101,"Turkcell","28601",52,855E,03,1,,"II",01,6OK
+			// #SERVINFO: <B-ARFCN>,<dBM>,<NetNameAsc>,<NetCode>,<BSIC>,<LAC>,<TA>,<GPRS>[,[<PB-ARFCN>],[<NOM>],<RAC>[,<PAT>]]
+
+			// Handle Operator
+			if (_Variable_Count == 7) {
+
+				// End Function
+				return (true);
+
+			} else {
+
+				// End Function
+				return (false);
 
 			}
 
-			// Handle Operator
-			if (_Operator == 28601 or _Operator == 28602 or _Operator == 28603 or _Operator == 28604) return(true);
+		}
+
+		/**
+		 * @brief Execution command reports information about serving cell.
+		 * @version 01.01.00
+		 * @param _MONI_Data Parameter. 
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */	
+		bool MONI(char * _LAC, char * _Cell_ID) {
+
+			// Clear UART Buffer
+			Clear_UART_Buffer();
+
+			// Declare Buffer Object
+			Serial_Buffer Buffer = {false, 0, 0, 5000};
+
+			// Declare Buffer
+			char Buffer_Variable[255];
+			memset(Buffer_Variable, '\0', 255);
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Send UART Command
+			GSM_Serial->print(F("AT#MONI"));
+			GSM_Serial->print(F("\r\n"));
+
+			// Read Current Time
+			const uint32_t Current_Time = millis();
+
+			// Response Wait Delay
+			delay(10);
+
+			// Define Variables
+			int _BSIC;
+			int _RxQual;
+
+			// Read UART Response
+			while (!Buffer.Response) {
+
+				// Read Serial Char
+				Buffer_Variable[Buffer.Read_Order] = GSM_Serial->read();
+
+				// Control for <OK> Response
+				if (Buffer_Variable[Buffer.Read_Order - 1] == 'O' and Buffer_Variable[Buffer.Read_Order] == 'K') Buffer.Response = true;
+
+				// Increase Read Order
+				if (Buffer_Variable[Buffer.Read_Order] > 31 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
+
+				// Handle for timeout
+				if (millis() - Current_Time >= Buffer.Time_Out) return(false);
+
+			}
+
+			// Handle Variables
+			uint8_t _Variable_Count = sscanf(Buffer_Variable, "#MONI: Turkcell BSIC:%d RxQual:%d LAC:%4c Id:%4c ARFCN:3 PWR:-94dbm TA:3OK", &_BSIC, &_RxQual, _LAC, _Cell_ID);
+
+			// Control for Variable
+			if (_Variable_Count == 4) {
+
+				// End Function
+				return(true);
+
+			} else {
+
+				// End Function
+				return(false);
+
+			}
+
+		}
+
+		/**
+		 * @brief Set command sets one cell out of seven, in a the neighbour list of the serving cell including it, from which extract GSM-related information.
+		 * @param _Cid Parameter
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
+		bool Set_MONIZIP(const uint8_t _Cid = 0) {
+
+			// Clear UART Buffer
+			Clear_UART_Buffer();
+
+			// Declare Buffer Object
+			Serial_Buffer Buffer = {false, 0, 0, 5000};
+
+			// Declare Buffer
+			char Buffer_Variable[255];
+			memset(Buffer_Variable, '\0', 255);
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Send UART Command
+			GSM_Serial->print(F("AT#MONIZIP="));
+			GSM_Serial->print(_Cid);
+			GSM_Serial->print(F("\r\n"));
+
+			// Read Current Time
+			const uint32_t Current_Time = millis();
+
+			// Response Wait Delay
+			delay(10);
+
+			// Read UART Response
+			while (!Buffer.Response) {
+
+				// Read Serial Char
+				Buffer_Variable[Buffer.Read_Order] = GSM_Serial->read();
+
+				// Control for <OK> Response
+				if (Buffer_Variable[Buffer.Read_Order - 1] == 'O' and Buffer_Variable[Buffer.Read_Order] == 'K') Buffer.Response = true;
+
+				// Increase Read Order
+				if (Buffer_Variable[Buffer.Read_Order] > 31 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
+
+				// Handle for timeout
+				if (millis() - Current_Time >= Buffer.Time_Out) return(false);
+
+			}
 
 			// End Function
-			return (false);
+			return(true);
+
+		}
+
+		/**
+		 * @brief Set command sets one cell out of seven, in a the neighbour list of the serving cell including it, from which extract GSM-related information.
+		 * @param _Operator 
+		 * @param _BSIC 
+		 * @param _QUAL 
+		 * @param _LAC 
+		 * @param _Cell_ID 
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
+		bool Get_MONIZIP(uint16_t & _Operator, uint16_t _BSIC, uint16_t _QUAL, char * _LAC, char * _Cell_ID) {
+
+			// Declare Variable Structure
+			struct Operator_Structure {
+				int 	Network_Code	= 0;
+				int 	BSIC			= 0;
+				int 	QUAL			= 0;
+				char	LAC[5];
+				char	CELL_ID[5];
+				int		ARFCN			= 0;
+				int		dBm				= 0;
+				int		TIMADV			= 0;
+			} Operator;
+
+			// Clear UART Buffer
+			Clear_UART_Buffer();
+
+			// Declare Buffer Object
+			Serial_Buffer Buffer = {false, 0, 0, 10000};
+
+			// Declare Buffer
+			char Buffer_Variable[255];
+			memset(Buffer_Variable, '\0', 255);
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Send UART Command
+			GSM_Serial->print(F("AT#MONIZIP"));
+			GSM_Serial->print(F("\r\n"));
+
+			// Read Current Time
+			const uint32_t Current_Time = millis();
+
+			// Response Wait Delay
+			delay(10);
+
+			// Read UART Response
+			while (!Buffer.Response) {
+
+				// Read Serial Char
+				Buffer_Variable[Buffer.Read_Order] = GSM_Serial->read();
+
+				// Control for <OK> Response
+				if (Buffer_Variable[Buffer.Read_Order - 1] == 'O' and Buffer_Variable[Buffer.Read_Order] == 'K') Buffer.Response = true;
+
+				// Increase Read Order
+				if (Buffer_Variable[Buffer.Read_Order] > 31 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
+
+				// Handle for timeout
+				if (millis() - Current_Time >= Buffer.Time_Out) return(false);
+
+			}
+
+			// #MONIZIP: 28601,23,0,855E,CCF3,60,-92,3OK
+			// #MONIZIP: 28601,23,0,855E,CCF3,60,-93,0OK
+
+			// Handle Variables
+			// uint8_t Variable_Count = sscanf(Buffer_Variable, "#MONIZIP: %u,%d,%d,%4c,%4c,%d,-%d,%dK", Operator.Network_Code, Operator.BSIC, Operator.QUAL, Operator.LAC, Operator.CELL_ID, Operator.ARFCN, Operator.dBm, Operator.TIMADV);
+
+			// Control for Variable
+//			if (_Variable_Count == 8) return(true);
+
+			// End Function
+			return(true);
+
+		}
+
+		/**
+		 * @brief Set command sets one cell out of seven, in a the neighbour list of the serving cell including it, from which extract GSM-related information.
+		 * @param _Response 
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
+		bool All_MONIZIP(char * _Response) {
+
+			// Clear UART Buffer
+			Clear_UART_Buffer();
+
+			// Declare Buffer Object
+			Serial_Buffer Buffer = {false, 0, 0, 5000};
+
+			// Declare Buffer
+			char Buffer_Variable[255];
+			memset(Buffer_Variable, '\0', 255);
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Send UART Command
+			GSM_Serial->print(F("AT#MONIZIP"));
+			GSM_Serial->print(F("\r\n"));
+
+			// Read Current Time
+			const uint32_t Current_Time = millis();
+
+			// Response Wait Delay
+			delay(10);
+
+			// Read UART Response
+			while (!Buffer.Response) {
+
+				// Read Serial Char
+				Buffer_Variable[Buffer.Read_Order] = GSM_Serial->read();
+
+				// Control for <OK> Response
+				if (Buffer_Variable[Buffer.Read_Order - 1] == 'O' and Buffer_Variable[Buffer.Read_Order] == 'K') Buffer.Response = true;
+
+				// Increase Read Order
+				if (Buffer_Variable[Buffer.Read_Order] > 31 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
+
+				// Handle for timeout
+				if (millis() - Current_Time >= Buffer.Time_Out) return(false);
+
+			}
+
+			strcpy(_Response, Buffer_Variable);
 
 		}
 
@@ -3188,15 +3518,15 @@ class AT_Command_Set {
 
 			// Print Command State
 			#ifdef GSM_Debug
-				Terminal.Text(26, 108, CYAN, "         ");
-				if (_State == 0) Terminal.Text(26, 108, RED, "Closed   ");
-				if (_State == 1) Terminal.Text(26, 108, WHITE, "Transfer ");
-				if (_State == 2) Terminal.Text(26, 108, YELLOW, "Suspend  ");
-				if (_State == 3) Terminal.Text(26, 108, YELLOW, "Suspend  ");
-				if (_State == 4) Terminal.Text(26, 108, GREEN, "Listening");
-				if (_State == 5) Terminal.Text(26, 108, WHITE, "Incoming ");
-				if (_State == 6) Terminal.Text(26, 108, RED, "DNS      ");
-				if (_State == 7) Terminal.Text(26, 108, WHITE, "Connecting");
+				Terminal_GSM.Text(26, 108, CYAN, "         ");
+				if (_State == 0) Terminal_GSM.Text(26, 108, RED, "Closed   ");
+				if (_State == 1) Terminal_GSM.Text(26, 108, WHITE, "Transfer ");
+				if (_State == 2) Terminal_GSM.Text(26, 108, YELLOW, "Suspend  ");
+				if (_State == 3) Terminal_GSM.Text(26, 108, YELLOW, "Suspend  ");
+				if (_State == 4) Terminal_GSM.Text(26, 108, GREEN, "Listening");
+				if (_State == 5) Terminal_GSM.Text(26, 108, WHITE, "Incoming ");
+				if (_State == 6) Terminal_GSM.Text(26, 108, RED, "DNS      ");
+				if (_State == 7) Terminal_GSM.Text(26, 108, WHITE, "Connecting");
 			#endif
 
 			// End Function
@@ -3955,7 +4285,10 @@ class AT_Command_Set {
 
 				// Select Response Code
 				if (_Response_Code == 200) GSM_Serial->print(F("HTTP/1.1 200 OK\r\n"));
+				if (_Response_Code == 202) GSM_Serial->print(F("HTTP/1.1 202 Accepted\r\n"));
 				if (_Response_Code == 400) GSM_Serial->print(F("HTTP/1.1 400 Bad Request\r\n"));
+				if (_Response_Code == 405) GSM_Serial->print(F("HTTP/1.1 405 Method Not Allowed\r\n"));
+				if (_Response_Code == 406) GSM_Serial->print(F("HTTP/1.1 406 Not Acceptable\r\n"));
 
 				// Print Connection Header
 				GSM_Serial->print(F("Connection: close\r\n"));

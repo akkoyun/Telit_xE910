@@ -3,14 +3,13 @@
 
 // Define Arduino Library
 #ifndef __Arduino__
-#include <Arduino.h>
+	#include <Arduino.h>
 #endif
 
 // Define AT Definition
 #ifndef __AT_Definition__
 	#include "Definition.h"
 #endif
-
 // Modem Hardware Class
 class Modem_Hardware {
 
@@ -30,20 +29,10 @@ class Modem_Hardware {
 		void Communication(const bool _State) {
 
 			// Enable Communication 
-			if (_State) {
-
-				// Set Port				
-				PORTJ &= 0b11101111;
-
-			}
+			if (_State) PORTJ &= 0b11101111;
 
 			// Disable Communication
-			if (!_State) {
-
-				// Set Port
-				PORTJ |= 0b00010000;
-
-			} 
+			if (!_State) PORTJ |= 0b00010000;
 
 		}
 
@@ -64,7 +53,7 @@ class Modem_Hardware {
 
 				// Terminal Bar
 				#ifdef GSM_Debug
-					Terminal.Text(Debug_Boot_X, Debug_Boot_Y + i, WHITE, F("▒"));
+					Terminal_GSM.Text(Debug_Boot_X, Debug_Boot_Y + i, WHITE, F("▒"));
 				#endif
 
 				// Wait
@@ -77,7 +66,7 @@ class Modem_Hardware {
 
 			// Clear Bar
 			#ifdef GSM_Debug
-				for (uint8_t i = 0; i < 100; i++) Terminal.Text(Debug_Boot_X, Debug_Boot_Y + i, WHITE, F(" "));
+				for (uint8_t i = 0; i < 100; i++) Terminal_GSM.Text(Debug_Boot_X, Debug_Boot_Y + i, WHITE, F(" "));
 			#endif
 
 		}
@@ -106,20 +95,10 @@ class Modem_Hardware {
 		void Power_Switch(const bool _State) {
 
 			// Set GSM Power Enable
-			if (_State) {
-				
-				// Set Port				
-				PORTH |= 0b00000100;
-
-			}
+			if (_State) PORTH |= 0b00000100;
 
 			// Set GSM Power Disable
-			if (!_State) {
-
-				// Set Port
-				PORTH &= 0b11111011;
-			
-			}
+			if (!_State) PORTH &= 0b11111011;
 		
 		}
 
@@ -130,20 +109,10 @@ class Modem_Hardware {
 		void LED(const bool _State) {
 
 			// Set GSM LED Power Enable
-			if (_State) {
-				
-				// Set Port
-				PORTH &= 0b11101111;
-				
-			}
+			if (_State) PORTH &= 0b11101111;
 
 			// Set GSM LED Power Disable
-			if (!_State) {
-
-				// Set Port
-				PORTH |= 0b00010000;
-				
-			}
+			if (!_State) PORTH |= 0b00010000;
 
 		}
 
@@ -180,7 +149,7 @@ class Modem_Hardware {
 		/**
 		 * @brief Power on Sequence of Modem
 		 * @param _Power_Switch Power Switch State
-		 * @param _LED_Switch  LED Stata
+		 * @param _LED_Switch  LED Stat
 		 * @param _Communication_Switch Communication State
 		 * @return true Modem is ON
 		 * @return false Modem is OFF
@@ -233,7 +202,7 @@ class Modem_Hardware {
 		/**
 		 * @brief Power on Sequence of Modem
 		 * @param _Power_Switch Power Switch State
-		 * @param _LED_Switch  LED Stata
+		 * @param _LED_Switch  LED Stat
 		 * @param _Communication_Switch Communication State
 		 * @return true Modem is OFF
 		 * @return false Modem is ON

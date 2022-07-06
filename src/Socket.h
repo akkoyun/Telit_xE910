@@ -6,16 +6,6 @@
 	#include <Arduino.h>
 #endif
 
-// Define AT Command Library
-#ifndef __AT_Command_Set__
-	#include "AT_Command_Set.h"
-#endif
-
-// Define AT Definition
-#ifndef __AT_Definition__
-	#include "Definition.h"
-#endif
-
 // Define Objects
 AT_Command_Set _AT(Serial_GSM);
 
@@ -62,7 +52,7 @@ class GSM_Socket_Incoming {
 			uint16_t Event = 0;
 
 			// Declare JSON Object
-			StaticJsonDocument<255> Incoming_JSON;
+			StaticJsonDocument<512> Incoming_JSON;
 
 			// Deserialize the JSON document
 			DeserializationError Error = deserializeJson(Incoming_JSON, _Data);
@@ -103,7 +93,7 @@ class GSM_Socket_Incoming {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
 				#endif
 
 				// Process Command
@@ -145,7 +135,7 @@ class GSM_Socket_Incoming {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
 				#endif
 			
 				// End Function
@@ -405,7 +395,7 @@ class GSM_Socket_Outgoing {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
 				#endif
 
 				// Process Command
@@ -447,7 +437,7 @@ class GSM_Socket_Outgoing {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
 				#endif
 			
 				// End Function

@@ -11,15 +11,6 @@
 	#include "Definition.h"
 #endif
 
-// Define Socket Command Library
-#ifndef __GSM_Socket__
-	#include "Socket.h"
-#endif
-
-// Define Objects
-Modem_Hardware GSM_Hardware;
-AT_Command_Set AT(Serial_GSM);
-
 class Telit_xE910 {
 
 	private:
@@ -47,8 +38,21 @@ class Telit_xE910 {
 			uint8_t 	Model 				= 0;
 			char 		Firmware[10];
 			uint8_t 	RSSI				= 0;
-			uint16_t 	Operator			= 0;
+
+			// IP Address Variable (xxx.xxx.xxx.xxx)
 			char 		IP_Address[16];
+
+			// Servinfo Variables
+			uint16_t 	Operator			= 0;
+			uint16_t 	BARFCN				= 0;
+			uint16_t 	dBM					= 0;
+			uint16_t 	BSIC				= 0;
+			uint16_t 	TA					= 0;
+			uint16_t 	GPRS				= 0;
+			uint16_t	QUAL				= 0;
+			char 		LAC[5];
+			char 		Cell_ID[5];
+
 		} Modem;
 
 		// Define Time Structure
@@ -154,7 +158,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Initialize_X, Debug_Initialize_Y, BLUE, F(" .. "));
+						Terminal_GSM.Text(Debug_Initialize_X, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -173,7 +177,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Initialize_X, Debug_Initialize_Y);
+						Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X, Debug_Initialize_Y);
 					#endif
 				
 					// End Function
@@ -192,7 +196,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 1, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 1, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -211,7 +215,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Initialize_X + 1, Debug_Initialize_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 1, Debug_Initialize_Y);
 					#endif
 
 					// End Function
@@ -230,7 +234,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 2, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 2, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -249,7 +253,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Initialize_X + 2, Debug_Initialize_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 2, Debug_Initialize_Y);
 					#endif
 				
 					// End Function
@@ -268,7 +272,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 3, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 3, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -287,7 +291,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Initialize_X + 3, Debug_Initialize_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 3, Debug_Initialize_Y);
 					#endif
 				
 					// End Function
@@ -306,7 +310,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 4, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 4, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -325,7 +329,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Initialize_X + 4, Debug_Initialize_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 4, Debug_Initialize_Y);
 					#endif
 				
 					// End Function
@@ -344,7 +348,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 5, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 5, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -363,8 +367,8 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Initialize_X + 5, Debug_Initialize_Y);
-						Terminal.Text(17, 102, CYAN, String(Modem.IMEI));
+						Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 5, Debug_Initialize_Y);
+						Terminal_GSM.Text(17, 102, CYAN, String(Modem.IMEI));
 					#endif
 				
 					// End Function
@@ -383,7 +387,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 6, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 6, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -402,8 +406,8 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Initialize_X + 6, Debug_Initialize_Y);
-						Terminal.Text(18, 107, CYAN, String(Modem.Serial_ID));
+						Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 6, Debug_Initialize_Y);
+						Terminal_GSM.Text(18, 107, CYAN, String(Modem.Serial_ID));
 					#endif
 				
 					// End Function
@@ -422,7 +426,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 7, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 7, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -441,8 +445,8 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Initialize_X + 7, Debug_Initialize_Y);
-						Terminal.Text(19, 98, CYAN, String(Modem.ICCID));
+						Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 7, Debug_Initialize_Y);
+						Terminal_GSM.Text(19, 98, CYAN, String(Modem.ICCID));
 					#endif
 				
 					// End Function
@@ -461,7 +465,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 8, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 8, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -480,8 +484,8 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Initialize_X + 8, Debug_Initialize_Y);
-						Terminal.Text(14, 116, CYAN, String(Modem.Manufacturer));
+						Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 8, Debug_Initialize_Y);
+						Terminal_GSM.Text(14, 116, CYAN, String(Modem.Manufacturer));
 					#endif
 
 					// End Function
@@ -500,7 +504,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 9, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 9, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -519,8 +523,8 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Initialize_X + 9, Debug_Initialize_Y);
-						Terminal.Text(15, 116, CYAN, String(Modem.Model));
+						Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 9, Debug_Initialize_Y);
+						Terminal_GSM.Text(15, 116, CYAN, String(Modem.Model));
 					#endif
 				
 					// End Function
@@ -539,7 +543,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 10, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 10, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -558,8 +562,8 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Initialize_X + 10, Debug_Initialize_Y);
-						Terminal.Text(16, 108, CYAN, String(Modem.Firmware));
+						Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 10, Debug_Initialize_Y);
+						Terminal_GSM.Text(16, 108, CYAN, String(Modem.Firmware));
 					#endif
 				
 					// End Function
@@ -578,7 +582,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 11, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 11, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -597,7 +601,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Initialize_X + 11, Debug_Initialize_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 11, Debug_Initialize_Y);
 					#endif
 				
 					// End Function
@@ -654,7 +658,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Initialize_X + 12, Debug_Initialize_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Initialize_X + 12, Debug_Initialize_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -673,7 +677,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Initialize_X + 12, Debug_Initialize_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Initialize_X + 12, Debug_Initialize_Y);
 					#endif
 				
 					// End Function
@@ -692,7 +696,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Connect_X, Debug_Connect_Y, BLUE, F(" .. "));
+						Terminal_GSM.Text(Debug_Connect_X, Debug_Connect_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -711,7 +715,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Connect_X, Debug_Connect_Y);
+						Terminal_GSM.OK_Decide(_Response, Debug_Connect_X, Debug_Connect_Y);
 					#endif
 
 					// End Function
@@ -730,7 +734,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.Text(Debug_Connect_X + 1, Debug_Connect_Y, BLUE, F(" .. "));
+					Terminal_GSM.Text(Debug_Connect_X + 1, Debug_Connect_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -749,7 +753,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Connect_X + 1, Debug_Connect_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 1, Debug_Connect_Y);
 					#endif
 				
 					// End Function
@@ -861,7 +865,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Connect_X + 2, Debug_Connect_Y, BLUE, F(" .. "));
+						Terminal_GSM.Text(Debug_Connect_X + 2, Debug_Connect_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -883,7 +887,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Connect_X + 2, Debug_Connect_Y, CYAN, F(" ** "));
+						Terminal_GSM.Text(Debug_Connect_X + 2, Debug_Connect_Y, CYAN, F(" ** "));
 					#endif
 
 					// Declare Watchdog Variable
@@ -903,8 +907,8 @@ class Telit_xE910 {
 
 						// Print Command State
 						#ifdef GSM_Debug
-							Terminal.Text(Debug_Connect_X + 2, Debug_Connect_Y, CYAN, F("    "));
-							Terminal.Text(Debug_Connect_X + 2, Debug_Connect_Y + 1, CYAN, String(_CREG_Connection_Status));
+							Terminal_GSM.Text(Debug_Connect_X + 2, Debug_Connect_Y, CYAN, F("    "));
+							Terminal_GSM.Text(Debug_Connect_X + 2, Debug_Connect_Y + 1, CYAN, String(_CREG_Connection_Status));
 						#endif
 
 						// Control for Connection
@@ -926,7 +930,7 @@ class Telit_xE910 {
 
 						// Print Command State
 						#ifdef GSM_Debug
-							Terminal.Text(22, 113, CYAN, String((millis() - _Connection_Start_Time) / 1000));
+							Terminal_GSM.Text(22, 113, CYAN, String((millis() - _Connection_Start_Time) / 1000));
 						#endif
 
 						// Set WD Variable
@@ -939,7 +943,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Connect_X + 2, Debug_Connect_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 2, Debug_Connect_Y);
 					#endif
 
 				#endif
@@ -949,7 +953,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Connect_X + 3, Debug_Connect_Y, BLUE, F(" .. "));
+						Terminal_GSM.Text(Debug_Connect_X + 3, Debug_Connect_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -971,7 +975,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Connect_X + 3, Debug_Connect_Y, CYAN, F(" ** "));
+						Terminal_GSM.Text(Debug_Connect_X + 3, Debug_Connect_Y, CYAN, F(" ** "));
 					#endif
 
 					// Declare Watchdog Variable
@@ -991,8 +995,8 @@ class Telit_xE910 {
 
 						// Print Command State
 						#ifdef GSM_Debug
-							Terminal.Text(Debug_Connect_X + 3, Debug_Connect_Y, CYAN, F("    "));
-							Terminal.Text(Debug_Connect_X + 3, Debug_Connect_Y + 1, CYAN, String(_CGREG_Connection_Status));
+							Terminal_GSM.Text(Debug_Connect_X + 3, Debug_Connect_Y, CYAN, F("    "));
+							Terminal_GSM.Text(Debug_Connect_X + 3, Debug_Connect_Y + 1, CYAN, String(_CGREG_Connection_Status));
 						#endif
 
 						// Control for Connection
@@ -1014,7 +1018,7 @@ class Telit_xE910 {
 
 						// Print Command State
 						#ifdef GSM_Debug
-							Terminal.Text(22, 113, CYAN, String((millis() - _Connection_Start_Time) / 1000));
+							Terminal_GSM.Text(22, 113, CYAN, String((millis() - _Connection_Start_Time) / 1000));
 						#endif
 
 						// Set WD Variable
@@ -1027,7 +1031,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-					Terminal.OK_Decide(_Response, Debug_Connect_X + 3, Debug_Connect_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 3, Debug_Connect_Y);
 					#endif
 
 				#endif
@@ -1043,7 +1047,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Connect_X + 7, Debug_Connect_Y, BLUE, F(" .. "));
+						Terminal_GSM.Text(Debug_Connect_X + 7, Debug_Connect_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -1062,7 +1066,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Connect_X + 7, Debug_Connect_Y);
+						Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 7, Debug_Connect_Y);
 					#endif
 				
 					// End Function
@@ -1081,7 +1085,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Connect_X + 9, Debug_Connect_Y, BLUE, F(" .. "));
+						Terminal_GSM.Text(Debug_Connect_X + 9, Debug_Connect_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -1103,8 +1107,8 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(25, 102, CYAN, String(this->Modem.IP_Address));
-						Terminal.OK_Decide(_Response, Debug_Connect_X + 9, Debug_Connect_Y);
+						Terminal_GSM.Text(25, 102, CYAN, String(this->Modem.IP_Address));
+						Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 9, Debug_Connect_Y);
 					#endif
 
 				#endif
@@ -1120,14 +1124,14 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Connect_X + 8, Debug_Connect_Y, BLUE, F(" .. "));
+						Terminal_GSM.Text(Debug_Connect_X + 8, Debug_Connect_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
 					while (!_Response) {
 
 						// Process Command
-						_Response = AT.SERVINFO(this->Modem.Operator);
+						_Response = AT.SERVINFO(this->Modem.Operator, this->Modem.BARFCN, this->Modem.dBM, this->Modem.BSIC, this->Modem.TA, this->Modem.GPRS, this->Modem.LAC);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -1139,8 +1143,8 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Connect_X + 8, Debug_Connect_Y);
-						Terminal.Text(24, 112, CYAN, String(this->Modem.Operator));
+						Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 8, Debug_Connect_Y);
+						Terminal_GSM.Text(24, 112, CYAN, String(this->Modem.Operator));
 					#endif
 				
 					// End Function
@@ -1176,7 +1180,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(23, 115, CYAN, String(this->Modem.RSSI));
+						Terminal_GSM.Text(23, 115, CYAN, String(this->Modem.RSSI));
 					#endif
 
 				#endif
@@ -1186,7 +1190,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Connect_X + 12, Debug_Connect_Y, BLUE, F(" .. "));
+						Terminal_GSM.Text(Debug_Connect_X + 12, Debug_Connect_Y, BLUE, F(" .. "));
 					#endif
 
 					// Declare Watchdog Variable
@@ -1254,7 +1258,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Connect_X + 12, Debug_Connect_Y);
+						Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 12, Debug_Connect_Y);
 					#endif
 
 				#endif
@@ -1270,7 +1274,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.Text(Debug_Connect_X + 11, Debug_Connect_Y, BLUE, F(" .. "));
+						Terminal_GSM.Text(Debug_Connect_X + 11, Debug_Connect_Y, BLUE, F(" .. "));
 					#endif
 
 					// Process Command
@@ -1292,8 +1296,36 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal.OK_Decide(_Response, Debug_Connect_X + 11, Debug_Connect_Y);
+						Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 11, Debug_Connect_Y);
 					#endif
+
+				#endif
+
+				// Set MONI Command
+				#ifdef _AT_MONI_
+
+					// Declare Watchdog Variable
+					_Error_WD = 0;
+
+					// Set Response Variable
+					_Response = false;
+
+					// Process Command
+					while (!_Response) {
+
+						// Process Command
+						_Response = AT.MONI(this->Modem.LAC, this->Modem.Cell_ID);
+
+						// Set WD Variable
+						_Error_WD++;
+
+						// Control for WD
+						if (_Error_WD > 5) break;
+
+					}
+				
+					// End Function
+					if (!_Response) return (false);
 
 				#endif
 
@@ -1302,7 +1334,7 @@ class Telit_xE910 {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal.Text(22, 113, CYAN, String(this->Status.Connection_Time));
+					Terminal_GSM.Text(22, 113, CYAN, String(this->Status.Connection_Time));
 				#endif
 
 				// Set Variable
@@ -1400,9 +1432,9 @@ class Telit_xE910 {
 		}
 
 		/**
-		 * @brief Get RSSI Function
+		 * @brief Get Connection Details Function
 		 */
-		void Get_RSSI(void) {
+		void Get_Connection_Detail(void) {
 
 			// Declare Watchdog Variable
 			uint8_t _Error_WD = 0;
@@ -1410,32 +1442,103 @@ class Telit_xE910 {
 			// Declare Response Status
 			bool _Response = false;
 
-			// Declare Watchdog Variable
-			_Error_WD = 0;
+			// CSQ Command
+			#ifdef _AT_CSQ_
 
-			// Set Response Variable
-			_Response = false;
+				// Declare Watchdog Variable
+				_Error_WD = 0;
 
-			// Clear RSSI
-			this->Modem.RSSI = 0;
+				// Set Response Variable
+				_Response = false;
 
-			// Process Command
-			while (!_Response) {
+				// Clear RSSI
+				this->Modem.RSSI = 0;
 
-				// Send Command
-				_Response = AT.CSQ(this->Modem.RSSI);
+				// Process Command
+				while (!_Response) {
 
-				// Set WD Variable
-				_Error_WD++;
+					// Send Command
+					_Response = AT.CSQ(this->Modem.RSSI);
 
-				// Control for WD
-				if (_Error_WD > 5) break;
+					// Set WD Variable
+					_Error_WD++;
 
-			}
+					// Control for WD
+					if (_Error_WD > 5) break;
+
+				}
+
+				// Print Command State
+				#ifdef GSM_Debug
+					Terminal_GSM.Text(23, 115, CYAN, String(this->Modem.RSSI));
+				#endif
+
+			#endif
+			
+			// SERVINFO Command Socket
+			#ifdef _AT_SERVINFO_
+
+				// Declare Watchdog Variable
+				_Error_WD = 0;
+
+				// Set Response Variable
+				_Response = false;
+
+				// Print Command State
+				#ifdef GSM_Debug
+					Terminal_GSM.Text(Debug_Connect_X + 8, Debug_Connect_Y, BLUE, F(" .. "));
+				#endif
+
+				// Process Command
+				while (!_Response) {
+
+					// Process Command
+					_Response = AT.SERVINFO(this->Modem.Operator, this->Modem.BARFCN, this->Modem.dBM, this->Modem.BSIC, this->Modem.TA, this->Modem.GPRS, this->Modem.LAC);
+
+					// Set WD Variable
+					_Error_WD++;
+
+					// Control for WD
+					if (_Error_WD > 5) break;
+
+				}
+
+				// Print Command State
+				#ifdef GSM_Debug
+					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 8, Debug_Connect_Y);
+					Terminal_GSM.Text(24, 112, CYAN, String(this->Modem.Operator));
+				#endif
+
+			#endif
+
+			// MONI Command Socket
+			#ifdef _AT_MONI_
+
+				// Declare Watchdog Variable
+				_Error_WD = 0;
+
+				// Set Response Variable
+				_Response = false;
+
+				// Process Command
+				while (!_Response) {
+
+					// Process Command
+					_Response = AT.MONI(this->Modem.LAC, this->Modem.Cell_ID);
+
+					// Set WD Variable
+					_Error_WD++;
+
+					// Control for WD
+					if (_Error_WD > 5) break;
+
+				}
+
+			#endif
 
 			// Print Command State
 			#ifdef GSM_Debug
-				Terminal.Text(23, 115, CYAN, String(this->Modem.RSSI));
+				Terminal_GSM.Text(23, 115, CYAN, String(this->Modem.RSSI));
 			#endif
 
 		}
