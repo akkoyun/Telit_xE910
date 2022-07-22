@@ -1,10 +1,10 @@
-#ifndef __AT_Command_Set__
-#define __AT_Command_Set__
-
 // Define Arduino Library
 #ifndef __Arduino__
 	#include <Arduino.h>
 #endif
+
+// Define AT Command Definitions
+#include "AT_Definitions.h"
 
 class AT_Command_Set {
 
@@ -4085,6 +4085,9 @@ class AT_Command_Set {
 
 			}
 
+			// Response Debug
+			// Serial.println(_Data);
+
 			// End Function
 			return (true);
 
@@ -4339,5 +4342,3 @@ class AT_Command_Set {
 		}
 
 };
-
-#endif /* defined(__AT_Command_Set__) */

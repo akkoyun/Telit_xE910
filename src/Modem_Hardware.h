@@ -1,6 +1,3 @@
-#ifndef __Modem_Hardware__
-#define __Modem_Hardware__
-
 // Define Arduino Library
 #ifndef __Arduino__
 	#include <Arduino.h>
@@ -226,5 +223,3 @@ class Modem_Hardware {
 		}
 
 };
-
-#endif /* defined(__Modem_Hardware__) */

@@ -346,7 +346,7 @@ class GSM_Socket_Outgoing {
 		uint16_t Handle_JSON_Send_Response(const char *_Data) {
 
 			// Declare JSON Object
-			StaticJsonDocument<40> Incoming_JSON;
+			StaticJsonDocument<128> Incoming_JSON;
 
 			// Deserialize the JSON document
 			deserializeJson(Incoming_JSON, _Data);

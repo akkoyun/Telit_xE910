@@ -6,9 +6,9 @@
 	#include <Arduino.h>
 #endif
 
-// Define AT Definition
-#ifndef __AT_Definition__
-	#include "Definition.h"
+// Define Library Includes
+#ifndef __Telit_xE910_Includes__
+	#include "Includes.h"
 #endif
 
 class Telit_xE910 {

@@ -1,15 +1,9 @@
-// Debug Parameters
-#define GSM_Debug
-#ifdef GSM_Debug
+// Terminal Coordinates
+#define Debug_Initialize_X 		(uint8_t) 14
+#define Debug_Initialize_Y 		(uint8_t) 33
 
-	// Terminal Coordinates
-	#define Debug_Initialize_X 14
-	#define Debug_Initialize_Y 33
+#define Debug_Connect_X 		(uint8_t) 14
+#define Debug_Connect_Y 		(uint8_t) 73
 
-	#define Debug_Connect_X 14
-	#define Debug_Connect_Y 73
-
-	#define Debug_Boot_X 29
-	#define Debug_Boot_Y 10
-
-#endif
+#define Debug_Boot_X 			(uint8_t) 29
+#define Debug_Boot_Y 			(uint8_t) 10
