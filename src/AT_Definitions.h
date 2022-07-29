@@ -146,7 +146,7 @@
 #define _AT_GMR_
 #define _AT_ICCID_
 #define _AT_COPS_
-#define _AT_SERVINFO_
+//#define _AT_SERVINFO_
 #define _AT_MONI_
 #define _AT_CSQ_
 #define _AT_FRWL_
