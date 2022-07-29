@@ -875,7 +875,7 @@ class Telit_xE910 {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal_GSM.Text(Debug_Connect_X + 3, Debug_Connect_Y, CYAN, F(" ** "));
+						Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 3, Debug_Connect_Y);
 					#endif
 
 				#endif
@@ -927,8 +927,8 @@ class Telit_xE910 {
 
 						// Print Command State
 						#ifdef GSM_Debug
-							Terminal_GSM.Text(Debug_Connect_X + 2, Debug_Connect_Y, CYAN, F("    "));
-							Terminal_GSM.Text(Debug_Connect_X + 2, Debug_Connect_Y + 1, CYAN, String(_CREG_Connection_Status));
+							Terminal_GSM.Text(Debug_Connect_X + 4, Debug_Connect_Y, CYAN, F("    "));
+							Terminal_GSM.Text(Debug_Connect_X + 4, Debug_Connect_Y + 1, CYAN, String(_CREG_Connection_Status));
 						#endif
 
 						// Control for Connection
@@ -1015,8 +1015,8 @@ class Telit_xE910 {
 
 						// Print Command State
 						#ifdef GSM_Debug
-							Terminal_GSM.Text(Debug_Connect_X + 3, Debug_Connect_Y, CYAN, F("    "));
-							Terminal_GSM.Text(Debug_Connect_X + 3, Debug_Connect_Y + 1, CYAN, String(_CGREG_Connection_Status));
+							Terminal_GSM.Text(Debug_Connect_X + 5, Debug_Connect_Y, CYAN, F("    "));
+							Terminal_GSM.Text(Debug_Connect_X + 5, Debug_Connect_Y + 1, CYAN, String(_CGREG_Connection_Status));
 						#endif
 
 						// Control for Connection
@@ -1404,6 +1404,11 @@ class Telit_xE910 {
 			// Control for Initialization Monitor
 			if (this->Status.Connection) {
 
+				// Print Command State
+				#ifdef GSM_Debug
+					Terminal_GSM.Text(Debug_Connect_X + 12, Debug_Connect_Y, BLUE, F(" .. "));
+				#endif
+
 				// Process Command
 				while (!_Response) {
 
@@ -1426,6 +1431,11 @@ class Telit_xE910 {
 
 				// End Function
 				return(this->Status.Time_Update);
+
+				// Print Command State
+				#ifdef GSM_Debug
+					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 11, Debug_Connect_Y);
+				#endif
 
 			} else {
 
