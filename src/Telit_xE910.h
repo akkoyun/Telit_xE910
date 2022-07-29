@@ -1387,7 +1387,7 @@ class Telit_xE910 {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 11, Debug_Connect_Y);
+					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 12, Debug_Connect_Y);
 				#endif
 
 				// End Function
@@ -1492,11 +1492,6 @@ class Telit_xE910 {
 				// Set Response Variable
 				_Response = false;
 
-				// Print Command State
-				#ifdef GSM_Debug
-					Terminal_GSM.Text(Debug_Connect_X + 8, Debug_Connect_Y, BLUE, F(" .. "));
-				#endif
-
 				// Process Command
 				while (!_Response) {
 
@@ -1513,7 +1508,6 @@ class Telit_xE910 {
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 8, Debug_Connect_Y);
 					Terminal_GSM.Text(24, 112, CYAN, String(this->Modem.Operator));
 				#endif
 
