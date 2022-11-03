@@ -1220,6 +1220,26 @@ class Telit_xE910 {
 
 					}
 
+					// Declare Watchdog Variable
+					_Error_WD = 0;
+
+					// Set Response Variable
+					_Response = false;
+
+					// Process Command
+					while (!_Response) {
+
+						// Send Command
+						_Response = AT.FRWL(1, "176.240.98.205");
+
+						// Set WD Variable
+						_Error_WD++;
+
+						// Control for WD
+						if (_Error_WD > 5) break;
+
+					}
+
 					// End Function
 					if (!_Response) return (false);
 

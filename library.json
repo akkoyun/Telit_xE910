@@ -1,6 +1,6 @@
 {
 	"name": "Telit_xE910",
-	"version": "4.3.23",
+	"version": "4.3.24",
 	"keywords": "GSM, Modem, GPRS, 2G, IoT, Telit, GE910, LE910",
 	"description": "Telit xE910 series GSM modem library.",
 	"authors":
