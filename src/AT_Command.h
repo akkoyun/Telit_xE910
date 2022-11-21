@@ -4,7 +4,7 @@
 #endif
 
 // Define AT Command Definitions
-#include "AT_Definitions.h"
+#include "AT_Command_Config.h"
 
 class AT_Command_Set {
 
@@ -61,6 +61,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_
 		bool AT(void) {
 
 			// Clear UART Buffer
@@ -107,6 +108,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command enables/disables the command echo.
@@ -114,6 +116,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_ATE_
 		bool ATE(const bool _ECHO) {
 
 			// Clear UART Buffer
@@ -161,6 +164,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command enables/disables the report of result code.
@@ -168,6 +172,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CMEE_
 		bool CMEE(const uint8_t _CMEE) {
 
 			// Control for Parameter
@@ -218,6 +223,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command sets the wireless module in specified connection mode (data, fax, voice), hence all the calls done afterwards will be data or voice.
@@ -225,6 +231,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_FCLASS_
 		bool FCLASS(const uint8_t _FCLASS) {
 
 			// Clear UART Buffer
@@ -272,6 +279,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command controls the RS232 flow control behaviour.
@@ -286,6 +294,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_K_
 		bool K(const uint8_t _K) {
 
 			// Clear UART Buffer
@@ -333,6 +342,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Read command reports the PIN/PUK/PUK2 request status of the device.
@@ -344,6 +354,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CPIN_
 		bool CPIN(uint8_t & _Status) {
 
 			// Clear UART Buffer
@@ -432,6 +443,7 @@ class AT_Command_Set {
 			return(false);
 
 		}
+		#endif
 
 		/**
 		 * @brief Query SIM Status unsolicited indication
@@ -440,6 +452,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_QSS_
 		bool QSS(uint8_t & _Mode, uint8_t & _Status) {
 
 			// Clear UART Buffer
@@ -492,6 +505,7 @@ class AT_Command_Set {
 			return(false);
 
 		}
+		#endif
 
 		/**
 		 * @brief Returns the product serial number, identified as the IMEI of the modem.
@@ -499,6 +513,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CGSN_
 		bool CGSN(char * _IMEI) {
 
 			// Clear UART Buffer
@@ -567,6 +582,7 @@ class AT_Command_Set {
 			return(true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command returns the device board serial number.
@@ -574,6 +590,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_GSN_
 		bool GSN(char * _Serial_ID) {
 
 			// Clear UART Buffer
@@ -639,6 +656,7 @@ class AT_Command_Set {
 			return(true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Reads on SIM the ICCID.
@@ -646,6 +664,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CCID_
 		bool CCID(char * _ICCID) {
 
 			// Clear UART Buffer
@@ -714,6 +733,7 @@ class AT_Command_Set {
 			return(true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Returns the manufacturer identification.
@@ -721,6 +741,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_GMI_
 		bool GMI(uint8_t & _Manufacturer) {
 
 			// Clear UART Buffer
@@ -784,6 +805,7 @@ class AT_Command_Set {
 			return(true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Returns the model identification.
@@ -791,6 +813,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_GMM_
 		bool GMM(uint8_t & _Model) {
 
 			// Clear UART Buffer
@@ -859,6 +882,7 @@ class AT_Command_Set {
 			return(true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Returns the software revision identification.
@@ -866,6 +890,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_GMR_
 		bool GMR(char * _Firmware) {
 
 			// Clear UART Buffer
@@ -931,6 +956,7 @@ class AT_Command_Set {
 			return(true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command sets the behaviour of the STAT_LED GPIO.
@@ -942,6 +968,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SLED_
 		bool SLED(const uint8_t _SLED) {
 
 			// Clear UART Buffer
@@ -989,6 +1016,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command enables/disables the Ring Indicator pin response to a Socket Listen connect and, if enabled, the duration of the negative going pulse generated on receipt of connect.
@@ -998,6 +1026,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_E2SLRI_
 		bool E2SLRI(const uint16_t _Pulse_Duration) {
 
 			// Clear UART Buffer
@@ -1045,6 +1074,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command enables/disables the Ring Indicator pin response to one or more events. 
@@ -1065,6 +1095,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_E2RI_
 		bool E2RI(const uint8_t _Event_Mask, const uint16_t _Pulse_Duration) {
 
 			// Clear UART Buffer
@@ -1114,6 +1145,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief There are situations in which the presentation of the URCs controlled by either +CREG and +CGREG are slightly different from ETSI specifications.
@@ -1123,6 +1155,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_REGMODE_
 		bool REGMODE(const uint8_t _REGMODE) {
 
 			// Clear UART Buffer
@@ -1170,6 +1203,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set TXMON pin behaviour.
@@ -1185,6 +1219,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_TXMONMODE_
 		bool TXMONMODE(const uint8_t _TXMONMODE) {
 
 			// Clear UART Buffer
@@ -1232,6 +1267,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command enables/disables the automatic band selection at power-on.
@@ -1242,6 +1278,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_AUTOBND_
 		bool AUTOBND(const uint8_t _Mode) {
 
 			// Clear UART Buffer
@@ -1289,6 +1326,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command forces an attempt to select and register the GSM network operator.
@@ -1302,6 +1340,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_COPS_
 		bool COPS(const uint8_t _Mode, const uint8_t _Format, const uint16_t _Operator) {
 
 			// Clear UART Buffer
@@ -1353,6 +1392,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command enables/disables network registration reports depending on the parameter <mode>.
@@ -1363,6 +1403,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CREG_
 		bool Set_CREG(const bool _Mode) {
 
 			// Clear UART Buffer
@@ -1410,6 +1451,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Get command registration reports depending on the parameter <stat>.
@@ -1423,6 +1465,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CREG_
 		bool Get_CREG(uint8_t & _Stat) {
 
 			// Clear UART Buffer
@@ -1486,6 +1529,7 @@ class AT_Command_Set {
 			return (false);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command controls the presentation of an unsolicited result code
@@ -1495,6 +1539,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CGREG_
 		bool Set_CGREG(const bool _Mode) {
 
 			// Clear UART Buffer
@@ -1542,6 +1587,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Get command controls the presentation of an unsolicited result code.
@@ -1555,6 +1601,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CGREG_
 		bool Get_CGREG(uint8_t & _Stat) {
 
 			// Clear UART Buffer
@@ -1618,6 +1665,7 @@ class AT_Command_Set {
 			return (false);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command specifies PDP context parameter values for a PDP context identified by the (local) context identification parameter, <cid>
@@ -1641,6 +1689,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CGDCONT_
 		bool CGDCONT(const uint8_t _Cid, const char * _PDP_Type, const char * _APN, const char * _PDP_Addr, const bool _D_Comp, const bool _H_Comp) {
 
 			// Clear UART Buffer
@@ -1698,6 +1747,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command is used to activate or deactivate either the GSM context or the specified PDP context.
@@ -1714,6 +1764,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SGACT_
 		bool Set_SGACT(const uint8_t _Cid, const bool _Stat, char * _IP) {
 
 			// Clear UART Buffer
@@ -1807,6 +1858,7 @@ class AT_Command_Set {
 			}
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command is used to get either the GSM context or the specified PDP context.
@@ -1817,6 +1869,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SGACT_
 		bool Get_SGACT(const uint8_t _Cid) {
 
 			// Clear UART Buffer
@@ -1875,6 +1928,7 @@ class AT_Command_Set {
 			return(false);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command is used to activate or deactivate the specified PDP context(s)
@@ -1889,6 +1943,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CGACT_
 		bool Set_CGACT(const uint8_t _Cid, const bool _State) {
 
 			// Clear UART Buffer
@@ -1938,6 +1993,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command is used to activate or deactivate the specified PDP context(s)
@@ -1948,6 +2004,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CGACT_
 		bool Get_CGACT(const uint8_t _Cid) {
 
 			// Clear UART Buffer
@@ -2006,6 +2063,7 @@ class AT_Command_Set {
 			return(false);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command returns a list of PDP addresses for the specified context identifiers in the format:
@@ -2018,6 +2076,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CGPADDR_
 		bool CGPADDR(const uint8_t _Cid,  char * _IP) {
 
 			// Clear UART Buffer
@@ -2090,6 +2149,7 @@ class AT_Command_Set {
 			return(true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command enables/disables the ICMP Ping support.
@@ -2103,6 +2163,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_ICMP_
 		bool ICMP(const uint8_t _Mode) {
 
 			// Clear UART Buffer
@@ -2150,6 +2211,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command reports received signal quality indicators in the form.
@@ -2163,6 +2225,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CSQ_
 		bool CSQ(uint8_t & _RSSI) {
 
 			// Clear UART Buffer
@@ -2241,6 +2304,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command reports information about serving cell.
@@ -2250,6 +2314,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SERVINFO_
 		bool SERVINFO(uint16_t & _Operator, uint16_t & _BARFCN, uint16_t & _dBM, uint16_t & _BSIC, uint16_t & _TA, uint16_t & _GPRS, char * _LAC) {
 
 			// Clear UART Buffer
@@ -2315,6 +2380,7 @@ class AT_Command_Set {
 			}
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command reports information about serving cell.
@@ -2323,6 +2389,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */	
+		#ifdef _AT_MONI_
 		bool MONI(char * _LAC, char * _Cell_ID) {
 
 			// Clear UART Buffer
@@ -2386,6 +2453,7 @@ class AT_Command_Set {
 			}
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command sets one cell out of seven, in a the neighbour list of the serving cell including it, from which extract GSM-related information.
@@ -2393,6 +2461,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_MONIZIP_
 		bool Set_MONIZIP(const uint8_t _Cid = 0) {
 
 			// Clear UART Buffer
@@ -2440,6 +2509,7 @@ class AT_Command_Set {
 			return(true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command sets one cell out of seven, in a the neighbour list of the serving cell including it, from which extract GSM-related information.
@@ -2451,6 +2521,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_MONIZIP_
 		bool Get_MONIZIP(uint16_t & _Operator, uint16_t _BSIC, uint16_t _QUAL, char * _LAC, char * _Cell_ID) {
 
 			// Declare Variable Structure
@@ -2518,6 +2589,7 @@ class AT_Command_Set {
 			return(true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command sets one cell out of seven, in a the neighbour list of the serving cell including it, from which extract GSM-related information.
@@ -2525,6 +2597,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_MONIZIP_
 		bool All_MONIZIP(char * _Response) {
 
 			// Clear UART Buffer
@@ -2570,6 +2643,7 @@ class AT_Command_Set {
 			strcpy(_Response, Buffer_Variable);
 
 		}
+		#endif
 
 		/**
 		 * @brief his command enables and disables automatic time zone update via NITZ.
@@ -2579,6 +2653,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CTZU_
 		bool CTZU(const bool _State) {
 
 			// Clear UART Buffer
@@ -2626,6 +2701,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command enables/disables automatic date/time updating and Network Timezone unsolicited indication.
@@ -2635,6 +2711,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_NITZ_
 		bool NITZ(const bool _State) {
 
 			// Clear UART Buffer
@@ -2682,6 +2759,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief This command permits to calculate and update date and time through NTP protocol(RFC2030), sending a request to a NTP server.
@@ -2697,6 +2775,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_NTP_
 		bool NTP(const char *_NTP_Addr, const uint8_t _NTP_Port, const bool _Update_Module_Clock, const uint8_t _Time_Out, uint8_t & _Year, uint8_t & _Month, uint8_t & _Day, uint8_t & _Hour, uint8_t & _Minute, uint8_t & _Second) {
 
 			// Clear UART Buffer
@@ -2768,6 +2847,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command sets the real-time clock of the ME.
@@ -2780,6 +2860,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_CCLK_
 		bool CCLK(uint8_t & _Year, uint8_t & _Month, uint8_t & _Day, uint8_t & _Hour, uint8_t & _Minute, uint8_t & _Second) {
 
 			// Clear UART Buffer
@@ -2844,6 +2925,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command controls the internal firewall settings.
@@ -2856,6 +2938,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_FRWL_
 		bool FRWL(const uint8_t _Action, const char *_IP_Addr) {
 
 			// Clear UART Buffer
@@ -2906,6 +2989,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief This command sets the parameters needed to the HTTP connection
@@ -2916,6 +3000,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_HTTPCFG_
 		bool HTTPCFG(const char *_HTTP_Server, const uint8_t _Port) {
 
 			// Clear UART Buffer
@@ -2966,6 +3051,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command performs a POST or PUT request to HTTP server and starts sending data to the server.
@@ -2982,6 +3068,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_HTTPSND_
 		bool HTTPSND(const uint8_t _Prof_ID, const uint8_t _Command, const char *_URL, const char *_Data) {
 
 			// Clear UART Buffer
@@ -3071,6 +3158,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command permits the user to read data from HTTP server in response to a previous HTTP module request.
@@ -3080,6 +3168,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_HTTPRCV_
 		bool HTTPRCV(const uint8_t _Prof_ID, char * _Response) {
 
 			// Clear UART Buffer
@@ -3153,6 +3242,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command sets the socket configuration parameters.
@@ -3182,6 +3272,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SCFG_
 		bool SCFG(const uint8_t _Conn_ID, const uint8_t _Cid, const uint16_t _Pkt_Sz, const uint16_t _Max_To, const uint16_t _Conn_To, const uint8_t _TX_To) {
 
 			// Clear UART Buffer
@@ -3239,6 +3330,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command sets the socket configuration extended parameters.
@@ -3269,6 +3361,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SCFGEXT_
 		bool SCFGEXT(const uint8_t _Conn_ID, const uint8_t _Sr_Mode, const uint8_t _Recv_Data_Mode, const uint8_t _Keep_Alive, const uint8_t _Listen_Auto_Rsp, const uint8_t _Send_Data_Mode) {
 
 			// <connId> - socket connection identifier (1..6)
@@ -3333,6 +3426,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command sets the socket configuration extended parameters for features not included in #SCFGEXT command.
@@ -3345,6 +3439,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SCFGEXT2_
 		bool SCFGEXT2(const uint8_t _Conn_ID, const uint8_t _Buffer_Start, const uint8_t _Abort_Conn_Attempt, const uint8_t _SRing_Len, const uint8_t _SRing_To, const uint8_t _No_Carrier_Mode) {
 
 			// Clear UART Buffer
@@ -3402,6 +3497,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set command sets the socket configuration extended parameters for features not included in #SCFGEXT command nor in #SCFGEXT2 command.
@@ -3411,6 +3507,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SCFGEXT3_
 		bool SCFGEXT3(const uint8_t _Conn_ID, const uint8_t _Imm_Rsp, const uint8_t _Closure_Type_Cmd_Mode_Enabling) {
 
 			// Clear UART Buffer
@@ -3462,6 +3559,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Get Socket Status
@@ -3470,6 +3568,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SS_
 		bool SS(const uint8_t _ConnID, uint8_t & _State) {
 
 			// Clear UART Buffer
@@ -3533,6 +3632,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Set Socket Listen
@@ -3543,6 +3643,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SL_
 		bool SL(const uint8_t _ConnID, const bool _Listen_State, const uint16_t _Listen_Port, const uint8_t _Closure_Type) {
 
 			// Clear UART Buffer
@@ -3596,6 +3697,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief This command is used to close a socket.
@@ -3603,6 +3705,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SH_
 		bool SH(const uint8_t _ConnID) {
 
 			// Clear UART Buffer
@@ -3650,6 +3753,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command resumes the direct interface to a socket connection which has been suspended by the escape sequence.
@@ -3657,6 +3761,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SO_
 		bool SO(const uint8_t _ConnID) {
 
 			// Clear UART Buffer
@@ -3704,6 +3809,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command accepts an incoming socket connection after an URC
@@ -3714,6 +3820,7 @@ class AT_Command_Set {
 		 * @return false Function fail.
 		 * TODO:Development
 		 */
+		#ifdef _AT_SA_
 		bool SA(const uint8_t _ConnID, const uint8_t _ConnMode, uint16_t & _Length) {
 
 			// Clear UART Buffer
@@ -3817,6 +3924,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command opens a remote connection via socket.
@@ -3847,6 +3955,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SD_
 		bool SD(const uint8_t _Cid, const uint8_t _Protocol, const uint8_t _Port, const uint8_t _Closure_Type, uint16_t _IPort, const bool _Conn_Mode, const char *_IP) {
 
 			// Clear UART Buffer
@@ -3906,6 +4015,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command permits, while the module is in command mode, to send data through a connected socket.
@@ -3924,6 +4034,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SSEND_
 		bool SSEND(const uint8_t _ConnID, const uint8_t _Send_Type, const uint16_t _Response_Code, const char * _IP, const char * _URL, const char * _Data_Pack) {
 
 			// Clear UART Buffer
@@ -4012,6 +4123,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command permits the user to read data arrived through a connected socket.
@@ -4023,6 +4135,7 @@ class AT_Command_Set {
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SRECV_
 		bool SRECV(const uint8_t _ConnID, const uint16_t _MaxByte, char * _Data) {
 
 			// Clear UART Buffer
@@ -4092,12 +4205,14 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Execution command causes device detach from the network and shut down. Before definitive shut down an OK response is returned.
 		 * @return true Function is success.
 		 * @return false Function fail.
 		 */
+		#ifdef _AT_SHDN_
 		bool SHDN(void) {
 
 			// Clear UART Buffer
@@ -4144,6 +4259,7 @@ class AT_Command_Set {
 			return (true);
 
 		}
+		#endif
 
 		/**
 		 * @brief Detect SRING Response.

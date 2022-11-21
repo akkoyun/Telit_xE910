@@ -3,8 +3,11 @@
 	#include <Arduino.h>
 #endif
 
+// Define Hardware Configuration
+#include "Hardware_Config.h"
+
 // Modem Hardware Class
-class Modem_Hardware {
+class Hardware {
 
 	private:
 
@@ -21,11 +24,78 @@ class Modem_Hardware {
 		 */
 		void Communication(const bool _State) {
 
-			// Enable Communication 
-			if (_State) PORTJ &= 0b11101111;
+			// Set Communication
+			if (_State) {
 
-			// Disable Communication
-			if (!_State) PORTJ |= 0b00010000;
+				// Set Communication Signal
+				PORTJ &= 0b11101111;
+
+				// Set Variable
+				this->Status.Communication = true;
+	
+			} else {
+
+				// Set Communication Signal
+				PORTJ |= 0b00010000;
+
+				// Set Variable
+				this->Status.Communication = false;
+
+			}
+
+		}
+
+		/**
+		 * @brief Power Switch
+		 * @param _State Switch State
+		 */
+		void Power_Switch(const bool _State) {
+
+			// Set Power Switch
+			if (_State) {
+
+				// Set GSM Power Switch Signal
+				PORTH |= 0b00000100;
+
+				// Set Variable
+				this->Status.Power_Switch = true;
+
+			} else {
+
+				// Set GSM Power Switch Signal
+				PORTH &= 0b11111011;
+
+				// Set Variable
+				this->Status.Power_Switch = false;
+
+			}
+		
+		}
+
+		/**
+		 * @brief LED Power
+		 * @param _State LED State
+		 */
+		void LED(const bool _State) {
+
+			// Set LED Status
+			if (_State) {
+
+				// Set GSM LED Signal
+				PORTH &= 0b11101111;
+
+				// Set Variable
+				this->Status.LED = true;
+
+			} else {
+
+				// Set GSM LED Signal
+				PORTH |= 0b00010000;
+
+				// Set Variable
+				this->Status.LED = false;
+
+			}
 
 		}
 
@@ -33,7 +103,7 @@ class Modem_Hardware {
 		 * @brief On or Off Modem.
 		 * @param _Time On/Off Time
 		 */
-		void OnOff(const uint16_t _Time) {
+		void OnOff(void) {
 
 			// Set On/Off Signal HIGH [PJ6]
 			PORTJ |= 0b01000000;
@@ -42,11 +112,11 @@ class Modem_Hardware {
 			for (uint8_t i = 0; i < 100; i++) {
 
 				// Calculate Delay (2000)
-				uint8_t _Delay = _Time / 100;
+				uint8_t _Delay = GSM_Modem_On_Time / 100;
 
 				// Terminal Bar
 				#ifdef GSM_Debug
-					Terminal_GSM.Text(Debug_Boot_X, Debug_Boot_Y + i, WHITE, F("▒"));
+					Terminal_GSM.Text(GSM_Boot_Bar_X, GSM_Boot_Bar_Y + i, WHITE, F("▒"));
 				#endif
 
 				// Wait
@@ -59,7 +129,7 @@ class Modem_Hardware {
 
 			// Clear Bar
 			#ifdef GSM_Debug
-				for (uint8_t i = 0; i < 100; i++) Terminal_GSM.Text(Debug_Boot_X, Debug_Boot_Y + i, WHITE, F(" "));
+				for (uint8_t i = 0; i < 100; i++) Terminal_GSM.Text(GSM_Boot_Bar_X, GSM_Boot_Bar_Y + i, WHITE, F(" "));
 			#endif
 
 		}
@@ -68,48 +138,29 @@ class Modem_Hardware {
 		 * @brief ShutDown Modem
 		 * @param _Time ShutDown Time
 		 */
-		void ShutDown(const uint16_t _Time) {
+		void ShutDown(void) {
 
 			// Set Shut Down Signal HIGH [PJ5]
 			PORTJ |= 0b00100000;
 
 			// Command Delay
-			delay(_Time);
+			delay(GSM_Modem_SDown_Time);
 
 			// Set Shut Down Signal LOW [PJ5]
 			PORTJ &= 0b11011111;
 
 		}
 
-		/**
-		 * @brief Power Switch
-		 * @param _State Switch State
-		 */
-		void Power_Switch(const bool _State) {
-
-			// Set GSM Power Enable
-			if (_State) PORTH |= 0b00000100;
-
-			// Set GSM Power Disable
-			if (!_State) PORTH &= 0b11111011;
-		
-		}
-
-		/**
-		 * @brief LED Power
-		 * @param _State LED State
-		 */
-		void LED(const bool _State) {
-
-			// Set GSM LED Power Enable
-			if (_State) PORTH &= 0b11101111;
-
-			// Set GSM LED Power Disable
-			if (!_State) PORTH |= 0b00010000;
-
-		}
-
 	public:
+
+		// Define Modem Hardware Status
+		struct Struct_Status {
+			bool Communication = false;
+			bool Power_Switch = false;
+			bool LED = false;
+			bool Power = false;
+			bool Power_Monitor = false;
+		} Status;
 
 		/**
 		 * @brief Get Power Monitor
@@ -122,7 +173,10 @@ class Modem_Hardware {
 			if ((PINJ & (1 << PINJ3)) == (1 << PINJ3)) {
 
 				// Response Delay
-				delay(10);
+				delay(5);
+
+				// Set Variable
+				this->Status.Power_Monitor = true;
 
 				// Power Monitor 3V3 HIGH
 				return (true);
@@ -130,7 +184,10 @@ class Modem_Hardware {
 			} else {
 
 				// Response Delay
-				delay(10);
+				delay(5);
+
+				// Set Variable
+				this->Status.Power_Monitor = false;
 
 				// Power Monitor 3V3 LOW
 				return (false);
@@ -150,16 +207,16 @@ class Modem_Hardware {
 		bool ON(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch) {
 
 			// Send Shut Down Signal
-			this->ShutDown(500);
+			this->ShutDown();
 
 			// Enable GSM Modem Power Switch
-			if (_Power_Switch) this->Power_Switch(true);  
+			if (_Power_Switch) this->Power_Switch(Enable);  
 			
 			// Enable GSM Modem LED Feed
-			if (_LED_Switch) this->LED(true);
+			if (_LED_Switch) this->LED(Enable);
 
 			// Set Communication Signal LOW
-			if (_Communication_Switch) this->Communication(true);
+			if (_Communication_Switch) this->Communication(Enable);
 			
 			// Turn On Modem
 			if (this->PowerMonitor()) {
@@ -170,7 +227,7 @@ class Modem_Hardware {
 			} else {
 
 				// Send On Off Signal
-				this->OnOff(5000);
+				this->OnOff();
 
 				// Control for PWMon (PH7)
 				if (this->PowerMonitor()) {
@@ -181,7 +238,7 @@ class Modem_Hardware {
 				} else {
 
 					// Send Shut Down Signal
-					this->ShutDown(200);
+					this->ShutDown();
 
 				}
 
@@ -203,16 +260,16 @@ class Modem_Hardware {
 		bool OFF(const bool _Power_Switch, const bool _LED_Switch, const bool _Communication_Switch) {
 
 			// Turn Off Modem
-			if (this->PowerMonitor()) this->ShutDown(200);
+			if (this->PowerMonitor()) this->ShutDown();
 
 			// Disable GSM LED Power
-			if (_LED_Switch) this->LED(false);
+			if (_LED_Switch) this->LED(Disable);
 
 			// Disable GSM Modem Voltage Translator
-			if (_Communication_Switch) this->Communication(false);
+			if (_Communication_Switch) this->Communication(Disable);
 
 			// Disable GSM Modem Main Power Switch
-			if (_Power_Switch) this->Power_Switch(false);
+			if (_Power_Switch) this->Power_Switch(Disable);
 
 			// Command Delay
 			delay(1000);

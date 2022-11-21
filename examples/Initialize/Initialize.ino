@@ -1,19 +1,40 @@
+// Define Console Parameters
+#define CONSOLE_TEMPLATE_GE910
+#define GSM_Debug
+#define GSM_Boot_Bar_X (uint8_t) 24
+#define GSM_Boot_Bar_Y (uint8_t) 10
+#define GSM_Initialize_X (uint8_t) 5
+#define GSM_Initialize_Y (uint8_t) 33
+#define GSM_Detail_X (uint8_t) 4
+#define GSM_Detail_Y (uint8_t) 80
+#define GSM_Connection_X (uint8_t) 5
+#define GSM_Connection_Y (uint8_t) 40
+#define GSM_Connection_Detail_X (uint8_t) 12
+#define GSM_Connection_Detail_Y (uint8_t) 80
+
+
+
+
+
+
 // Define Libraries
 #include <Telit_xE910.h>
-#include <ArduinoJson.h>
+#include <Console.h>
+//#include <ArduinoJson.h>
 
 // Define Object
 Telit_xE910 GSM;
-GSM_Socket_Incoming Incoming_Socket(2);
-GSM_Socket_Outgoing Outgoing_Socket(3, "54.216.226.171", "/api/v1.1/p402");
 Console Terminal(Serial);
+//GSM_Socket_Incoming Incoming_Socket(2);
+//GSM_Socket_Outgoing Outgoing_Socket(3, "54.216.226.171", "/api/v1.1/p402");
+//Console Terminal(Serial);
 
 // Declare Global Variable
-bool Interrupt = false;
-uint32_t Timer_Counter = 0;
-bool Command_Clear = false;
-bool Listen_Control = false;
-bool Timer_Display = false;
+//bool Interrupt = false;
+//uint32_t Timer_Counter = 0;
+//bool Command_Clear = false;
+//bool Listen_Control = false;
+//bool Timer_Display = false;
 
 void setup() {
 
@@ -41,7 +62,7 @@ void setup() {
 	Terminal.Telit_xE910();
 
 	// GSM Begin
-	GSM.Power(true);
+	GSM.Power(Enable);
 
 	// Initialize Modem
 	GSM.Initialize();
@@ -49,26 +70,28 @@ void setup() {
 	// Connect Modem
 	GSM.Connect();
 
+
+
 	// Socket Config
-	Incoming_Socket.Configure();
-	Outgoing_Socket.Configure();
+//	Incoming_Socket.Configure();
+//	Outgoing_Socket.Configure();
 
 	// Listen Socket
-	Incoming_Socket.Listen(true);
-
-	// Time Update
-	GSM.Time_Update();
+//	Incoming_Socket.Listen(true);
 
 	// Set Pin Change Interrupt Mask 1
-	PCICR |= (1 << PCIE1);
-	PCMSK1 |= (1 << PCINT11) | (1 << PCINT12);
+//	PCICR |= (1 << PCIE1);
+//	PCMSK1 |= (1 << PCINT11) | (1 << PCINT12);
 
-	AVR_Timer_1sn();
+//	AVR_Timer_1sn();
 
 }
 
 void loop() {
 
+		Terminal.Text(2, 2, WHITE, String(millis()));
+
+/*
 	// Print Command State
 	if (Command_Clear) {
 		Terminal.Text(23, 115, CYAN, "   ");
@@ -83,8 +106,8 @@ void loop() {
 		Terminal.Text(2, 2, WHITE, String(millis()));
 		Timer_Display = false;
 	}
-
-
+*/
+/*
 	if (Interrupt) {
 
 		// Declare Variable
@@ -120,9 +143,11 @@ void loop() {
 		Interrupt = false;
 
 	}
+*/
 
 }
 
+/*
 void AVR_Timer_1sn(void) {
 
 	// Timer-0 : 8-bit		- Delay, Millis, Micros, AnalogWrite(5,6)
@@ -193,3 +218,4 @@ ISR(TIMER5_COMPA_vect) {
 	if (Timer_Counter % 10) Timer_Display = true;
 
 }
+*/

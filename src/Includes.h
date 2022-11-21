@@ -23,10 +23,10 @@
 	#endif
 
 	// Define Modem Hardware Library
-	#include "Modem_Hardware.h"
+	#include "Hardware.h"
 
 	// Define AT Command Library
-	#include "AT_Command_Set.h"
+	#include "AT_Command.h"
 
 	// Define Socket Command Library
 	#ifndef __GSM_Socket__
@@ -34,7 +34,7 @@
 	#endif
 
 	// Define Hardware Object
-	Modem_Hardware GSM_Hardware;
+	Hardware GSM_Modem;
 
 	// Define AT Command Object
 	AT_Command_Set AT(Serial_GSM);
