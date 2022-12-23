@@ -4566,6 +4566,64 @@ class AT_Command_Set {
 
 };
 
+// RTC Class
+class xE910_RTC : public AT_Command_Set {
+
+	public:
+
+		// Define Time Structure
+		struct Struct_Time {
+			bool		Time_Update			= false;
+			uint8_t 	Year				= 0;
+			uint8_t 	Month				= 0;
+			uint8_t 	Day					= 0;
+			uint8_t 	Hour				= 0;
+			uint8_t 	Minute				= 0;
+			uint8_t 	Second				= 0;
+		} Time;
+
+		/**
+		 * @brief Pair Modem RTC from Time Server
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
+		bool RTC_Update(void) {
+
+			// Declare Watchdog Variable
+			uint8_t _Error_WD = 0;
+
+			// Print Command State
+			#ifdef GSM_Debug
+				Terminal_GSM.Text(GSM_Console_Connect_X + 13, 42, WHITE, F("AT+CCLK"));
+				Terminal_GSM.Text(GSM_Console_Connect_X + 13, 73, BLUE, F(" .. "));
+			#endif
+
+			// Process Command
+			while (!this->Time.Time_Update) {
+
+				// Send Command
+				this->Time.Time_Update = CCLK(this->Time.Year, this->Time.Month, this->Time.Day, this->Time.Hour, this->Time.Minute, this->Time.Second);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+
+			// Print Command State
+			#ifdef GSM_Debug
+				Terminal_GSM.OK_Decide(this->Time.Time_Update, GSM_Console_Connect_X + 13, 73);
+			#endif
+
+			// End Function
+			return(this->Time.Time_Update);
+
+		}
+
+};
+
 // Data Incoming Class
 class xE910_Incoming : public AT_Command_Set {
 
@@ -4573,29 +4631,9 @@ class xE910_Incoming : public AT_Command_Set {
 
 		// Define Socket Status Structure
 		struct Socket_Status {
-			
-			// Incoming Socket Port Definations
-			uint8_t Port = 2;
+			uint8_t Conn_ID;
 			uint8_t Cid = 1;
 			uint8_t Server_Port = 80;
-
-			// SCFG Parameters
-			struct SCFG_Structure {
-				uint16_t PktSize = 1500;
-				uint8_t MaxTO = 90;
-				uint16_t ConnTO = 300;
-				uint8_t TxTO = 50;
-			} SCFG;
-			
-			// SCFGEXT Parameters
-			struct SCFGEXT_Structure {
-				uint8_t SrMode = 1;
-				uint8_t RecvDataMode = 0;
-				uint8_t KeepAlive = 1;
-				uint8_t AutoResp = 0;
-				uint8_t SendDataMode = 0;
-			} SCFGEXT;
-
 		} Parameter;
 
 		/**
@@ -4624,10 +4662,10 @@ class xE910_Incoming : public AT_Command_Set {
 
 	public:
 
-		xE910_Incoming(uint8_t _Port) : AT_Command_Set() {
+		xE910_Incoming(uint8_t _Conn_ID) : AT_Command_Set() {
 
 			// Set Socket Port
-			this->Parameter.Port = _Port;
+			this->Parameter.Conn_ID = _Conn_ID;
 
 		}
 
@@ -4653,7 +4691,7 @@ class xE910_Incoming : public AT_Command_Set {
 				while (!_Response) {
 
 					// Process Command
-					_Response = SCFG(this->Parameter.Port, this->Parameter.Cid, this->Parameter.SCFG.PktSize, this->Parameter.SCFG.MaxTO, this->Parameter.SCFG.ConnTO, this->Parameter.SCFG.TxTO);
+					_Response = SCFG(this->Parameter.Conn_ID, this->Parameter.Cid, 1500, 90, 300, 50);
 
 					// Set WD Variable
 					_Error_WD++;
@@ -4676,7 +4714,7 @@ class xE910_Incoming : public AT_Command_Set {
 				while (!_Response) {
 
 					// Process Command
-					_Response = SCFGEXT(this->Parameter.Cid, this->Parameter.SCFGEXT.SrMode, this->Parameter.SCFGEXT.RecvDataMode, this->Parameter.SCFGEXT.KeepAlive, this->Parameter.SCFGEXT.AutoResp, this->Parameter.SCFGEXT.SendDataMode);
+					_Response = SCFGEXT(this->Parameter.Cid, 1, 0, 1, 0, 0);
 
 					// Set WD Variable
 					_Error_WD++;
@@ -4711,19 +4749,19 @@ class xE910_Incoming : public AT_Command_Set {
 			uint8_t Socket_Status;
 
 			// Get Socket Status
-			SS(this->Parameter.Port, Socket_Status);
+			SS(this->Parameter.Conn_ID, Socket_Status);
 
 			// Handle State
 			if (_State) {
 
 				// Control Current State
-				if (Socket_Status != 4) SL(this->Parameter.Port, 1, this->Parameter.Server_Port, 255);
+				if (Socket_Status != 4) SL(this->Parameter.Conn_ID, 1, this->Parameter.Server_Port, 255);
 
 				// Command Delay
 				delay(20);
 
 				// Get Socket Status
-				SS(this->Parameter.Port, Socket_Status);
+				SS(this->Parameter.Conn_ID, Socket_Status);
 
 				// Command Delay
 				delay(20);
@@ -4734,13 +4772,13 @@ class xE910_Incoming : public AT_Command_Set {
 			} else {
 
 				// Control Current State
-				if (Socket_Status != 0) SL(this->Parameter.Port, 0, this->Parameter.Server_Port, 255);
+				if (Socket_Status != 0) SL(this->Parameter.Conn_ID, 0, this->Parameter.Server_Port, 255);
 
 				// Command Delay
 				delay(20);
 
 				// Get Socket Status
-				SS(this->Parameter.Port, Socket_Status);
+				SS(this->Parameter.Conn_ID, Socket_Status);
 
 				// Command Delay
 				delay(20);
@@ -4800,13 +4838,13 @@ class xE910_Incoming : public AT_Command_Set {
 		bool Response(uint16_t _Response_Code, char * _Data) {
 
 			// Send Socket Answer
-			if (SSEND(this->Parameter.Port, 1, _Response_Code, "", "", _Data)) {
+			if (SSEND(this->Parameter.Conn_ID, 1, _Response_Code, "", "", _Data)) {
 
 				// Command Delay
 				delay(20);
 
 				// Close Socket
-				if (SH(this->Parameter.Port)) {
+				if (SH(this->Parameter.Conn_ID)) {
 
 					// Command Delay
 					delay(20);
@@ -4862,39 +4900,11 @@ class xE910_Outgoing : public AT_Command_Set {
 
 		// Define Socket Status Structure
 		struct Socket_Status {
-			uint8_t Port = 3;
-			uint8_t Cid = 1;
-
-			// Server Parameters
-			struct Server_Structure {
-				char * Address;
-				char * EndPoint;
-				uint8_t Port = 80;
-			} Server;
-
-			// SCFG Parameters
-			struct SCFG_Structure {
-				uint16_t PktSize = 1500;
-				uint8_t MaxTO = 90;
-				uint16_t ConnTO = 300;
-				uint8_t TxTO = 50;
-			} SCFG;
-
-			// SCFGEXT Parameters
-			struct SCFGEXT_Structure {
-				uint8_t SrMode = 1;
-				uint8_t RecvDataMode = 0;
-				uint8_t KeepAlive = 1;
-				uint8_t AutoResp = 0;
-				uint8_t SendDataMode = 0;
-			} SCFGEXT;
-
+			uint8_t Conn_ID = 3;
+			char * Server_Address;
+			char * Server_EndPoint;
+			uint8_t Server_Port;
 		} Parameter;
-
-		/**
-		 * @brief GSM Serial Stream Definition
-		 */
-		Stream * xE910_Outgoing_Serial;
 
 		/**
 		 * @brief Handle Send Response
@@ -4919,16 +4929,25 @@ class xE910_Outgoing : public AT_Command_Set {
 
 	public:
 
-		xE910_Outgoing(uint8_t _Port, char * _Server, char * _End_Point) : AT_Command_Set() {
+		/**
+		 * @brief Construct a new outgoing socket object.
+		 * @param _Server Remote Server Address
+		 * @param _End_Point Remote Server End Point
+		 * @param _Server_Port Remote Server port
+		 */
+		xE910_Outgoing(uint8_t _Conn_ID, char * _Server, char * _End_Point, uint8_t _Server_Port = 80) : AT_Command_Set() {
 
 			// Set Socket Port
-			this->Parameter.Port = _Port;
+			this->Parameter.Conn_ID = _Conn_ID;
+
+			// Set Socket Port
+			this->Parameter.Server_Port = _Server_Port;
 
 			// Set Socket Server
-			this->Parameter.Server.Address = _Server;
+			this->Parameter.Server_Address = _Server;
 
 			// Set Socket URL
-			this->Parameter.Server.EndPoint = _End_Point;
+			this->Parameter.Server_EndPoint = _End_Point;
 
 		}
 
@@ -4954,7 +4973,7 @@ class xE910_Outgoing : public AT_Command_Set {
 				while (!_Response) {
 
 					// Process Command
-					_Response = SCFG(this->Parameter.Port, this->Parameter.Cid, this->Parameter.SCFG.PktSize, this->Parameter.SCFG.MaxTO, this->Parameter.SCFG.ConnTO, this->Parameter.SCFG.TxTO);
+					_Response = SCFG(this->Parameter.Conn_ID, 1, 1500, 90, 300, 50);
 
 					// Set WD Variable
 					_Error_WD++;
@@ -4977,7 +4996,7 @@ class xE910_Outgoing : public AT_Command_Set {
 				while (!_Response) {
 
 					// Process Command
-					_Response = SCFGEXT(this->Parameter.Cid, this->Parameter.SCFGEXT.SrMode, this->Parameter.SCFGEXT.RecvDataMode, this->Parameter.SCFGEXT.KeepAlive, this->Parameter.SCFGEXT.AutoResp, this->Parameter.SCFGEXT.SendDataMode);
+					_Response = SCFGEXT(1, 1, 0, 1, 0, 0);
 
 					// Set WD Variable
 					_Error_WD++;
@@ -5009,10 +5028,10 @@ class xE910_Outgoing : public AT_Command_Set {
 		uint16_t Send(const char *_Data, char *_Response) {
 
 			// Open Connection
-			if (SD(this->Parameter.Port, 0, this->Parameter.Server.Port, 0, 88, 1, this->Parameter.Server.Address)) {
+			if (SD(this->Parameter.Conn_ID, 0, this->Parameter.Server_Port, 0, 88, 1, this->Parameter.Server_Address)) {
 
 				// Send Data Pack
-				SSEND(this->Parameter.Port, 2, 0, this->Parameter.Server.Address, this->Parameter.Server.EndPoint, _Data);
+				SSEND(this->Parameter.Conn_ID, 2, 0, this->Parameter.Server_Address, this->Parameter.Server_EndPoint, _Data);
 
 				// Declare Ring Status
 				uint8_t Ring_ID;
@@ -5048,10 +5067,126 @@ class xE910_Outgoing : public AT_Command_Set {
 
 };
 
-// Main GSM Class
-class xE910 : public xE910_Hardware, public AT_Command_Set {
+// Cloud Functions
+class xE910_Cloud : public xE910_Outgoing {
 
 	private:
+
+		// Define JSON Info Structure
+		struct JSON_Info_Structure {
+			char * Device_ID;
+			char * Hardware_Version;
+			char * Firmware_Version;
+			float Temperature;
+			float Humidity;
+		} JSON_Info;
+
+		// Define JSON Battery Structure
+		struct JSON_Battery_Structure {
+			float IV;
+			float AC;
+			float SOC;
+			uint8_t Charge;
+			float T;
+			uint16_t FB;
+			uint16_t IB;
+		} JSON_Battery;
+
+		// Define JSON GSM Module Structure
+		struct JSON_GSM_Module_Structure {
+			char * Firmware;
+			char * IMEI;
+			uint8_t Manufacturer;
+			uint8_t Model;
+			char * Serial;
+		} JSON_GSM_Module;
+
+		// Define JSON GSM Operator Structure
+		struct JSON_GSM_Operator_Structure {
+			char * ICCID;
+			uint16_t Code;
+			uint8_t dBm;
+			uint8_t ConnTime;
+			char * LAC;
+			char * Cell_ID;
+		} JSON_GSM_Operator;
+
+
+	public:
+
+		/**
+		 * @brief Construct a new cloud object.
+		 * @param _Conn_ID Modem Connection Handler
+		 * @param _Server Remote Server Address
+		 * @param _End_Point Remote Server End Point
+		 * @param _Server_Port Remote Server port
+		 */
+		xE910_Cloud(char * _Cloud_Server, char * _Cloud_End_Point) : xE910_Outgoing(3, _Cloud_Server, _Cloud_End_Point, 80) {
+
+		}
+
+		// Set Info Variables
+		void Set_Info(char * _Device_ID, char * _Hardware_Version, char * _Firmware_Version, float _Temperature, float _Humidity) {
+
+			// Set Device ID
+			this->JSON_Info.Device_ID = _Device_ID;
+
+			// Set Version
+			this->JSON_Info.Hardware_Version = _Hardware_Version;
+			this->JSON_Info.Firmware_Version = _Firmware_Version;
+
+			// Set Environment
+			this->JSON_Info.Temperature = _Temperature;
+			this->JSON_Info.Humidity = _Humidity;
+
+		}
+
+		// Set Battery Variables
+		void Set_Battery(float _IV, float _AC, float _SOC, uint8_t _Charge, float _T, uint16_t _FB, uint16_t _IB) {
+
+			// Set Battery Parameters
+			this->JSON_Battery.IV = _IV;
+			this->JSON_Battery.AC = _AC;
+			this->JSON_Battery.SOC = _SOC;
+			this->JSON_Battery.Charge = _Charge;
+			this->JSON_Battery.T = _T;
+			this->JSON_Battery.FB = _FB;
+			this->JSON_Battery.IB = _IB;
+
+		}
+
+		// Set GSM Module Variables
+		void Set_GSM_Module(char * _Firmware, char * _IMEI, uint8_t _Manufacturer, uint8_t _Model, char * _Serial) {
+
+			// Set GSM Module Parameters
+			this->JSON_GSM_Module.Firmware = _Firmware;
+			this->JSON_GSM_Module.IMEI = _IMEI;
+			this->JSON_GSM_Module.Manufacturer = _Manufacturer;
+			this->JSON_GSM_Module.Model = _Model;
+			this->JSON_GSM_Module.Serial = _Serial;
+
+		}
+
+		// Set GSM Operator Variables
+		void Set_GSM_Operator(char * _ICCID, uint16_t _Code, uint8_t _dBm, uint8_t _ConnTime, char * _LAC, char * _Cell_ID) {
+
+			// Set GSM Module Parameters
+			this->JSON_GSM_Operator.ICCID = _ICCID;
+			this->JSON_GSM_Operator.Code = _Code;
+			this->JSON_GSM_Operator.dBm = _dBm;
+			this->JSON_GSM_Operator.ConnTime = _ConnTime;
+			this->JSON_GSM_Operator.LAC = _LAC;
+			this->JSON_GSM_Operator.Cell_ID = _Cell_ID;
+
+		}
+
+
+
+
+};
+
+// Main GSM Class
+class xE910 : public xE910_Hardware, public AT_Command_Set {
 
 	public:
 
@@ -5077,17 +5212,6 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 			char 		LAC[5];
 			char 		Cell_ID[5];
 		} Modem;
-
-		// Define Time Structure
-		struct Struct_Time {
-			bool		Time_Update			= false;
-			uint8_t 	Year				= 0;
-			uint8_t 	Month				= 0;
-			uint8_t 	Day					= 0;
-			uint8_t 	Hour				= 0;
-			uint8_t 	Minute				= 0;
-			uint8_t 	Second				= 0;
-		} Time;
 
 		/**
 		 * @brief Construct a new x E910 object
@@ -5211,7 +5335,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = ATE(_AT_ATE_Parameter_);
+						_Response = ATE(0);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5253,7 +5377,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = CMEE(_AT_CMEE_Parameter_);
+						_Response = CMEE(1);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5295,7 +5419,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = FCLASS(_AT_FCLASS_Parameter_);
+						_Response = FCLASS(0);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5337,7 +5461,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = K(_AT_K_Parameter_);
+						_Response = K(0);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5679,7 +5803,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = SLED(_AT_SLED_Parameter);
+						_Response = SLED(2);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5721,7 +5845,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Process Command
-						_Response = E2SLRI(_AT_E2SLRI_Parameter_);
+						_Response = E2SLRI(50);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5809,7 +5933,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Process Command
-						_Response = REGMODE(_AT_REGMODE_Parameter_);
+						_Response = REGMODE(0);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5851,7 +5975,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Process Command
-						_Response = TXMONMODE(_AT_TXMONMODE_Parameter_);
+						_Response = TXMONMODE(1);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5935,7 +6059,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = AUTOBND(_AT_AUTOBND_Parameter);
+						_Response = AUTOBND(1);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5971,7 +6095,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = Set_CREG(_AT_CREG_Parameter);
+						_Response = Set_CREG(0);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -6063,7 +6187,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = Set_CGREG(_AT_CGREG_Parameter);
+						_Response = Set_CGREG(0);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -6161,7 +6285,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Process Command
-						_Response = CGDCONT(_AT_CGDCONT_Parameter_Cid_, _AT_CGDCONT_Parameter_PDP_, _AT_CGDCONT_Parameter_APN_, _AT_CGDCONT_Parameter_PDP_Addr_, _AT_CGDCONT_Parameter_DComp_, _AT_CGDCONT_Parameter_HComp_);
+						_Response = CGDCONT(1, "IP", "mgbs", "0.0.0.0", 0, 0);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -6203,7 +6327,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = Set_SGACT(_AT_SGACT_Parameter_Cid_, _AT_SGACT_Parameter_State_, this->Modem.IP_Address);
+						_Response = Set_SGACT(1, 1, this->Modem.IP_Address);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -6375,7 +6499,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = ICMP(_AT_ICMP_Parameter_Mode_);
+						_Response = ICMP(1);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -6464,46 +6588,6 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 
 			// End Function
 			return(this->Status.Connection);
-
-		}
-
-		/**
-		 * @brief Pair Modem RTC from Time Server
-		 * @return true Function is success.
-		 * @return false Function fail.
-		 */
-		bool RTC_Update(void) {
-
-			// Declare Watchdog Variable
-			uint8_t _Error_WD = 0;
-
-			// Print Command State
-			#ifdef GSM_Debug
-				Terminal_GSM.Text(GSM_Console_Connect_X + 13, 42, WHITE, F("AT+CCLK"));
-				Terminal_GSM.Text(GSM_Console_Connect_X + 13, 73, BLUE, F(" .. "));
-			#endif
-
-			// Process Command
-			while (!this->Time.Time_Update) {
-
-				// Send Command
-				this->Time.Time_Update = CCLK(this->Time.Year, this->Time.Month, this->Time.Day, this->Time.Hour, this->Time.Minute, this->Time.Second);
-
-				// Set WD Variable
-				_Error_WD++;
-
-				// Control for WD
-				if (_Error_WD > 5) break;
-
-			}
-
-			// Print Command State
-			#ifdef GSM_Debug
-				Terminal_GSM.OK_Decide(this->Time.Time_Update, GSM_Console_Connect_X + 13, 73);
-			#endif
-
-			// End Function
-			return(this->Time.Time_Update);
 
 		}
 

@@ -13,7 +13,15 @@ Console Terminal(Serial_Terminal);
 
 // Define Object
 xE910 GSM(Serial_GSM);
-xE910_Outgoing GSM_Out(3, "54.216.226.171", "/api/v1.1/p402");
+xE910_RTC GSM_RTC;
+
+
+
+xE910_Cloud Cloud("54.216.226.171", "/api/v1.1/p402");
+
+
+
+
 xE910_Incoming GSM_IN(2);
 
 
@@ -58,7 +66,11 @@ void setup() {
 	Terminal.Begin();
 	Terminal.Telit_xE910();
 
-	// GSM Begin
+
+
+
+
+	// Power ON GSM Modem
 	GSM.Power(true);
 
 	// Initialize Modem
@@ -68,17 +80,15 @@ void setup() {
 	GSM.Connect();
 
 	// Time Update
-	GSM.RTC_Update();
-
-
-
-
+	GSM_RTC.RTC_Update();
 
 	// Socket Config
-	GSM_Out.Configure();
+	//GSM_Out.Configure();
 
 	// Listen Socket
 	GSM_IN.Configure();
+
+
 
 
 
