@@ -14,6 +14,11 @@
 // Define JSON Handler
 #include <ArduinoJson.h>
 
+/**
+ * @brief GSM Serial Stream Definition
+ */
+Stream * GSM_Serial;
+
 // Modem Hardware Class
 class xE910_Hardware {
 
@@ -244,11 +249,6 @@ class AT_Command_Set {
 	private:
 
 		/**
-		 * @brief GSM Serial Stream Definition
-		 */
-		Stream * GSM_Serial;
-
-		/**
 		 * @brief GSM Serial Buffer Object Definition.
 		 */
 		struct Serial_Buffer {
@@ -277,17 +277,6 @@ class AT_Command_Set {
 		}
 
 	public:
-
-		/**
-		 * @brief Construct a new at command set object
-		 * @param _Serial GSM Serial Object
-		 */
-		AT_Command_Set(Stream &_Serial) {
-
-			// Set Serial Port
-			GSM_Serial = & _Serial;
-
-		}
 
 		/**
 		 * @brief AT Command
@@ -4610,11 +4599,6 @@ class xE910_Incoming : public AT_Command_Set {
 		} Parameter;
 
 		/**
-		 * @brief GSM Serial Stream Definition
-		 */
-		Stream * xE910_Incoming_Serial;
-
-		/**
 		 * @brief Handle JSON Pack Function
 		 * @param _Data JSON Pack
 		 * @return uint16_t Request Command
@@ -4640,7 +4624,7 @@ class xE910_Incoming : public AT_Command_Set {
 
 	public:
 
-		xE910_Incoming(Stream &xE910_Incoming_Serial, uint8_t _Port) : AT_Command_Set(xE910_Incoming_Serial) {
+		xE910_Incoming(uint8_t _Port) : AT_Command_Set() {
 
 			// Set Socket Port
 			this->Parameter.Port = _Port;
@@ -4935,7 +4919,7 @@ class xE910_Outgoing : public AT_Command_Set {
 
 	public:
 
-		xE910_Outgoing(Stream &xE910_Outgoing_Serial, uint8_t _Port, char * _Server, char * _End_Point) : AT_Command_Set(xE910_Outgoing_Serial) {
+		xE910_Outgoing(uint8_t _Port, char * _Server, char * _End_Point) : AT_Command_Set() {
 
 			// Set Socket Port
 			this->Parameter.Port = _Port;
@@ -5109,7 +5093,10 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 		 * @brief Construct a new x E910 object
 		 * @param _Serial GSM Connection Serial
 		 */
-		xE910(Stream &_Serial) : AT_Command_Set(_Serial) {
+		xE910(Stream &_Serial) : AT_Command_Set() {
+
+			// Set Serial Port
+			GSM_Serial = & _Serial;
 
 		}
 

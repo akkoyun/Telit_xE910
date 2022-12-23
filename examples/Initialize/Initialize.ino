@@ -2,30 +2,26 @@
 #define Serial_Terminal 			Serial
 #define Serial_GSM 					Serial3
 
-
-
-
-
-
-// Terminal Coordinates
-#define GSM_Console_Initialize_X	(uint8_t) 5
-#define GSM_Console_Initialize_Y 	(uint8_t) 4
-#define GSM_Console_Detail_X		(uint8_t) 5
-#define GSM_Console_Detail_Y 		(uint8_t) 82
-#define GSM_Console_Connect_X 		(uint8_t) 5
-#define GSM_Console_Connect_Y 		(uint8_t) 42
-#define GSM_Console_Boot_X 			(uint8_t) 24
-#define GSM_Console_Boot_Y 			(uint8_t) 10
-
 // Define Libraries
+#include "Terminal_Variables.h"
 #include <Telit_xE910.h>
 #include <ArduinoJson.h>
+#include <Console.h>
+
+// Define Console
+Console Terminal(Serial_Terminal);
 
 // Define Object
-xE910 GSM(Serial3);
-xE910_Outgoing GSM_Out(Serial3, 3, "54.216.226.171", "/api/v1.1/p402");
-xE910_Incoming GSM_IN(Serial3, 2);
-Console Terminal(Serial);
+xE910 GSM(Serial_GSM);
+xE910_Outgoing GSM_Out(3, "54.216.226.171", "/api/v1.1/p402");
+xE910_Incoming GSM_IN(2);
+
+
+
+
+
+
+
 
 
 // Declare Global Variable
