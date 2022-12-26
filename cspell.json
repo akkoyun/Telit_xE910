@@ -14,6 +14,8 @@
         "BSIC",
         "CCID",
         "CCLK",
+        "CEER",
+        "CEERNET",
         "CGACT",
         "CGDCONT",
         "CGPADDR",

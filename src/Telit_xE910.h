@@ -1530,6 +1530,67 @@ class AT_Command_Set {
 		}
 
 		/**
+		 * @brief Execution command causes the TA to return a numeric code in the format
+		 * @return true Function is success.
+		 * @return false Function fail.
+		 */
+		bool CEER(uint16_t & _Code) {
+
+			// Clear UART Buffer
+			Clear_UART_Buffer();
+
+			// Declare Buffer Object
+			Serial_Buffer Buffer = {false, 0, 0, 1000};
+
+			// Declare Buffer
+			char Buffer_Variable[255];
+			memset(Buffer_Variable, '\0', 255);
+
+			// Command Chain Delay (Advice by Telit)
+			delay(20);
+
+			// Send UART Command
+			GSM_Serial->print(F("AT#CEER"));
+			GSM_Serial->print(F("\r\n"));
+
+			// Read Current Time
+			const uint32_t Current_Time = millis();
+
+			// Response Wait Delay
+			delay(10);
+
+			// Read UART Response
+			while (!Buffer.Response) {
+
+				// Read Serial Char
+				Buffer_Variable[Buffer.Read_Order] = GSM_Serial->read();
+
+				// Control for <OK> Response
+				if (Buffer_Variable[Buffer.Read_Order - 1] == 'O' and Buffer_Variable[Buffer.Read_Order] == 'K') Buffer.Response = true;
+
+				// Increase Read Order
+				if (Buffer_Variable[Buffer.Read_Order] > 31 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
+
+				// Handle for timeout
+				if (millis() - Current_Time >= Buffer.Time_Out) return(false);
+
+			}
+
+			// Serial.println(Buffer_Variable);
+
+			// Handle Variables
+			uint8_t _Variable_Count = sscanf(Buffer_Variable, "#CEER: %03dOK", &_Code);
+
+			// Control for Variable
+			if (_Variable_Count == 1) return(true);
+
+			// End Function
+			return(false);
+
+
+		}
+
+		/**
 		 * @brief Set command forces an attempt to select and register the GSM network operator.
 		 * @param _Mode Parameter
 		 * 0 - automatic choice (the parameter <oper> will be ignored) (factory default)
@@ -1559,10 +1620,12 @@ class AT_Command_Set {
 			// Send UART Command
 			GSM_Serial->print(F("AT+COPS="));
 			GSM_Serial->print(_Mode);
-			GSM_Serial->print(F(","));
-			GSM_Serial->print(_Format);
-			GSM_Serial->print(F(","));
-			GSM_Serial->print(_Operator);
+			if (_Format != 99 or _Operator != 99) {
+				GSM_Serial->print(F(","));
+				GSM_Serial->print(_Format);
+				GSM_Serial->print(F(","));
+				GSM_Serial->print(_Operator);
+			}
 			GSM_Serial->print(F("\r\n"));
 
 			// Read Current Time
@@ -4584,7 +4647,7 @@ class AT_Command_Set {
 };
 
 // RTC Class
-class xE910_RTC : public AT_Command_Set {
+class xE910_RTC : private AT_Command_Set {
 
 	public:
 
@@ -4642,7 +4705,7 @@ class xE910_RTC : public AT_Command_Set {
 };
 
 // Data Incoming Class
-class xE910_Incoming : public AT_Command_Set {
+class xE910_Incoming : private AT_Command_Set {
 
 	private:
 
@@ -4911,7 +4974,7 @@ class xE910_Incoming : public AT_Command_Set {
 };
 
 // Data Send Class
-class xE910_Outgoing : public AT_Command_Set {
+class xE910_Outgoing : private AT_Command_Set {
 
 	private:
 
@@ -4981,58 +5044,48 @@ class xE910_Outgoing : public AT_Command_Set {
 			// Declare Response Status
 			bool _Response = false;
 
-				// Print Command State
-				#ifdef GSM_Debug
-					//Terminal_GSM.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
-				#endif
+			// Process Command
+			while (!_Response) {
 
 				// Process Command
-				while (!_Response) {
+				_Response = SCFG(this->Parameter.Conn_ID, 1, 1500, 90, 300, 50);
 
-					// Process Command
-					_Response = SCFG(this->Parameter.Conn_ID, 1, 1500, 90, 300, 50);
+				// Set WD Variable
+				_Error_WD++;
 
-					// Set WD Variable
-					_Error_WD++;
+				// Control for WD
+				if (_Error_WD > 5) break;
 
-					// Control for WD
-					if (_Error_WD > 5) break;
-
-				}
-
-				// End Function
-				if (!_Response) return (false);
-
-				// Declare Watchdog Variable
-				_Error_WD = 0;
-
-				// Set Response Variable
-				_Response = false;
-
-				// Process Command
-				while (!_Response) {
-
-					// Process Command
-					_Response = SCFGEXT(1, 1, 0, 1, 0, 0);
-
-					// Set WD Variable
-					_Error_WD++;
-
-					// Control for WD
-					if (_Error_WD > 5) break;
-
-				}
-
-				// Print Command State
-				#ifdef GSM_Debug
-					//Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
-				#endif
-			
-				// End Function
-				if (!_Response) return (false);
+			}
 
 			// End Function
-			return(false);
+			if (!_Response) return (false);
+
+			// Declare Watchdog Variable
+			_Error_WD = 0;
+
+			// Set Response Variable
+			_Response = false;
+
+			// Process Command
+			while (!_Response) {
+
+				// Process Command
+				_Response = SCFGEXT(1, 1, 0, 1, 0, 0);
+
+				// Set WD Variable
+				_Error_WD++;
+
+				// Control for WD
+				if (_Error_WD > 5) break;
+
+			}
+		
+			// End Function
+			if (!_Response) return (false);
+
+			// End Function
+			return(true);
 
 		}
 
@@ -5085,72 +5138,248 @@ class xE910_Outgoing : public AT_Command_Set {
 };
 
 // Cloud Functions
-class xE910_Cloud : public xE910_Outgoing {
+class PostOffice : private xE910_Outgoing {
 
 	private:
 
+		// Device ID
+		char * Device_ID;
+
+		// Global Definitions
+		// __Firmware__
+		// __Hardware__
+
+		// Time Stamp
+		char * Time_Stamp;
+
+		// Define JSON Control Structure
+		struct JSON_Control_Structure {
+
+			// Define JSON Status Structure
+			struct JSON_Status_Structure {
+				uint16_t * Device;
+				uint16_t * Fault;
+			} JSON_Status;
+
+			// Fault Control Status 
+			struct JSON_Fault_Structure {
+				bool * PhaseLose;
+				bool * Thermic;
+				bool * MotorProtection;
+				bool * ContactorAnomaly;
+			} JSON_Fault_Status;
+
+			// Pressure Control Status
+			struct JSON_Pressure_Structure {
+				bool * Limit_Control;
+				float * Limit_Min;
+				float * Limit_Max;
+				bool * Regression_Control;
+				float * Regression_Max;
+			} JSON_Pressure_Status;
+
+			// Voltage Control Status
+			struct JSON_Voltage_Structure {
+				bool * Limit_Control;
+				float * Limit_Min;
+				float * Limit_Max;
+				bool * Imbalance_Control;
+				float * Imbalance_Max;
+			} JSON_Voltage_Status;
+
+			// Current Control Status
+			struct JSON_Current_Structure {
+				bool * Limit_Control;
+				float * Limit_Min;
+				float * Limit_Max;
+				bool * Imbalance_Control;
+				float * Imbalance_Max;
+				uint16_t * Multiplexer;
+			} JSON_Current_Status;
+
+			// Frequency Control Status
+			struct JSON_Frequency_Structure {
+				bool * Limit_Control;
+				float * Limit_Min;
+				float * Limit_Max;
+			} JSON_Frequency_Status;
+
+		} JSON_Control;
+
 		// Define JSON Info Structure
-		struct JSON_Info_Structure {
-			char * Device_ID;
-			char * Hardware_Version;
-			char * Firmware_Version;
-			float Temperature;
-			float Humidity;
-		} JSON_Info;
+		struct JSON_Environment_Structure {
+			float * Temperature;
+			float * Humidity;
+		} JSON_Environment;
 
 		// Define JSON Battery Structure
 		struct JSON_Battery_Structure {
-			float IV;
-			float AC;
-			float SOC;
-			uint8_t Charge;
-			float T;
-			uint16_t FB;
-			uint16_t IB;
+			float * IV;
+			float * AC;
+			float * SOC;
+			uint8_t * Charge;
+			float * T;
+			uint16_t * FB;
+			uint16_t * IB;
 		} JSON_Battery;
+
+		// In Functions Variables
+		// Connection_Time		// Optional
+		// IMEI					// Optional
+		// Serial_ID			// Optional
+		// ICCID				// Optional
+		// Manufacturer			// Optional
+		// Model				// Optional
+		// Firmware				// Optional
+		// dBm
+		// IP_Address
+		// Operator
+		// LAC
+		// Cell_ID
+
 
 	public:
 
-		/**
-		 * @brief Construct a new cloud object.
-		 * @param _Conn_ID Modem Connection Handler
-		 * @param _Server Remote Server Address
-		 * @param _End_Point Remote Server End Point
-		 * @param _Server_Port Remote Server port
-		 */
-		xE910_Cloud(char * _Cloud_Server, char * _Cloud_End_Point) : xE910_Outgoing(3, _Cloud_Server, _Cloud_End_Point, 80) {
+		// PostOffice Constructor
+		PostOffice(void) : xE910_Outgoing(3, Cloud_Server, Cloud_EndPoint, 80) {
 
 		}
 
-		// Set Info Variables
-		void Set_Info(char * _Device_ID, char * _Hardware_Version, char * _Firmware_Version, float _Temperature, float _Humidity) {
+		// Connect Cloud
+		void Connect(char * _Device_ID) {
 
 			// Set Device ID
-			this->JSON_Info.Device_ID = _Device_ID;
+			this->Device_ID = _Device_ID;
 
-			// Set Version
-			this->JSON_Info.Hardware_Version = _Hardware_Version;
-			this->JSON_Info.Firmware_Version = _Firmware_Version;
+			// Print Command State
+			#ifdef GSM_Debug
+				Terminal_GSM.Text(21, 42, WHITE, F("PostOffice Connection"));
+				Terminal_GSM.Text(21, 42 + 31, BLUE, F(" .. "));
+			#endif
+
+			// Connect to Postoffice cloud
+			bool _Response = Configure();
+
+			// Print Command State
+			#ifdef GSM_Debug
+				Terminal_GSM.OK_Decide(_Response, 21, 42 + 31);
+			#endif
+
+		}
+
+		// Set Environment Variables
+		void Environment(float * _Temperature, float * _Humidity) {
 
 			// Set Environment
-			this->JSON_Info.Temperature = _Temperature;
-			this->JSON_Info.Humidity = _Humidity;
+			this->JSON_Environment.Temperature = _Temperature;
+			this->JSON_Environment.Humidity = _Humidity;
 
 		}
 
 		// Set Battery Variables
-		void Set_Battery(float _IV, float _AC, float _SOC, uint8_t _Charge, float _T, uint16_t _FB, uint16_t _IB) {
+		void Battery(float * _IV, float * _AC, float * _SOC, uint8_t * _Charge, float * _T, uint16_t * _FB, uint16_t * _IB) {
 
 			// Set Battery Parameters
 			this->JSON_Battery.IV = _IV;
 			this->JSON_Battery.AC = _AC;
 			this->JSON_Battery.SOC = _SOC;
 			this->JSON_Battery.Charge = _Charge;
-			this->JSON_Battery.T = _T;
-			this->JSON_Battery.FB = _FB;
-			this->JSON_Battery.IB = _IB;
+			this->JSON_Battery.T = _T;				// Optional
+			this->JSON_Battery.FB = _FB;			// Optional
+			this->JSON_Battery.IB = _IB;			// Optional
 
 		}
+
+		// Set TimeStamp
+		void TimeStamp(char * _TimeStamp) {
+
+			// Set Time Stamp
+			this->Time_Stamp = _TimeStamp;
+
+		}
+
+		// Set Status
+		void Status(uint16_t * _Device, uint16_t * _Fault) {
+
+			// Set Device Status Variables
+			this->JSON_Control.JSON_Status.Device = _Device;
+			this->JSON_Control.JSON_Status.Fault = _Fault;
+
+		}
+
+		// Set Status Details
+		void Status_Fault(bool * _PhaseLose, bool * _Thermic, bool * _MotorProtection, bool * _ContactorAnomaly) {
+
+			// Set Status Detail Variables
+			this->JSON_Control.JSON_Fault_Status.PhaseLose = _PhaseLose;
+			this->JSON_Control.JSON_Fault_Status.Thermic = _Thermic;
+			this->JSON_Control.JSON_Fault_Status.MotorProtection = _MotorProtection;
+			this->JSON_Control.JSON_Fault_Status.ContactorAnomaly = _ContactorAnomaly;
+
+		}
+		void Status_Pressure(bool * _Limit, float * _Min, float * _Max, bool * _Regression, float * _RMax) {
+
+			// Set Status Detail Variables
+			this->JSON_Control.JSON_Pressure_Status.Limit_Control = _Limit;
+			this->JSON_Control.JSON_Pressure_Status.Limit_Min = _Min;
+			this->JSON_Control.JSON_Pressure_Status.Limit_Max = _Max;
+			this->JSON_Control.JSON_Pressure_Status.Regression_Control = _Regression;
+			this->JSON_Control.JSON_Pressure_Status.Regression_Max = _RMax;
+
+		}
+		void Status_Voltage(bool * _Limit, float * _Min, float * _Max, bool * _Imbalance, float * _IMax) {
+
+			// Set Status Detail Variables
+			this->JSON_Control.JSON_Voltage_Status.Limit_Control = _Limit;
+			this->JSON_Control.JSON_Voltage_Status.Limit_Min = _Min;
+			this->JSON_Control.JSON_Voltage_Status.Limit_Max = _Max;
+			this->JSON_Control.JSON_Voltage_Status.Imbalance_Control = _Imbalance;
+			this->JSON_Control.JSON_Voltage_Status.Imbalance_Max = _IMax;
+
+		}
+		void Status_Current(bool * _Limit, float * _Min, float * _Max, bool * _Imbalance, float * _IMax, uint16_t * _Multiplexer) {
+
+			// Set Status Detail Variables
+			this->JSON_Control.JSON_Current_Status.Limit_Control = _Limit;
+			this->JSON_Control.JSON_Current_Status.Limit_Min = _Min;
+			this->JSON_Control.JSON_Current_Status.Limit_Max = _Max;
+			this->JSON_Control.JSON_Current_Status.Imbalance_Control = _Imbalance;
+			this->JSON_Control.JSON_Current_Status.Imbalance_Max = _IMax;
+			this->JSON_Control.JSON_Current_Status.Multiplexer = _Multiplexer;
+
+		}
+		void Status_Frequency(bool * _Limit, float * _Min, float * _Max) {
+
+			// Set Status Detail Variables
+			this->JSON_Control.JSON_Frequency_Status.Limit_Control = _Limit;
+			this->JSON_Control.JSON_Frequency_Status.Limit_Min = _Min;
+			this->JSON_Control.JSON_Frequency_Status.Limit_Max = _Max;
+
+		}
+
+		// Pressure Payload
+		void Pressure(float * _Inst, float * _Min, float * _Max, float * _Avg, float * _Slope, float * _Offset, float * _R2, uint16_t * _DataCount) {
+
+
+		}
+
+		// Energy Payload
+		void Voltage(uint8_t _Phase, float * _Inst, float * _Min, float * _Max, float * _Avg, float * _Slope, float * _Offset, float * _R2, uint16_t * _DataCount) {
+
+
+		}
+		void Current(uint8_t _Phase, float * _Inst, float * _Min, float * _Max, float * _Avg, float * _Slope, float * _Offset, float * _R2, uint16_t * _DataCount) {
+
+
+		}
+
+
+
+
+
+
+
+
 
 };
 
@@ -5820,6 +6049,48 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 
 				#endif
 
+				// TXMONMODE Command
+				#ifdef _AT_TXMONMODE_
+
+					// Declare Watchdog Variable
+					_Error_WD = 0;
+
+					// Set Response Variable
+					_Response = false;
+
+					// Print Command State
+					#ifdef GSM_Debug
+						Terminal_GSM.Text(GSM_Console_Initialize_ROW, GSM_Console_Initialize_Y, WHITE, F("AT#TXMONMODE=1"));
+						Terminal_GSM.Text(GSM_Console_Initialize_ROW, GSM_Console_Initialize_Y + 29, BLUE, F(" .. "));
+					#endif
+
+					// Process Command
+					while (!_Response) {
+
+						// Process Command
+						_Response = TXMONMODE(1);
+
+						// Set WD Variable
+						_Error_WD++;
+
+						// Control for WD
+						if (_Error_WD > 5) break;
+
+					}
+
+					// Print Command State
+					#ifdef GSM_Debug
+						Terminal_GSM.OK_Decide(_Response, GSM_Console_Initialize_ROW, GSM_Console_Initialize_Y + 29);
+					#endif
+				
+					// End Function
+					if (!_Response) return (false);
+
+					// Set Variable
+					GSM_Console_Initialize_ROW += 1;
+
+				#endif
+
 				// Set Variable
 				this->Status.Initialize = true;
 
@@ -5885,7 +6156,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Process Command
-						_Response = REGMODE(0);
+						_Response = REGMODE(_AT_REGMODE_mode_);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5908,8 +6179,14 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					
 				#endif
 
-				// TXMONMODE Command
-				#ifdef _AT_TXMONMODE_
+				// AUTOBND Command
+				#ifdef _AT_AUTOBND_
+
+					// Print Command State
+					#ifdef GSM_Debug
+						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y, WHITE, F("AT#AUTOBND=1"));
+						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, BLUE, F(" .. "));
+					#endif
 
 					// Declare Watchdog Variable
 					_Error_WD = 0;
@@ -5917,17 +6194,11 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					// Set Response Variable
 					_Response = false;
 
-					// Print Command State
-					#ifdef GSM_Debug
-						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y, WHITE, F("AT#TXMONMODE=1"));
-						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, BLUE, F(" .. "));
-					#endif
-
 					// Process Command
 					while (!_Response) {
 
-						// Process Command
-						_Response = TXMONMODE(1);
+						// Send Command
+						_Response = AUTOBND(_AT_AUTOBND_value_);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5937,13 +6208,13 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 
 					}
 
+					// End Function
+					if (!_Response) return (false);
+
 					// Print Command State
 					#ifdef GSM_Debug
 						Terminal_GSM.OK_Decide(_Response, GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31);
 					#endif
-				
-					// End Function
-					if (!_Response) return (false);
 
 					// Set Variable
 					GSM_Console_Connect_ROW += 1;
@@ -5969,49 +6240,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = COPS(0, 2, 28601);
-
-						// Set WD Variable
-						_Error_WD++;
-
-						// Control for WD
-						if (_Error_WD > 5) break;
-
-					}
-
-					// End Function
-					if (!_Response) return (false);
-
-					// Print Command State
-					#ifdef GSM_Debug
-						Terminal_GSM.OK_Decide(_Response, GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31);
-					#endif
-
-					// Set Variable
-					GSM_Console_Connect_ROW += 1;
-
-				#endif
-
-				// AUTOBND Command
-				#ifdef _AT_AUTOBND_
-
-					// Print Command State
-					#ifdef GSM_Debug
-						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y, WHITE, F("AT#AUTOBND=1"));
-						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, BLUE, F(" .. "));
-					#endif
-
-					// Declare Watchdog Variable
-					_Error_WD = 0;
-
-					// Set Response Variable
-					_Response = false;
-
-					// Process Command
-					while (!_Response) {
-
-						// Send Command
-						_Response = AUTOBND(1);
+						_Response = COPS(_AT_COPS_mode_, _AT_COPS_format_, _AT_COPS_oper_); // 0,2,28601
 
 						// Set WD Variable
 						_Error_WD++;
@@ -6062,14 +6291,23 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, CYAN, F(" ** "));
+						Terminal_GSM.OK_Decide(_Response, GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31);
 					#endif
+
+					// Set Variable
+					GSM_Console_Connect_ROW += 1;
 
 					// Declare Watchdog Variable
 					_Error_WD = 0;
 
 					// Declare Response Status
 					_Response = false;
+
+					// Print Command State
+					#ifdef GSM_Debug
+						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y, WHITE, F("AT+CREG?"));
+						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, BLUE, F(" .. "));
+					#endif
 
 					// Process Command
 					while (!_Response) {
@@ -6083,8 +6321,19 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 						// Print Command State
 						#ifdef GSM_Debug
 							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, CYAN, F("    "));
-							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 32, CYAN, String(_CREG_Connection_Status));
+							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 32, RED, String(_CREG_Connection_Status));
 						#endif
+
+						// Control for Connection
+						if (_CREG_Connection_Status == 3) {
+							
+							uint16_t _Error_Code;
+							CEER(_Error_Code);
+
+							Terminal_GSM.Text(27, 5, RED, F("CEER Code : "));
+							Terminal_GSM.Text(27, 17, RED, String(_Error_Code));
+
+						}
 
 						// Control for Connection
 						if (_CREG_Connection_Status == 1 or _CREG_Connection_Status == 5) {
@@ -6112,7 +6361,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 						_Error_WD++;
 
 						// Control for WD
-						if (_Error_WD > 150) return(false);
+						if (_Error_WD > 100) return(false);
 
 					}
 

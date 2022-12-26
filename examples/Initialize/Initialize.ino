@@ -15,9 +15,8 @@ Console Terminal(Serial_Terminal);
 xE910 GSM(Serial_GSM);
 xE910_RTC GSM_RTC;
 
-
-
-xE910_Cloud Cloud("54.216.226.171", "/api/v1.1/p402");
+// Set PostOffice Cloud API
+PostOffice Postoffice;
 
 
 
@@ -81,6 +80,42 @@ void setup() {
 
 	// Time Update
 	GSM_RTC.RTC_Update();
+
+
+
+
+	float T = 23.12;
+	float H = 38.12;
+
+	float IV = 4.12;
+	float AC = 0.32;
+	float SOC = 99.22;
+	uint8_t Charge = 3;
+	float BT = 30.12;
+	uint16_t FB = 2000;
+	uint16_t IB = 1200;
+
+	uint16_t DeviceStatus = 240;
+	uint16_t FaultStatus = 500;
+
+	bool Fault1 = true;
+	bool Fault2 = true;
+	bool Fault3 = true;
+	bool Fault4 = true;
+
+	// Set PostOffice
+	Postoffice.Connect("70A11D1D01000026");
+	Postoffice.Environment(&T, &H);
+	Postoffice.Battery(&IV, &AC, &SOC, &Charge, &BT, &FB, &IB);
+
+	Postoffice.TimeStamp("2022-03-23 14:18:28");
+	Postoffice.Status(&DeviceStatus, &FaultStatus);
+	Postoffice.Status_Fault(&Fault1, &Fault2, &Fault3, &Fault4);
+
+
+
+
+
 
 	// Socket Config
 	//GSM_Out.Configure();
@@ -171,3 +206,4 @@ ISR(TIMER5_COMPA_vect) {
 	if (Timer_Counter % 1) Timer_Display = true;
 
 }
+

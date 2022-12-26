@@ -7,13 +7,21 @@
 	// Define AT Command Defaults	
 	#include "AT_Definitions.h"
 	
-	
-	
-	
-	
-	
 
 
+
+
+	// Define Cloud Server
+	#ifndef Cloud_Server
+		#define Cloud_Server "54.216.226.171"
+	#endif
+	#ifndef Cloud_EndPoint
+		#define Cloud_EndPoint "/api/v1.1/p402"
+	#endif
+	
+	
+	
+	
 
 
 

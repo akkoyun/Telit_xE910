@@ -5,9 +5,29 @@
 #define _AT_K_
 #define _AT_SLED_
 #define _AT_E2SLRI_
+
+// RegMode Command
 #define _AT_REGMODE_
-#define _AT_TXMONMODE_
+#ifdef _AT_REGMODE_
+	#define _AT_REGMODE_mode_ 0
+#endif
+
+// Cops Command
+#define _AT_COPS_
+#ifdef _AT_COPS_
+	#define _AT_COPS_mode_ 0
+	#define _AT_COPS_format_ 2
+	#define _AT_COPS_oper_ 28601
+#endif
+
+// AutoBnd Command
 #define _AT_AUTOBND_
+#ifdef _AT_AUTOBND_
+	#define _AT_AUTOBND_value_ 1
+#endif
+
+
+#define _AT_TXMONMODE_
 #define _AT_CREG_
 #define _AT_CGREG_
 #define _AT_CGDCONT_
@@ -20,7 +40,6 @@
 #define _AT_GMM_
 #define _AT_GMR_
 #define _AT_ICCID_
-#define _AT_COPS_
 //#define _AT_SERVINFO_
 #define _AT_MONIZIP_
 #define _AT_CSQ_
