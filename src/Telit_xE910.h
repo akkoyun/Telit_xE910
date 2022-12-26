@@ -19,6 +19,23 @@
  */
 Stream * GSM_Serial;
 
+// Define Modem Structure
+struct Struct_Modem {
+	uint8_t 	PIN;
+	uint8_t 	Connection_Time		= 0;
+	char 		IMEI[17];
+	char 		Serial_ID[11]; 
+	char 		ICCID[21];
+	uint8_t 	Manufacturer;
+	uint8_t 	Model;
+	char 		Firmware[10];
+	uint8_t 	dBm;
+	char 		IP_Address[16];
+	uint16_t 	Operator;
+	char 		LAC[5];
+	char 		Cell_ID[5];
+} Modem;
+
 // Modem Hardware Class
 class xE910_Hardware {
 
@@ -5092,26 +5109,6 @@ class xE910_Cloud : public xE910_Outgoing {
 			uint16_t IB;
 		} JSON_Battery;
 
-		// Define JSON GSM Module Structure
-		struct JSON_GSM_Module_Structure {
-			char * Firmware;
-			char * IMEI;
-			uint8_t Manufacturer;
-			uint8_t Model;
-			char * Serial;
-		} JSON_GSM_Module;
-
-		// Define JSON GSM Operator Structure
-		struct JSON_GSM_Operator_Structure {
-			char * ICCID;
-			uint16_t Code;
-			uint8_t dBm;
-			uint8_t ConnTime;
-			char * LAC;
-			char * Cell_ID;
-		} JSON_GSM_Operator;
-
-
 	public:
 
 		/**
@@ -5155,34 +5152,6 @@ class xE910_Cloud : public xE910_Outgoing {
 
 		}
 
-		// Set GSM Module Variables
-		void Set_GSM_Module(char * _Firmware, char * _IMEI, uint8_t _Manufacturer, uint8_t _Model, char * _Serial) {
-
-			// Set GSM Module Parameters
-			this->JSON_GSM_Module.Firmware = _Firmware;
-			this->JSON_GSM_Module.IMEI = _IMEI;
-			this->JSON_GSM_Module.Manufacturer = _Manufacturer;
-			this->JSON_GSM_Module.Model = _Model;
-			this->JSON_GSM_Module.Serial = _Serial;
-
-		}
-
-		// Set GSM Operator Variables
-		void Set_GSM_Operator(char * _ICCID, uint16_t _Code, uint8_t _dBm, uint8_t _ConnTime, char * _LAC, char * _Cell_ID) {
-
-			// Set GSM Module Parameters
-			this->JSON_GSM_Operator.ICCID = _ICCID;
-			this->JSON_GSM_Operator.Code = _Code;
-			this->JSON_GSM_Operator.dBm = _dBm;
-			this->JSON_GSM_Operator.ConnTime = _ConnTime;
-			this->JSON_GSM_Operator.LAC = _LAC;
-			this->JSON_GSM_Operator.Cell_ID = _Cell_ID;
-
-		}
-
-
-
-
 };
 
 // Main GSM Class
@@ -5194,24 +5163,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 		struct Struct_Status {
 			bool 		Initialize		 	= false;
 			bool		Connection			= false;
-			uint8_t 	Connection_Time		= 0;
 		} Status;
-
-		// Define Modem Structure
-		struct Struct_Modem {
-			uint8_t 	PIN 				= 0;
-			char 		IMEI[17];
-			char 		Serial_ID[11]; 
-			char 		ICCID[21];
-			uint8_t 	Manufacturer 		= 0;
-			uint8_t 	Model 				= 0;
-			char 		Firmware[10];
-			uint8_t 	dBm					= 0;
-			char 		IP_Address[16];
-			uint16_t 	Operator			= 0;
-			char 		LAC[5];
-			char 		Cell_ID[5];
-		} Modem;
 
 		/**
 		 * @brief Construct a new x E910 object
@@ -5503,7 +5455,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = CPIN(this->Modem.PIN);
+						_Response = CPIN(Modem.PIN);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5545,7 +5497,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = CGSN(this->Modem.IMEI);
+						_Response = CGSN(Modem.IMEI);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5588,7 +5540,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = GSN(this->Modem.Serial_ID);
+						_Response = GSN(Modem.Serial_ID);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5631,7 +5583,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = CCID(this->Modem.ICCID);
+						_Response = CCID(Modem.ICCID);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5674,7 +5626,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = GMI(this->Modem.Manufacturer);
+						_Response = GMI(Modem.Manufacturer);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5717,7 +5669,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = GMM(this->Modem.Model);
+						_Response = GMM(Modem.Model);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -5760,7 +5712,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = GMR(this->Modem.Firmware);
+						_Response = GMR(Modem.Firmware);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -6327,7 +6279,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Send Command
-						_Response = Set_SGACT(1, 1, this->Modem.IP_Address);
+						_Response = Set_SGACT(1, 1, Modem.IP_Address);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -6342,7 +6294,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal_GSM.Text(16, 102, CYAN, String(this->Modem.IP_Address));
+						Terminal_GSM.Text(16, 102, CYAN, String(Modem.IP_Address));
 						Terminal_GSM.OK_Decide(_Response, GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31);
 					#endif
 
@@ -6541,7 +6493,7 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 					while (!_Response) {
 
 						// Process Command
-						_Response = Get_MONIZIP(this->Modem.Operator, this->Modem.LAC, this->Modem.Cell_ID, this->Modem.dBm);
+						_Response = Get_MONIZIP(Modem.Operator, Modem.LAC, Modem.Cell_ID, Modem.dBm);
 
 						// Set WD Variable
 						_Error_WD++;
@@ -6553,10 +6505,10 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal_GSM.Text(17, 112, CYAN, String(this->Modem.LAC));
-						Terminal_GSM.Text(18, 112, CYAN, String(this->Modem.Cell_ID));
-						Terminal_GSM.Text(15, 112, CYAN, String(this->Modem.Operator));
-						Terminal_GSM.Text(14, 115, CYAN, String(this->Modem.dBm));
+						Terminal_GSM.Text(17, 112, CYAN, String(Modem.LAC));
+						Terminal_GSM.Text(18, 112, CYAN, String(Modem.Cell_ID));
+						Terminal_GSM.Text(15, 112, CYAN, String(Modem.Operator));
+						Terminal_GSM.Text(14, 115, CYAN, String(Modem.dBm));
 						Terminal_GSM.OK_Decide(_Response, GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31);
 					#endif
 
@@ -6569,11 +6521,11 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 				#endif
 
 				// Set Connection Time
-				this->Status.Connection_Time = ((millis() - _Connection_Start_Time) / 1000);
+				Modem.Connection_Time = ((millis() - _Connection_Start_Time) / 1000);
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal_GSM.Text(13, 113, CYAN, String(this->Status.Connection_Time));
+					Terminal_GSM.Text(13, 113, CYAN, String(Modem.Connection_Time));
 				#endif
 
 				// Set Variable
