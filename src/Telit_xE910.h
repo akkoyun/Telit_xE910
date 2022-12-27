@@ -263,7 +263,7 @@ class xE910_Hardware {
 // Modem AT Command Set Class
 class AT_Command_Set {
 
-	private:
+	public:
 
 		/**
 		 * @brief GSM Serial Buffer Object Definition.
@@ -292,8 +292,6 @@ class AT_Command_Set {
 			}
 
 		}
-
-	public:
 
 		/**
 		 * @brief AT Command
@@ -4374,22 +4372,25 @@ class AT_Command_Set {
 			// Declare Data Handle Variable
 			bool Data_Handle = false;
 
+			// Declare Data Order
+			int Data_Order = 0;
+
 			// Control for Buffer
-			for (uint8_t i = 0; i < Buffer.Read_Order - 2; i++) {
+			for (uint16_t i = 10; i <= Buffer.Read_Order; i++) {
 
 				// Handle JSON Data
 				if (Buffer_Variable[i] == '{') Data_Handle = true;
 
 				// Get Data
 				if (Data_Handle) {
-					_Data[Buffer.Data_Order] = Buffer_Variable[i];
-					Buffer.Data_Order += 1;
+					_Data[Data_Order] = Buffer_Variable[i];
+					Data_Order += 1;
 				}
 
-			}
+				// Handle JSON Data
+				if (Buffer_Variable[i] == '}') Data_Handle = false;
 
-			// Response Debug
-			// Serial.println(_Data);
+			}
 
 			// End Function
 			return (true);
@@ -4674,8 +4675,8 @@ class xE910_RTC : private AT_Command_Set {
 
 			// Print Command State
 			#ifdef GSM_Debug
-				Terminal_GSM.Text(GSM_Console_Connect_X + 13, 42, WHITE, F("AT+CCLK"));
-				Terminal_GSM.Text(GSM_Console_Connect_X + 13, 73, BLUE, F(" .. "));
+				Terminal_GSM.Text(GSM_Console_Connect_X + 15, 42, WHITE, F("AT+CCLK"));
+				Terminal_GSM.Text(GSM_Console_Connect_X + 15, 73, BLUE, F(" .. "));
 			#endif
 
 			// Process Command
@@ -4694,7 +4695,7 @@ class xE910_RTC : private AT_Command_Set {
 
 			// Print Command State
 			#ifdef GSM_Debug
-				Terminal_GSM.OK_Decide(this->Time.Time_Update, GSM_Console_Connect_X + 13, 73);
+				Terminal_GSM.OK_Decide(this->Time.Time_Update, GSM_Console_Connect_X + 15, 73);
 			#endif
 
 			// End Function
@@ -4973,18 +4974,149 @@ class xE910_Incoming : private AT_Command_Set {
 
 };
 
-// Data Send Class
-class xE910_Outgoing : private AT_Command_Set {
+// Cloud Functions
+class PostOffice : private AT_Command_Set {
 
 	private:
 
-		// Define Socket Status Structure
-		struct Socket_Status {
-			uint8_t Conn_ID = 3;
-			char * Server_Address;
-			char * Server_EndPoint;
-			uint8_t Server_Port;
-		} Parameter;
+		// Define JSON Status Structure
+		struct JSON_Device_Structure {
+
+			// Define JSON Status Structure
+			struct JSON_Info_Structure {
+				char * Device_ID;
+				float Temperature;
+				float Humidity;
+			} JSON_Info;
+
+			// Define JSON Battery Structure
+			struct JSON_Battery_Structure {
+				float IV;
+				float AC;
+				float SOC;
+				uint8_t Charge;
+				float T;
+				uint16_t FB;
+				uint16_t IB;
+			} JSON_Battery;
+
+			// Define JSON Status Structure
+			struct JSON_Status_Structure {
+				uint16_t Device;
+				uint16_t Fault;
+			} JSON_Status;
+
+			// Time Stamp
+			char * Time_Stamp;
+
+		} JSON_Data;
+
+		// Define JSON
+		String JSON_Pack;
+
+		// Parse JSON Pack
+		uint16_t Parse_JSON(uint8_t _Pack_Type) {
+
+			// Clear Pack
+			this->JSON_Pack = "";
+
+			// Define JSON
+			StaticJsonDocument<1024> JSON;
+
+			// Set Device ID Variable
+			if (_Pack_Type == Pack_Online) JSON[F("Command")] = F("STF:PowerStat.Online");
+			if (_Pack_Type == Pack_Timed) JSON[F("Command")] = F("STF:PowerStat.Timed");
+			if (_Pack_Type == Pack_Interrupt) JSON[F("Command")] = F("STF:PowerStat.Interrupt");
+			if (_Pack_Type == Pack_Alarm) JSON[F("Command")] = F("STF:PowerStat.Alarm");
+			if (_Pack_Type == Pack_Offline) JSON[F("Command")] = F("STF:PowerStat.Offline");
+
+			// Define Device Section
+			JsonObject JSON_Device = JSON.createNestedObject(F("Device"));
+
+			// Define Device Section
+			JsonObject JSON_Info= JSON_Device.createNestedObject(F("Info"));
+
+			// Set Device ID Variable
+			JSON_Info[F("ID")] = this->JSON_Data.JSON_Info.Device_ID;
+			
+			// Set Device Hardware Version Variable
+			if (_Pack_Type == Pack_Online) JSON_Info[F("Hardware")] = F(__Hardware__);
+
+			// Set Device Firmware Version Variable
+			if (_Pack_Type == Pack_Online) JSON_Info[F("Firmware")] = F(__Firmware__);
+
+			// Set Device Environment Variable
+			JSON_Info[F("Temperature")] = this->JSON_Data.JSON_Info.Temperature;
+			JSON_Info[F("Humidity")] = this->JSON_Data.JSON_Info.Humidity;
+
+			// Define Power Section
+			JsonObject JSON_Battery = JSON_Device["Power"].createNestedObject("Battery");
+
+			// Set Battery Variables
+			JSON_Battery[F("IV")] = this->JSON_Data.JSON_Battery.IV;
+			JSON_Battery[F("AC")] = this->JSON_Data.JSON_Battery.AC;
+			JSON_Battery[F("SOC")] = this->JSON_Data.JSON_Battery.SOC;
+			JSON_Battery[F("Charge")] = this->JSON_Data.JSON_Battery.Charge;
+			if (_Pack_Type == Pack_Online) JSON_Battery[F("T")] = this->JSON_Data.JSON_Battery.T;
+			if (_Pack_Type == Pack_Online) JSON_Battery[F("FB")] = this->JSON_Data.JSON_Battery.FB;
+			if (_Pack_Type == Pack_Online) JSON_Battery[F("IB")] = this->JSON_Data.JSON_Battery.IB;
+
+			// Define GSM Section
+			JsonObject JSON_GSM = JSON_Device["IoT"].createNestedObject(F("GSM"));
+
+			// Get GSM Parameters
+			if (_Pack_Type == Pack_Online) {
+
+				// Define IoT Module
+				JsonObject JSON_Module = JSON_GSM.createNestedObject(F("Module"));
+
+				// Set IoT Parameters
+				JSON_Module[F("Manufacturer")] = Modem.Manufacturer;
+				JSON_Module[F("Model")] = Modem.Model;
+				JSON_Module[F("Firmware")] = Modem.Firmware;
+				JSON_Module[F("Serial")] = Modem.Serial_ID;
+				JSON_Module[F("IMEI")] = Modem.IMEI;
+
+				// Define SIM
+				JsonObject JSON_SIM = JSON_GSM.createNestedObject(F("SIM"));
+
+				// Set SIM Parameters
+				JSON_SIM[F("SIM_Type")] = 1;
+				JSON_SIM[F("ICCID")] = Modem.ICCID;
+
+			}
+
+			// Define GSM Operator Section
+			JsonObject JSON_Operator = JSON_GSM.createNestedObject(F("Operator"));
+
+			// Set Device GSM Connection Detail Section
+			JSON_Operator[F("Code")] = Modem.Operator;
+			JSON_Operator[F("dBm")] = Modem.dBm;
+			JSON_Operator[F("LAC")] = Modem.LAC;
+			JSON_Operator[F("Cell_ID")] = Modem.Cell_ID;
+
+			// Define Data Section
+			JsonObject JSON_Payload = JSON.createNestedObject(F("Payload"));
+
+			// Set Device Time Variable
+			JSON_Payload[F("TimeStamp")] = this->JSON_Data.Time_Stamp;
+
+			// Set Device Status Variable
+			JSON_Payload[F("Device")] = this->JSON_Data.JSON_Status.Device;
+
+			// Set Device Fault Variable
+			JSON_Payload[F("Fault")] = this->JSON_Data.JSON_Status.Fault;
+
+			// Clear Unused Data
+			JSON.garbageCollect();
+
+			// Serialize JSON	
+			uint16_t _JSON_Size = serializeJson(JSON, this->JSON_Pack);
+
+			// End Function
+			return(_JSON_Size);
+
+		}
 
 		/**
 		 * @brief Handle Send Response
@@ -4994,7 +5126,7 @@ class xE910_Outgoing : private AT_Command_Set {
 		uint16_t Handle_JSON_Send_Response(const char *_Data) {
 
 			// Declare JSON Object
-			StaticJsonDocument<128> Incoming_JSON;
+			StaticJsonDocument<32> Incoming_JSON;
 
 			// Deserialize the JSON document
 			deserializeJson(Incoming_JSON, _Data);
@@ -5009,34 +5141,16 @@ class xE910_Outgoing : private AT_Command_Set {
 
 	public:
 
-		/**
-		 * @brief Construct a new outgoing socket object.
-		 * @param _Server Remote Server Address
-		 * @param _End_Point Remote Server End Point
-		 * @param _Server_Port Remote Server port
-		 */
-		xE910_Outgoing(uint8_t _Conn_ID, char * _Server, char * _End_Point, uint8_t _Server_Port = 80) : AT_Command_Set() {
-
-			// Set Socket Port
-			this->Parameter.Conn_ID = _Conn_ID;
-
-			// Set Socket Port
-			this->Parameter.Server_Port = _Server_Port;
-
-			// Set Socket Server
-			this->Parameter.Server_Address = _Server;
-
-			// Set Socket URL
-			this->Parameter.Server_EndPoint = _End_Point;
+		// PostOffice Constructor
+		PostOffice(void) : AT_Command_Set() {
 
 		}
 
-		/**
-		 * @brief Configure Socket
-		 * @return true Function is success.
-		 * @return false Function fail.
-		 */
-		bool Configure(void) {
+		// Connect Cloud
+		bool Connect(char * _Device_ID) {
+
+			// Set Device ID
+			this->JSON_Data.JSON_Info.Device_ID = _Device_ID;
 
 			// Declare Watchdog Variable
 			uint8_t _Error_WD = 0;
@@ -5044,11 +5158,16 @@ class xE910_Outgoing : private AT_Command_Set {
 			// Declare Response Status
 			bool _Response = false;
 
+			// Print Command State
+			#ifdef GSM_Debug
+				Terminal_GSM.Text(21, 108, YELLOW, F("........."));
+			#endif
+
 			// Process Command
 			while (!_Response) {
 
 				// Process Command
-				_Response = SCFG(this->Parameter.Conn_ID, 1, 1500, 90, 300, 50);
+				_Response = SCFG(3, 1, 1500, 90, 300, 50);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -5071,7 +5190,7 @@ class xE910_Outgoing : private AT_Command_Set {
 			while (!_Response) {
 
 				// Process Command
-				_Response = SCFGEXT(1, 1, 0, 1, 0, 0);
+				_Response = SCFGEXT(3, 1, 0, 1, 0, 0);
 
 				// Set WD Variable
 				_Error_WD++;
@@ -5084,8 +5203,53 @@ class xE910_Outgoing : private AT_Command_Set {
 			// End Function
 			if (!_Response) return (false);
 
+			// Print Command State
+			#ifdef GSM_Debug
+				if (_Response) Terminal_GSM.Text(21, 108, GREEN, F("Connected"));
+			#endif
+
 			// End Function
 			return(true);
+
+		}
+
+		// Set Environment Variables
+		void Environment(float _Temperature, float _Humidity) {
+
+			// Set Environment
+			this->JSON_Data.JSON_Info.Temperature = _Temperature;
+			this->JSON_Data.JSON_Info.Humidity = _Humidity;
+
+		}
+
+		// Set Battery Variables
+		void Battery(float _IV, float _AC, float _SOC, uint8_t _Charge, float _T = 0, uint16_t _FB = 0, uint16_t _IB = 0) {
+
+			// Set Battery Parameters
+			this->JSON_Data.JSON_Battery.IV = _IV;
+			this->JSON_Data.JSON_Battery.AC = _AC;
+			this->JSON_Data.JSON_Battery.SOC = _SOC;
+			this->JSON_Data.JSON_Battery.Charge = _Charge;
+			this->JSON_Data.JSON_Battery.T = _T;			// Optional
+			this->JSON_Data.JSON_Battery.FB = _FB;			// Optional
+			this->JSON_Data.JSON_Battery.IB = _IB;			// Optional
+
+		}
+
+		// Set TimeStamp
+		void TimeStamp(char * _TimeStamp) {
+
+			// Set Time Stamp
+			this->JSON_Data.Time_Stamp = _TimeStamp;
+
+		}
+
+		// Set Status
+		void Status(uint16_t _Device, uint16_t _Fault) {
+
+			// Set Device Status Variables
+			this->JSON_Data.JSON_Status.Device = _Device;
+			this->JSON_Data.JSON_Status.Fault = _Fault;
 
 		}
 
@@ -5095,15 +5259,104 @@ class xE910_Outgoing : private AT_Command_Set {
 		 * @param _Response Received Data
 		 * @return uint16_t Server Request Command
 		 */
-		uint16_t Send(const char *_Data, char *_Response) {
+		uint16_t Send(uint8_t _Pack_Type) {
+
+			// Parse JSON
+			uint16_t _JSON_Size = this->Parse_JSON(Pack_Online);
 
 			// Open Connection
-			if (SD(this->Parameter.Conn_ID, 0, this->Parameter.Server_Port, 0, 88, 1, this->Parameter.Server_Address)) {
+			if (SD(3, 0, 80, 0, 88, 1, Cloud_Server)) {
+
+				// Clear UART Buffer
+				Clear_UART_Buffer();
+
+				// Declare Buffer Object
+				Serial_Buffer Buffer_Set = {false, 0, 0, 2000};
+
+				// Declare Buffer
+				char Buffer_Variable[255];
+				memset(Buffer_Variable, '\0', 255);
+
+				// Command Chain Delay (Advice by Telit)
+				delay(20);
+
+				// Send UART Command
+				GSM_Serial->print(F("AT#SSEND=3"));
+				GSM_Serial->print(F("\r\n"));
+
+				// Read Current Time
+				uint32_t Current_Time = millis();
+
+				// Response Wait Delay
+				delay(10);
+
+				// Read UART Response
+				while (!Buffer_Set.Response) {
+
+					// Read Serial Char
+					Buffer_Variable[Buffer_Set.Read_Order] = GSM_Serial->read();
+
+					// Control for <OK> Response
+					if (Buffer_Variable[Buffer_Set.Read_Order - 1] == '>' and Buffer_Variable[Buffer_Set.Read_Order] == ' ') Buffer_Set.Response = true;
+
+					// Increase Read Order
+					if (Buffer_Variable[Buffer_Set.Read_Order] > 31 and Buffer_Variable[Buffer_Set.Read_Order] < 127) Buffer_Set.Read_Order += 1;
+
+					// Handle for timeout
+					if (millis() - Current_Time >= Buffer_Set.Time_Out) return(false);
+
+				}
+
+				// Send Delay
+				delay(10);
+
+				// Print HTTP Header
+				GSM_Serial->print(F("POST ")); GSM_Serial->print(Cloud_EndPoint); GSM_Serial->print(F(" HTTP/1.1\r\n"));
+				GSM_Serial->print(F("Host: ")); GSM_Serial->print(Cloud_Server); GSM_Serial->print(F("\r\n"));
+				GSM_Serial->print(F("Content-Length: ")); GSM_Serial->print(_JSON_Size); GSM_Serial->print(F("\r\n"));
+				GSM_Serial->print(F("Connection: close\r\n"));
+				GSM_Serial->print(F("Content-Type: application/json\r\n"));
+				GSM_Serial->print(F("User-Agent: STF-PowerStat\r\n"));
+				GSM_Serial->print(F("\r\n"));
 
 				// Send Data Pack
-				SSEND(this->Parameter.Conn_ID, 2, 0, this->Parameter.Server_Address, this->Parameter.Server_EndPoint, _Data);
+//				Serial.println(_JSON_Size);
+				GSM_Serial->print(this->JSON_Pack);
+
+				// Print End Char
+				GSM_Serial->print((char)26);
+
+				// Declare Buffer Object
+				Serial_Buffer Buffer_Get = {false, 0, 0, 2000};
+
+				// Declare Buffer
+				memset(Buffer_Variable, '\0', 255);
+
+				// Read Current Time
+				Current_Time = millis();
+
+				// Read UART Response
+				while (!Buffer_Get.Response) {
+
+					// Read Serial Char
+					Buffer_Variable[Buffer_Get.Read_Order] = GSM_Serial->read();
+
+					// Control for <OK> Response
+					if (Buffer_Variable[Buffer_Get.Read_Order - 1] == 'O' and Buffer_Variable[Buffer_Get.Read_Order] == 'K') Buffer_Get.Response = true;
+
+					// Increase Read Order
+					if (Buffer_Variable[Buffer_Get.Read_Order] > 31 and Buffer_Variable[Buffer_Get.Read_Order] < 127) Buffer_Get.Read_Order += 1;
+
+					// Handle for timeout
+					if (millis() - Current_Time >= Buffer_Get.Time_Out) return(false);
+
+				}
+
+				// Response Wait Delay
+				delay(10);
 
 				// Declare Ring Status
+				char _Response[32];
 				uint8_t Ring_ID;
 				uint16_t Length;
 				uint16_t Response_Command;
@@ -5112,13 +5365,13 @@ class xE910_Outgoing : private AT_Command_Set {
 				if (Send_SRING(Ring_ID, Length)) {
 
 					// Get Request Data
-					SRECV(Ring_ID, Length, _Response);
+					SRECV(3, Length, _Response);
 
 					// Handle JSON
 					Response_Command = this->Handle_JSON_Send_Response(_Response);
 
 					// Close Socket
-					SH(Ring_ID);
+					SH(3);
 
 					// End Function
 					return(Response_Command);
@@ -5134,251 +5387,6 @@ class xE910_Outgoing : private AT_Command_Set {
 			return(0);
 
 		}
-
-};
-
-// Cloud Functions
-class PostOffice : private xE910_Outgoing {
-
-	private:
-
-		// Device ID
-		char * Device_ID;
-
-		// Global Definitions
-		// __Firmware__
-		// __Hardware__
-
-		// Time Stamp
-		char * Time_Stamp;
-
-		// Define JSON Control Structure
-		struct JSON_Control_Structure {
-
-			// Define JSON Status Structure
-			struct JSON_Status_Structure {
-				uint16_t * Device;
-				uint16_t * Fault;
-			} JSON_Status;
-
-			// Fault Control Status 
-			struct JSON_Fault_Structure {
-				bool * PhaseLose;
-				bool * Thermic;
-				bool * MotorProtection;
-				bool * ContactorAnomaly;
-			} JSON_Fault_Status;
-
-			// Pressure Control Status
-			struct JSON_Pressure_Structure {
-				bool * Limit_Control;
-				float * Limit_Min;
-				float * Limit_Max;
-				bool * Regression_Control;
-				float * Regression_Max;
-			} JSON_Pressure_Status;
-
-			// Voltage Control Status
-			struct JSON_Voltage_Structure {
-				bool * Limit_Control;
-				float * Limit_Min;
-				float * Limit_Max;
-				bool * Imbalance_Control;
-				float * Imbalance_Max;
-			} JSON_Voltage_Status;
-
-			// Current Control Status
-			struct JSON_Current_Structure {
-				bool * Limit_Control;
-				float * Limit_Min;
-				float * Limit_Max;
-				bool * Imbalance_Control;
-				float * Imbalance_Max;
-				uint16_t * Multiplexer;
-			} JSON_Current_Status;
-
-			// Frequency Control Status
-			struct JSON_Frequency_Structure {
-				bool * Limit_Control;
-				float * Limit_Min;
-				float * Limit_Max;
-			} JSON_Frequency_Status;
-
-		} JSON_Control;
-
-		// Define JSON Info Structure
-		struct JSON_Environment_Structure {
-			float * Temperature;
-			float * Humidity;
-		} JSON_Environment;
-
-		// Define JSON Battery Structure
-		struct JSON_Battery_Structure {
-			float * IV;
-			float * AC;
-			float * SOC;
-			uint8_t * Charge;
-			float * T;
-			uint16_t * FB;
-			uint16_t * IB;
-		} JSON_Battery;
-
-		// In Functions Variables
-		// Connection_Time		// Optional
-		// IMEI					// Optional
-		// Serial_ID			// Optional
-		// ICCID				// Optional
-		// Manufacturer			// Optional
-		// Model				// Optional
-		// Firmware				// Optional
-		// dBm
-		// IP_Address
-		// Operator
-		// LAC
-		// Cell_ID
-
-
-	public:
-
-		// PostOffice Constructor
-		PostOffice(void) : xE910_Outgoing(3, Cloud_Server, Cloud_EndPoint, 80) {
-
-		}
-
-		// Connect Cloud
-		void Connect(char * _Device_ID) {
-
-			// Set Device ID
-			this->Device_ID = _Device_ID;
-
-			// Print Command State
-			#ifdef GSM_Debug
-				Terminal_GSM.Text(21, 42, WHITE, F("PostOffice Connection"));
-				Terminal_GSM.Text(21, 42 + 31, BLUE, F(" .. "));
-			#endif
-
-			// Connect to Postoffice cloud
-			bool _Response = Configure();
-
-			// Print Command State
-			#ifdef GSM_Debug
-				Terminal_GSM.OK_Decide(_Response, 21, 42 + 31);
-			#endif
-
-		}
-
-		// Set Environment Variables
-		void Environment(float * _Temperature, float * _Humidity) {
-
-			// Set Environment
-			this->JSON_Environment.Temperature = _Temperature;
-			this->JSON_Environment.Humidity = _Humidity;
-
-		}
-
-		// Set Battery Variables
-		void Battery(float * _IV, float * _AC, float * _SOC, uint8_t * _Charge, float * _T, uint16_t * _FB, uint16_t * _IB) {
-
-			// Set Battery Parameters
-			this->JSON_Battery.IV = _IV;
-			this->JSON_Battery.AC = _AC;
-			this->JSON_Battery.SOC = _SOC;
-			this->JSON_Battery.Charge = _Charge;
-			this->JSON_Battery.T = _T;				// Optional
-			this->JSON_Battery.FB = _FB;			// Optional
-			this->JSON_Battery.IB = _IB;			// Optional
-
-		}
-
-		// Set TimeStamp
-		void TimeStamp(char * _TimeStamp) {
-
-			// Set Time Stamp
-			this->Time_Stamp = _TimeStamp;
-
-		}
-
-		// Set Status
-		void Status(uint16_t * _Device, uint16_t * _Fault) {
-
-			// Set Device Status Variables
-			this->JSON_Control.JSON_Status.Device = _Device;
-			this->JSON_Control.JSON_Status.Fault = _Fault;
-
-		}
-
-		// Set Status Details
-		void Status_Fault(bool * _PhaseLose, bool * _Thermic, bool * _MotorProtection, bool * _ContactorAnomaly) {
-
-			// Set Status Detail Variables
-			this->JSON_Control.JSON_Fault_Status.PhaseLose = _PhaseLose;
-			this->JSON_Control.JSON_Fault_Status.Thermic = _Thermic;
-			this->JSON_Control.JSON_Fault_Status.MotorProtection = _MotorProtection;
-			this->JSON_Control.JSON_Fault_Status.ContactorAnomaly = _ContactorAnomaly;
-
-		}
-		void Status_Pressure(bool * _Limit, float * _Min, float * _Max, bool * _Regression, float * _RMax) {
-
-			// Set Status Detail Variables
-			this->JSON_Control.JSON_Pressure_Status.Limit_Control = _Limit;
-			this->JSON_Control.JSON_Pressure_Status.Limit_Min = _Min;
-			this->JSON_Control.JSON_Pressure_Status.Limit_Max = _Max;
-			this->JSON_Control.JSON_Pressure_Status.Regression_Control = _Regression;
-			this->JSON_Control.JSON_Pressure_Status.Regression_Max = _RMax;
-
-		}
-		void Status_Voltage(bool * _Limit, float * _Min, float * _Max, bool * _Imbalance, float * _IMax) {
-
-			// Set Status Detail Variables
-			this->JSON_Control.JSON_Voltage_Status.Limit_Control = _Limit;
-			this->JSON_Control.JSON_Voltage_Status.Limit_Min = _Min;
-			this->JSON_Control.JSON_Voltage_Status.Limit_Max = _Max;
-			this->JSON_Control.JSON_Voltage_Status.Imbalance_Control = _Imbalance;
-			this->JSON_Control.JSON_Voltage_Status.Imbalance_Max = _IMax;
-
-		}
-		void Status_Current(bool * _Limit, float * _Min, float * _Max, bool * _Imbalance, float * _IMax, uint16_t * _Multiplexer) {
-
-			// Set Status Detail Variables
-			this->JSON_Control.JSON_Current_Status.Limit_Control = _Limit;
-			this->JSON_Control.JSON_Current_Status.Limit_Min = _Min;
-			this->JSON_Control.JSON_Current_Status.Limit_Max = _Max;
-			this->JSON_Control.JSON_Current_Status.Imbalance_Control = _Imbalance;
-			this->JSON_Control.JSON_Current_Status.Imbalance_Max = _IMax;
-			this->JSON_Control.JSON_Current_Status.Multiplexer = _Multiplexer;
-
-		}
-		void Status_Frequency(bool * _Limit, float * _Min, float * _Max) {
-
-			// Set Status Detail Variables
-			this->JSON_Control.JSON_Frequency_Status.Limit_Control = _Limit;
-			this->JSON_Control.JSON_Frequency_Status.Limit_Min = _Min;
-			this->JSON_Control.JSON_Frequency_Status.Limit_Max = _Max;
-
-		}
-
-		// Pressure Payload
-		void Pressure(float * _Inst, float * _Min, float * _Max, float * _Avg, float * _Slope, float * _Offset, float * _R2, uint16_t * _DataCount) {
-
-
-		}
-
-		// Energy Payload
-		void Voltage(uint8_t _Phase, float * _Inst, float * _Min, float * _Max, float * _Avg, float * _Slope, float * _Offset, float * _R2, uint16_t * _DataCount) {
-
-
-		}
-		void Current(uint8_t _Phase, float * _Inst, float * _Min, float * _Max, float * _Avg, float * _Slope, float * _Offset, float * _R2, uint16_t * _DataCount) {
-
-
-		}
-
-
-
-
-
-
-
 
 
 };
@@ -6403,14 +6411,23 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 
 					// Print Command State
 					#ifdef GSM_Debug
-						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, CYAN, F(" ** "));
+						Terminal_GSM.OK_Decide(_Response, GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31);
 					#endif
+
+					// Set Variable
+					GSM_Console_Connect_ROW += 1;
 
 					// Declare Watchdog Variable
 					_Error_WD = 0;
 
 					// Declare Response Status
 					_Response = false;
+
+					// Print Command State
+					#ifdef GSM_Debug
+						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y, WHITE, F("AT+CGREG?"));
+						Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, BLUE, F(" .. "));
+					#endif
 
 					// Process Command
 					while (!_Response) {
@@ -6424,8 +6441,19 @@ class xE910 : public xE910_Hardware, public AT_Command_Set {
 						// Print Command State
 						#ifdef GSM_Debug
 							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, CYAN, F("    "));
-							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 32, CYAN, String(_CGREG_Connection_Status));
+							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 32, RED, String(_CGREG_Connection_Status));
 						#endif
+
+						// Control for Connection
+						if (_CGREG_Connection_Status == 3) {
+							
+							uint16_t _Error_Code;
+							CEER(_Error_Code);
+
+							Terminal_GSM.Text(27, 5, RED, F("CEER Code : "));
+							Terminal_GSM.Text(27, 17, RED, String(_Error_Code));
+
+						}
 
 						// Control for Connection
 						if (_CGREG_Connection_Status == 1 or _CGREG_Connection_Status == 5) {
