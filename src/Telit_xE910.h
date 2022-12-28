@@ -4987,465 +4987,6 @@
 
 	};
 
-	// Cloud Functions
-	class PostOffice : private AT_Command_Set {
-
-		// Private Functions
-		private:
-
-			// Define JSON Status Structure
-			struct JSON_Device_Structure {
-
-				// Define JSON Status Structure
-				struct JSON_Info_Structure {
-					char * Device_ID;
-					float Temperature;
-					float Humidity;
-				} JSON_Info;
-
-				// Define JSON Battery Structure
-				struct JSON_Battery_Structure {
-					float IV;
-					float AC;
-					float SOC;
-					uint8_t Charge;
-					float T;
-					uint16_t FB;
-					uint16_t IB;
-				} JSON_Battery;
-
-				// Define JSON Status Structure
-				struct JSON_Status_Structure {
-					uint16_t Device;
-					uint16_t Fault;
-				} JSON_Status;
-
-				// Time Stamp
-				char * Time_Stamp;
-
-			} JSON_Data;
-
-			// Define JSON
-			String JSON_Pack;
-
-			// Parse JSON Pack
-			uint16_t Parse_JSON(uint8_t _Pack_Type) {
-
-				// Clear Pack
-				this->JSON_Pack = "";
-
-				// Define Versions
-				#ifndef __Hardware__
-					#define __Hardware__ "00.00.00"
-				#endif
-				#ifndef __Firmware__
-					#define __Firmware__ "00.00.00"
-				#endif
-
-				// Define JSON
-				StaticJsonDocument<1024> JSON;
-
-				// Set Device ID Variable
-				if (_Pack_Type == Pack_Online) JSON[F("Command")] = F("STF:PowerStat.Online");
-				if (_Pack_Type == Pack_Timed) JSON[F("Command")] = F("STF:PowerStat.Timed");
-				if (_Pack_Type == Pack_Interrupt) JSON[F("Command")] = F("STF:PowerStat.Interrupt");
-				if (_Pack_Type == Pack_Alarm) JSON[F("Command")] = F("STF:PowerStat.Alarm");
-				if (_Pack_Type == Pack_Offline) JSON[F("Command")] = F("STF:PowerStat.Offline");
-
-				// Define Device Section
-				JsonObject JSON_Device = JSON.createNestedObject(F("Device"));
-
-				// Define Device Section
-				JsonObject JSON_Info= JSON_Device.createNestedObject(F("Info"));
-
-				// Set Device ID Variable
-				JSON_Info[F("ID")] = this->JSON_Data.JSON_Info.Device_ID;
-				
-				// Set Device Hardware Version Variable
-				if (_Pack_Type == Pack_Online) JSON_Info[F("Hardware")] = F(__Hardware__);
-
-				// Set Device Firmware Version Variable
-				if (_Pack_Type == Pack_Online) JSON_Info[F("Firmware")] = F(__Firmware__);
-
-				// Set Device Environment Variable
-				JSON_Info[F("Temperature")] = this->JSON_Data.JSON_Info.Temperature;
-				JSON_Info[F("Humidity")] = this->JSON_Data.JSON_Info.Humidity;
-
-				// Define Power Section
-				JsonObject JSON_Battery = JSON_Device["Power"].createNestedObject("Battery");
-
-				// Set Battery Variables
-				JSON_Battery[F("IV")] = this->JSON_Data.JSON_Battery.IV;
-				JSON_Battery[F("AC")] = this->JSON_Data.JSON_Battery.AC;
-				JSON_Battery[F("SOC")] = this->JSON_Data.JSON_Battery.SOC;
-				JSON_Battery[F("Charge")] = this->JSON_Data.JSON_Battery.Charge;
-				if (_Pack_Type == Pack_Online) JSON_Battery[F("T")] = this->JSON_Data.JSON_Battery.T;
-				if (_Pack_Type == Pack_Online) JSON_Battery[F("FB")] = this->JSON_Data.JSON_Battery.FB;
-				if (_Pack_Type == Pack_Online) JSON_Battery[F("IB")] = this->JSON_Data.JSON_Battery.IB;
-
-				// Set MONI Command
-				#ifdef _AT_MONIZIP_
-
-					// Declare Watchdog Variable
-					uint8_t _Error_WD = 0;
-
-					// Set Response Variable
-					bool _Response = false;
-
-					// Process Command
-					while (!_Response) {
-
-						// Process Command
-						_Response = Get_MONIZIP(Modem.Operator, Modem.LAC, Modem.Cell_ID, Modem.dBm);
-
-						// Set WD Variable
-						_Error_WD++;
-
-						// Control for WD
-						if (_Error_WD > 5) break;
-
-					}
-
-					// Print Command State
-					#ifdef GSM_Debug
-						Terminal_GSM.Text(17, 112, CYAN, String(Modem.LAC));
-						Terminal_GSM.Text(18, 112, CYAN, String(Modem.Cell_ID));
-						Terminal_GSM.Text(15, 112, CYAN, String(Modem.Operator));
-						Terminal_GSM.Text(14, 115, CYAN, String(Modem.dBm));
-					#endif
-
-				#endif
-
-				// Define GSM Section
-				JsonObject JSON_GSM = JSON_Device["IoT"].createNestedObject(F("GSM"));
-
-				// Get GSM Parameters
-				if (_Pack_Type == Pack_Online) {
-
-					// Define IoT Module
-					JsonObject JSON_Module = JSON_GSM.createNestedObject(F("Module"));
-
-					// Set IoT Parameters
-					JSON_Module[F("Manufacturer")] = Modem.Manufacturer;
-					JSON_Module[F("Model")] = Modem.Model;
-					JSON_Module[F("Firmware")] = Modem.Firmware;
-					JSON_Module[F("Serial")] = Modem.Serial_ID;
-					JSON_Module[F("IMEI")] = Modem.IMEI;
-
-					// Define SIM
-					JsonObject JSON_SIM = JSON_GSM.createNestedObject(F("SIM"));
-
-					// Set SIM Parameters
-					JSON_SIM[F("SIM_Type")] = 1;
-					JSON_SIM[F("ICCID")] = Modem.ICCID;
-
-				}
-
-				// Define GSM Operator Section
-				JsonObject JSON_Operator = JSON_GSM.createNestedObject(F("Operator"));
-
-				// Set Device GSM Connection Detail Section
-				JSON_Operator[F("Code")] = Modem.Operator;
-				JSON_Operator[F("dBm")] = Modem.dBm;
-				JSON_Operator[F("LAC")] = Modem.LAC;
-				JSON_Operator[F("Cell_ID")] = Modem.Cell_ID;
-
-				// Define Data Section
-				JsonObject JSON_Payload = JSON.createNestedObject(F("Payload"));
-
-				// Set Device Time Variable
-				JSON_Payload[F("TimeStamp")] = this->JSON_Data.Time_Stamp;
-
-				// Set Device Status Variable
-				JSON_Payload[F("Device")] = this->JSON_Data.JSON_Status.Device;
-
-				// Set Device Fault Variable
-				JSON_Payload[F("Fault")] = this->JSON_Data.JSON_Status.Fault;
-
-				// Clear Unused Data
-				JSON.garbageCollect();
-
-				// Serialize JSON	
-				uint16_t _JSON_Size = serializeJson(JSON, this->JSON_Pack);
-
-				// End Function
-				return(_JSON_Size);
-
-			}
-
-			/**
-			 * @brief Handle Send Response
-			 * @param _Data Received Response
-			 * @return uint16_t Command
-			 */		
-			uint16_t Handle_JSON_Send_Response(const char *_Data) {
-
-				// Declare JSON Object
-				StaticJsonDocument<32> Incoming_JSON;
-
-				// Deserialize the JSON document
-				deserializeJson(Incoming_JSON, _Data);
-
-				// Fetch values.
-				uint16_t Event = Incoming_JSON["Event"];
-
-				// End Function
-				return(Event);
-
-			}
-
-		// Public Functions
-		public:
-
-			// PostOffice Constructor
-			PostOffice(void) : AT_Command_Set() {
-
-			}
-
-			// Connect Cloud
-			bool Connect(char * _Device_ID) {
-
-				// Set Device ID
-				this->JSON_Data.JSON_Info.Device_ID = _Device_ID;
-
-				// Declare Watchdog Variable
-				uint8_t _Error_WD = 0;
-
-				// Declare Response Status
-				bool _Response = false;
-
-				// Print Command State
-				#ifdef GSM_Debug
-					Terminal_GSM.Text(21, 108, YELLOW, F("........."));
-				#endif
-
-				// Process Command
-				while (!_Response) {
-
-					// Process Command
-					_Response = SCFG(3, 1, 1500, 90, 300, 50);
-
-					// Set WD Variable
-					_Error_WD++;
-
-					// Control for WD
-					if (_Error_WD > 5) break;
-
-				}
-
-				// End Function
-				if (!_Response) return (false);
-
-				// Declare Watchdog Variable
-				_Error_WD = 0;
-
-				// Set Response Variable
-				_Response = false;
-
-				// Process Command
-				while (!_Response) {
-
-					// Process Command
-					_Response = SCFGEXT(3, 1, 0, 1, 0, 0);
-
-					// Set WD Variable
-					_Error_WD++;
-
-					// Control for WD
-					if (_Error_WD > 5) break;
-
-				}
-			
-				// End Function
-				if (!_Response) return (false);
-
-				// Print Command State
-				#ifdef GSM_Debug
-					if (_Response) Terminal_GSM.Text(21, 108, GREEN, F("Connected"));
-				#endif
-
-				// End Function
-				return(true);
-
-			}
-
-			// Set Environment Variables
-			void Environment(float _Temperature, float _Humidity) {
-
-				// Set Environment
-				this->JSON_Data.JSON_Info.Temperature = _Temperature;
-				this->JSON_Data.JSON_Info.Humidity = _Humidity;
-
-			}
-
-			// Set Battery Variables
-			void Battery(float _IV, float _AC, float _SOC, uint8_t _Charge, float _T = 0, uint16_t _FB = 0, uint16_t _IB = 0) {
-
-				// Set Battery Parameters
-				this->JSON_Data.JSON_Battery.IV = _IV;
-				this->JSON_Data.JSON_Battery.AC = _AC;
-				this->JSON_Data.JSON_Battery.SOC = _SOC;
-				this->JSON_Data.JSON_Battery.Charge = _Charge;
-				this->JSON_Data.JSON_Battery.T = _T;			// Optional
-				this->JSON_Data.JSON_Battery.FB = _FB;			// Optional
-				this->JSON_Data.JSON_Battery.IB = _IB;			// Optional
-
-			}
-
-			// Set TimeStamp
-			void TimeStamp(char * _TimeStamp) {
-
-				// Set Time Stamp
-				this->JSON_Data.Time_Stamp = _TimeStamp;
-
-			}
-
-			// Set Status
-			void Status(uint16_t _Device, uint16_t _Fault) {
-
-				// Set Device Status Variables
-				this->JSON_Data.JSON_Status.Device = _Device;
-				this->JSON_Data.JSON_Status.Fault = _Fault;
-
-			}
-
-			/**
-			 * @brief Send Data Batch Function
-			 * @param _Data Sended Data
-			 * @param _Response Received Data
-			 * @return uint16_t Server Request Command
-			 */
-			bool Send(uint8_t _Pack_Type) {
-
-				// Parse JSON
-				uint16_t _JSON_Size = this->Parse_JSON(Pack_Online);
-
-				// Open Connection
-				if (SD(3, 0, 80, 0, 88, 1, PostOffice_Server)) {
-
-					// Clear UART Buffer
-					Clear_UART_Buffer();
-
-					// Declare Buffer Object
-					Serial_Buffer Buffer_Set = {false, 0, 0, 2000};
-
-					// Declare Buffer
-					char Buffer_Variable[255];
-					memset(Buffer_Variable, '\0', 255);
-
-					// Command Chain Delay (Advice by Telit)
-					delay(20);
-
-					// Send UART Command
-					GSM_Serial->print(F("AT#SSEND=3"));
-					GSM_Serial->print(F("\r\n"));
-
-					// Read Current Time
-					uint32_t Current_Time = millis();
-
-					// Response Wait Delay
-					delay(10);
-
-					// Read UART Response
-					while (!Buffer_Set.Response) {
-
-						// Read Serial Char
-						Buffer_Variable[Buffer_Set.Read_Order] = GSM_Serial->read();
-
-						// Control for <OK> Response
-						if (Buffer_Variable[Buffer_Set.Read_Order - 1] == '>' and Buffer_Variable[Buffer_Set.Read_Order] == ' ') Buffer_Set.Response = true;
-
-						// Increase Read Order
-						if (Buffer_Variable[Buffer_Set.Read_Order] > 31 and Buffer_Variable[Buffer_Set.Read_Order] < 127) Buffer_Set.Read_Order += 1;
-
-						// Handle for timeout
-						if (millis() - Current_Time >= Buffer_Set.Time_Out) return(false);
-
-					}
-
-					// Send Delay
-					delay(10);
-
-					// Print HTTP Header
-					GSM_Serial->print(F("POST ")); GSM_Serial->print(PostOffice_EndPoint); GSM_Serial->print(F(" HTTP/1.1\r\n"));
-					GSM_Serial->print(F("Host: ")); GSM_Serial->print(PostOffice_Server); GSM_Serial->print(F("\r\n"));
-					GSM_Serial->print(F("Content-Length: ")); GSM_Serial->print(_JSON_Size); GSM_Serial->print(F("\r\n"));
-					GSM_Serial->print(F("Connection: close\r\n"));
-					GSM_Serial->print(F("Content-Type: application/json\r\n"));
-					GSM_Serial->print(F("User-Agent: PowerStat\r\n"));
-					GSM_Serial->print(F("\r\n"));
-
-					// Send Data Pack
-	//				Serial.println(_JSON_Size);
-					GSM_Serial->print(this->JSON_Pack);
-
-					// Print End Char
-					GSM_Serial->print((char)26);
-
-					// Declare Buffer Object
-					Serial_Buffer Buffer_Get = {false, 0, 0, 2000};
-
-					// Declare Buffer
-					memset(Buffer_Variable, '\0', 255);
-
-					// Read Current Time
-					Current_Time = millis();
-
-					// Read UART Response
-					while (!Buffer_Get.Response) {
-
-						// Read Serial Char
-						Buffer_Variable[Buffer_Get.Read_Order] = GSM_Serial->read();
-
-						// Control for <OK> Response
-						if (Buffer_Variable[Buffer_Get.Read_Order - 1] == 'O' and Buffer_Variable[Buffer_Get.Read_Order] == 'K') Buffer_Get.Response = true;
-
-						// Increase Read Order
-						if (Buffer_Variable[Buffer_Get.Read_Order] > 31 and Buffer_Variable[Buffer_Get.Read_Order] < 127) Buffer_Get.Read_Order += 1;
-
-						// Handle for timeout
-						if (millis() - Current_Time >= Buffer_Get.Time_Out) return(false);
-
-					}
-
-					// Response Wait Delay
-					delay(10);
-
-					// Declare Ring Status
-					char _Response[32];
-					uint8_t Ring_ID;
-					uint16_t Length;
-					uint16_t Response_Command;
-
-					// Get Ring Port
-					if (Send_SRING(Ring_ID, Length)) {
-
-						// Get Request Data
-						SRECV(3, Length, _Response);
-
-						// Handle JSON
-						Response_Command = this->Handle_JSON_Send_Response(_Response);
-
-						// Close Socket
-						SH(3);
-
-						// End Function
-						if (Response_Command == 200) return(true);
-						
-					}
-
-					// End Function
-					return(false);
-
-				}
-
-				// End Function
-				return(false);
-
-			}
-
-	};
-
 	// Main GSM Class
 	class xE910 : public xE910_Hardware, public AT_Command_Set {
 
@@ -5461,10 +5002,7 @@
 			 * @brief Construct a new x E910 object
 			 * @param _Serial GSM Connection Serial
 			 */
-			xE910(Stream &_Serial) : AT_Command_Set() {
-
-				// Set Serial Port
-				GSM_Serial = & _Serial;
+			xE910(void) : AT_Command_Set() {
 
 			}
 
@@ -6174,7 +5712,7 @@
 			 * @return true Function is success.
 			 * @return false Function fail.
 			 */
-			bool Connect(void) {
+			bool Online(void) {
 
 				// Set Variable
 				this->Status.Connection = false;
@@ -6874,6 +6412,468 @@
 
 				// End Function
 				return(this->Status.Connection);
+
+			}
+
+	};
+
+	// Cloud Functions
+	class PostOffice : public xE910 {
+
+		// Private Functions
+		private:
+
+			// Define JSON Status Structure
+			struct JSON_Device_Structure {
+
+				// Define JSON Status Structure
+				struct JSON_Info_Structure {
+					char * Device_ID;
+					float Temperature;
+					float Humidity;
+				} JSON_Info;
+
+				// Define JSON Battery Structure
+				struct JSON_Battery_Structure {
+					float IV;
+					float AC;
+					float SOC;
+					uint8_t Charge;
+					float T;
+					uint16_t FB;
+					uint16_t IB;
+				} JSON_Battery;
+
+				// Define JSON Status Structure
+				struct JSON_Status_Structure {
+					uint16_t Device;
+					uint16_t Fault;
+				} JSON_Status;
+
+				// Time Stamp
+				char * Time_Stamp;
+
+			} JSON_Data;
+
+			// Define JSON
+			String JSON_Pack;
+
+			// Parse JSON Pack
+			uint16_t Parse_JSON(uint8_t _Pack_Type) {
+
+				// Clear Pack
+				this->JSON_Pack = "";
+
+				// Define Versions
+				#ifndef __Hardware__
+					#define __Hardware__ "00.00.00"
+				#endif
+				#ifndef __Firmware__
+					#define __Firmware__ "00.00.00"
+				#endif
+
+				// Define JSON
+				StaticJsonDocument<1024> JSON;
+
+				// Set Device ID Variable
+				if (_Pack_Type == Pack_Online) JSON[F("Command")] = F("STF:PowerStat.Online");
+				if (_Pack_Type == Pack_Timed) JSON[F("Command")] = F("STF:PowerStat.Timed");
+				if (_Pack_Type == Pack_Interrupt) JSON[F("Command")] = F("STF:PowerStat.Interrupt");
+				if (_Pack_Type == Pack_Alarm) JSON[F("Command")] = F("STF:PowerStat.Alarm");
+				if (_Pack_Type == Pack_Offline) JSON[F("Command")] = F("STF:PowerStat.Offline");
+
+				// Define Device Section
+				JsonObject JSON_Device = JSON.createNestedObject(F("Device"));
+
+				// Define Device Section
+				JsonObject JSON_Info= JSON_Device.createNestedObject(F("Info"));
+
+				// Set Device ID Variable
+				JSON_Info[F("ID")] = this->JSON_Data.JSON_Info.Device_ID;
+				
+				// Set Device Hardware Version Variable
+				if (_Pack_Type == Pack_Online) JSON_Info[F("Hardware")] = F(__Hardware__);
+
+				// Set Device Firmware Version Variable
+				if (_Pack_Type == Pack_Online) JSON_Info[F("Firmware")] = F(__Firmware__);
+
+				// Set Device Environment Variable
+				JSON_Info[F("Temperature")] = this->JSON_Data.JSON_Info.Temperature;
+				JSON_Info[F("Humidity")] = this->JSON_Data.JSON_Info.Humidity;
+
+				// Define Power Section
+				JsonObject JSON_Battery = JSON_Device["Power"].createNestedObject("Battery");
+
+				// Set Battery Variables
+				JSON_Battery[F("IV")] = this->JSON_Data.JSON_Battery.IV;
+				JSON_Battery[F("AC")] = this->JSON_Data.JSON_Battery.AC;
+				JSON_Battery[F("SOC")] = this->JSON_Data.JSON_Battery.SOC;
+				JSON_Battery[F("Charge")] = this->JSON_Data.JSON_Battery.Charge;
+				if (_Pack_Type == Pack_Online) JSON_Battery[F("T")] = this->JSON_Data.JSON_Battery.T;
+				if (_Pack_Type == Pack_Online) JSON_Battery[F("FB")] = this->JSON_Data.JSON_Battery.FB;
+				if (_Pack_Type == Pack_Online) JSON_Battery[F("IB")] = this->JSON_Data.JSON_Battery.IB;
+
+				// Set MONI Command
+				#ifdef _AT_MONIZIP_
+
+					// Declare Watchdog Variable
+					uint8_t _Error_WD = 0;
+
+					// Set Response Variable
+					bool _Response = false;
+
+					// Process Command
+					while (!_Response) {
+
+						// Process Command
+						_Response = Get_MONIZIP(Modem.Operator, Modem.LAC, Modem.Cell_ID, Modem.dBm);
+
+						// Set WD Variable
+						_Error_WD++;
+
+						// Control for WD
+						if (_Error_WD > 5) break;
+
+					}
+
+					// Print Command State
+					#ifdef GSM_Debug
+						Terminal_GSM.Text(17, 112, CYAN, String(Modem.LAC));
+						Terminal_GSM.Text(18, 112, CYAN, String(Modem.Cell_ID));
+						Terminal_GSM.Text(15, 112, CYAN, String(Modem.Operator));
+						Terminal_GSM.Text(14, 115, CYAN, String(Modem.dBm));
+					#endif
+
+				#endif
+
+				// Define GSM Section
+				JsonObject JSON_GSM = JSON_Device["IoT"].createNestedObject(F("GSM"));
+
+				// Get GSM Parameters
+				if (_Pack_Type == Pack_Online) {
+
+					// Define IoT Module
+					JsonObject JSON_Module = JSON_GSM.createNestedObject(F("Module"));
+
+					// Set IoT Parameters
+					JSON_Module[F("Manufacturer")] = Modem.Manufacturer;
+					JSON_Module[F("Model")] = Modem.Model;
+					JSON_Module[F("Firmware")] = Modem.Firmware;
+					JSON_Module[F("Serial")] = Modem.Serial_ID;
+					JSON_Module[F("IMEI")] = Modem.IMEI;
+
+					// Define SIM
+					JsonObject JSON_SIM = JSON_GSM.createNestedObject(F("SIM"));
+
+					// Set SIM Parameters
+					JSON_SIM[F("SIM_Type")] = 1;
+					JSON_SIM[F("ICCID")] = Modem.ICCID;
+
+				}
+
+				// Define GSM Operator Section
+				JsonObject JSON_Operator = JSON_GSM.createNestedObject(F("Operator"));
+
+				// Set Device GSM Connection Detail Section
+				JSON_Operator[F("Code")] = Modem.Operator;
+				JSON_Operator[F("dBm")] = Modem.dBm;
+				JSON_Operator[F("LAC")] = Modem.LAC;
+				JSON_Operator[F("Cell_ID")] = Modem.Cell_ID;
+
+				// Define Data Section
+				JsonObject JSON_Payload = JSON.createNestedObject(F("Payload"));
+
+				// Set Device Time Variable
+				JSON_Payload[F("TimeStamp")] = this->JSON_Data.Time_Stamp;
+
+				// Set Device Status Variable
+				JSON_Payload[F("Device")] = this->JSON_Data.JSON_Status.Device;
+
+				// Set Device Fault Variable
+				JSON_Payload[F("Fault")] = this->JSON_Data.JSON_Status.Fault;
+
+				// Clear Unused Data
+				JSON.garbageCollect();
+
+				// Serialize JSON	
+				uint16_t _JSON_Size = serializeJson(JSON, this->JSON_Pack);
+
+				// End Function
+				return(_JSON_Size);
+
+			}
+
+			/**
+			 * @brief Handle Send Response
+			 * @param _Data Received Response
+			 * @return uint16_t Command
+			 */		
+			uint16_t Handle_JSON_Send_Response(const char *_Data) {
+
+				// Declare JSON Object
+				StaticJsonDocument<32> Incoming_JSON;
+
+				// Deserialize the JSON document
+				deserializeJson(Incoming_JSON, _Data);
+
+				// Fetch values.
+				uint16_t Event = Incoming_JSON["Event"];
+
+				// End Function
+				return(Event);
+
+			}
+
+		// Public Functions
+		public:
+
+			// PostOffice Constructor
+			PostOffice(Stream &_Serial) : xE910() {
+
+				// Set Serial Port
+				GSM_Serial = & _Serial;
+
+			}
+
+			// Connect Cloud
+			bool Connect(char * _Device_ID) {
+
+				// Set Device ID
+				this->JSON_Data.JSON_Info.Device_ID = _Device_ID;
+
+				// Declare Watchdog Variable
+				uint8_t _Error_WD = 0;
+
+				// Declare Response Status
+				bool _Response = false;
+
+				// Print Command State
+				#ifdef GSM_Debug
+					Terminal_GSM.Text(21, 108, YELLOW, F("........."));
+				#endif
+
+				// Process Command
+				while (!_Response) {
+
+					// Process Command
+					_Response = SCFG(3, 1, 1500, 90, 300, 50);
+
+					// Set WD Variable
+					_Error_WD++;
+
+					// Control for WD
+					if (_Error_WD > 5) break;
+
+				}
+
+				// End Function
+				if (!_Response) return (false);
+
+				// Declare Watchdog Variable
+				_Error_WD = 0;
+
+				// Set Response Variable
+				_Response = false;
+
+				// Process Command
+				while (!_Response) {
+
+					// Process Command
+					_Response = SCFGEXT(3, 1, 0, 1, 0, 0);
+
+					// Set WD Variable
+					_Error_WD++;
+
+					// Control for WD
+					if (_Error_WD > 5) break;
+
+				}
+			
+				// End Function
+				if (!_Response) return (false);
+
+				// Print Command State
+				#ifdef GSM_Debug
+					if (_Response) Terminal_GSM.Text(21, 108, GREEN, F("Connected"));
+				#endif
+
+				// End Function
+				return(true);
+
+			}
+
+			// Set Environment Variables
+			void Environment(float _Temperature, float _Humidity) {
+
+				// Set Environment
+				this->JSON_Data.JSON_Info.Temperature = _Temperature;
+				this->JSON_Data.JSON_Info.Humidity = _Humidity;
+
+			}
+
+			// Set Battery Variables
+			void Battery(float _IV, float _AC, float _SOC, uint8_t _Charge, float _T = 0, uint16_t _FB = 0, uint16_t _IB = 0) {
+
+				// Set Battery Parameters
+				this->JSON_Data.JSON_Battery.IV = _IV;
+				this->JSON_Data.JSON_Battery.AC = _AC;
+				this->JSON_Data.JSON_Battery.SOC = _SOC;
+				this->JSON_Data.JSON_Battery.Charge = _Charge;
+				this->JSON_Data.JSON_Battery.T = _T;			// Optional
+				this->JSON_Data.JSON_Battery.FB = _FB;			// Optional
+				this->JSON_Data.JSON_Battery.IB = _IB;			// Optional
+
+			}
+
+			// Set TimeStamp
+			void TimeStamp(char * _TimeStamp) {
+
+				// Set Time Stamp
+				this->JSON_Data.Time_Stamp = _TimeStamp;
+
+			}
+
+			// Set Status
+			void Status(uint16_t _Device, uint16_t _Fault) {
+
+				// Set Device Status Variables
+				this->JSON_Data.JSON_Status.Device = _Device;
+				this->JSON_Data.JSON_Status.Fault = _Fault;
+
+			}
+
+			/**
+			 * @brief Send Data Batch Function
+			 * @param _Data Sended Data
+			 * @param _Response Received Data
+			 * @return uint16_t Server Request Command
+			 */
+			bool Send(uint8_t _Pack_Type) {
+
+				// Parse JSON
+				uint16_t _JSON_Size = this->Parse_JSON(Pack_Online);
+
+				// Open Connection
+				if (SD(3, 0, 80, 0, 88, 1, PostOffice_Server)) {
+
+					// Clear UART Buffer
+					Clear_UART_Buffer();
+
+					// Declare Buffer Object
+					Serial_Buffer Buffer_Set = {false, 0, 0, 2000};
+
+					// Declare Buffer
+					char Buffer_Variable[255];
+					memset(Buffer_Variable, '\0', 255);
+
+					// Command Chain Delay (Advice by Telit)
+					delay(20);
+
+					// Send UART Command
+					GSM_Serial->print(F("AT#SSEND=3"));
+					GSM_Serial->print(F("\r\n"));
+
+					// Read Current Time
+					uint32_t Current_Time = millis();
+
+					// Response Wait Delay
+					delay(10);
+
+					// Read UART Response
+					while (!Buffer_Set.Response) {
+
+						// Read Serial Char
+						Buffer_Variable[Buffer_Set.Read_Order] = GSM_Serial->read();
+
+						// Control for <OK> Response
+						if (Buffer_Variable[Buffer_Set.Read_Order - 1] == '>' and Buffer_Variable[Buffer_Set.Read_Order] == ' ') Buffer_Set.Response = true;
+
+						// Increase Read Order
+						if (Buffer_Variable[Buffer_Set.Read_Order] > 31 and Buffer_Variable[Buffer_Set.Read_Order] < 127) Buffer_Set.Read_Order += 1;
+
+						// Handle for timeout
+						if (millis() - Current_Time >= Buffer_Set.Time_Out) return(false);
+
+					}
+
+					// Send Delay
+					delay(10);
+
+					// Print HTTP Header
+					GSM_Serial->print(F("POST ")); GSM_Serial->print(PostOffice_EndPoint); GSM_Serial->print(F(" HTTP/1.1\r\n"));
+					GSM_Serial->print(F("Host: ")); GSM_Serial->print(PostOffice_Server); GSM_Serial->print(F("\r\n"));
+					GSM_Serial->print(F("Content-Length: ")); GSM_Serial->print(_JSON_Size); GSM_Serial->print(F("\r\n"));
+					GSM_Serial->print(F("Connection: close\r\n"));
+					GSM_Serial->print(F("Content-Type: application/json\r\n"));
+					GSM_Serial->print(F("User-Agent: PowerStat\r\n"));
+					GSM_Serial->print(F("\r\n"));
+
+					// Send Data Pack
+	//				Serial.println(_JSON_Size);
+					GSM_Serial->print(this->JSON_Pack);
+
+					// Print End Char
+					GSM_Serial->print((char)26);
+
+					// Declare Buffer Object
+					Serial_Buffer Buffer_Get = {false, 0, 0, 2000};
+
+					// Declare Buffer
+					memset(Buffer_Variable, '\0', 255);
+
+					// Read Current Time
+					Current_Time = millis();
+
+					// Read UART Response
+					while (!Buffer_Get.Response) {
+
+						// Read Serial Char
+						Buffer_Variable[Buffer_Get.Read_Order] = GSM_Serial->read();
+
+						// Control for <OK> Response
+						if (Buffer_Variable[Buffer_Get.Read_Order - 1] == 'O' and Buffer_Variable[Buffer_Get.Read_Order] == 'K') Buffer_Get.Response = true;
+
+						// Increase Read Order
+						if (Buffer_Variable[Buffer_Get.Read_Order] > 31 and Buffer_Variable[Buffer_Get.Read_Order] < 127) Buffer_Get.Read_Order += 1;
+
+						// Handle for timeout
+						if (millis() - Current_Time >= Buffer_Get.Time_Out) return(false);
+
+					}
+
+					// Response Wait Delay
+					delay(10);
+
+					// Declare Ring Status
+					char _Response[32];
+					uint8_t Ring_ID;
+					uint16_t Length;
+					uint16_t Response_Command;
+
+					// Get Ring Port
+					if (Send_SRING(Ring_ID, Length)) {
+
+						// Get Request Data
+						SRECV(3, Length, _Response);
+
+						// Handle JSON
+						Response_Command = this->Handle_JSON_Send_Response(_Response);
+
+						// Close Socket
+						SH(3);
+
+						// End Function
+						if (Response_Command == 200) return(true);
+						
+					}
+
+					// End Function
+					return(false);
+
+				}
+
+				// End Function
+				return(false);
 
 			}
 

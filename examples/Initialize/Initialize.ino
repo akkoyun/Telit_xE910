@@ -11,12 +11,12 @@
 // Define Console
 Console Terminal(Serial_Terminal);
 
+// Set PostOffice Cloud API
+PostOffice Postoffice(Serial_GSM);
+
 // Define Object
-xE910 GSM(Serial_GSM);
 xE910_RTC GSM_RTC;
 
-// Set PostOffice Cloud API
-PostOffice Postoffice;
 
 // Declare Global Variable
 uint32_t Timer_Counter = 0;
@@ -50,13 +50,11 @@ void setup() {
 
 
 	// Power ON GSM Modem
-	GSM.Power(true);
+	Postoffice.Power(true);
 
 	// Initialize Modem
-	GSM.Initialize();
-	
-	// Connect Modem
-	GSM.Connect();
+	Postoffice.Initialize();
+	Postoffice.Online();
 
 	// Time Update
 	GSM_RTC.Sync();
