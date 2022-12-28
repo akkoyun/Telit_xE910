@@ -10,29 +10,13 @@
 
 
 
-	// Define Versions
-	#ifndef __Hardware__
-		#define __Hardware__ "00.00.00"
-	#endif
-	#ifndef __Firmware__
-		#define __Firmware__ "00.00.00"
-	#endif
 
 
-	// Define Cloud Server
-	#ifndef Cloud_Server
-		#define Cloud_Server "165.227.154.147"
-	#endif
-	#ifndef Cloud_EndPoint
-		#define Cloud_EndPoint "/"
-	#endif
 	
-	// Define Pack Type
-	#define Pack_Online 1
-	#define Pack_Timed 2
-	#define Pack_Interrupt 3
-	#define Pack_Alarm 4
-	#define Pack_Offline 5
+
+
+
+
 	
 	
 

@@ -59,7 +59,7 @@ void setup() {
 	GSM.Connect();
 
 	// Time Update
-	GSM_RTC.RTC_Update();
+	GSM_RTC.Sync();
 
 	// Set PostOffice
 	Postoffice.Connect("70A11D1D01000026");
@@ -87,14 +87,19 @@ void loop() {
 		// Release Interrupt
 		Timer_Display = false;
 
+		// Update Timer
+		Terminal.Text(2, 95, BLUE, String(GSM_RTC.Time.Hour));
+		Terminal.Text(2, 97, BLUE, String(":"));
+		Terminal.Text(2, 98, BLUE, String(GSM_RTC.Time.Minute));
+		Terminal.Text(2, 100, BLUE, String(":"));
+		Terminal.Text(2, 101, BLUE, String(GSM_RTC.Time.Second));
+
 	}
 
 	// Send Timer
 	if (Timer_Send) {
 
-		uint16_t Command = Postoffice.Send(Pack_Online);
-
-		if (Command == 200) {
+		if (Postoffice.Send(Pack_Online)) {
 			Terminal.Text(21, 108, GREEN, "Sended   ");
 			delay(1000);
 		} else {
