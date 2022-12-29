@@ -1,12 +1,13 @@
-// Serial Communications Definations
-#define Serial_Terminal 			Serial
-#define Serial_GSM 					Serial3
-
 // Define Libraries
 #include "Terminal_Variables.h"
 #include <Telit_xE910.h>
 #include <ArduinoJson.h>
 #include <Console.h>
+
+// Define Functions
+void Device_Data_CallBack();
+void Send_CallBack(uint16_t);
+void Command_CallBack(uint16_t);
 
 // Define Console
 Console Terminal(Serial_Terminal);
@@ -14,17 +15,17 @@ Console Terminal(Serial_Terminal);
 // Set PostOffice Cloud API
 PostOffice Postoffice(Serial_GSM);
 
-// Define Object
-xE910_RTC GSM_RTC;
+
+
+
+
 
 
 // Declare Global Variable
 uint32_t Timer_Counter = 0;
 bool Timer_Display = false;
 bool Timer_Send = false;
-
-
-
+bool GSM_Ring = false;
 
 
 
@@ -35,18 +36,12 @@ void setup() {
 	DDRJ &= 0b11110011; PORTJ |= 0b00000100;
 	DDRJ |= 0b11110000; PORTJ &= 0b00000111;
 
-	// Start GSM Serial
-	Serial3.begin(115200);
-
 	// Start Terminal
 	Serial.begin(115200);
 
 	// Start Console
 	Terminal.Begin();
 	Terminal.Telit_xE910();
-
-
-
 
 
 	// Power ON GSM Modem
@@ -57,14 +52,27 @@ void setup() {
 	Postoffice.Online();
 
 	// Time Update
-	GSM_RTC.Sync();
+	Postoffice.RTC_Sync();
+
+
 
 	// Set PostOffice
 	Postoffice.Connect("70A11D1D01000026");
-	Postoffice.Environment(22.22, 33.33);
-	Postoffice.Battery(4.12, 0.34, 99.98, 3, 30.30, 2000, 1200);
-	Postoffice.TimeStamp("2022-03-23 14:18:28");
-	Postoffice.Status(240, 500);
+
+	// Set CallBacks
+	Postoffice.Device_Data_CallBack(Device_Data_CallBack);
+	Postoffice.Payload_Data_CallBack(Payload_Data_CallBack);
+	Postoffice.PackSend_CallBack(Send_CallBack);
+	Postoffice.Request_CallBack(Command_CallBack);
+
+
+
+
+
+
+	// Set Pin Change Interrupt Mask 1
+	PCICR |= (1 << PCIE1);
+	PCMSK1 |= (1 << PCINT11) | (1 << PCINT12);
 
 	// Set 1sec Timer
 	AVR_Timer_1sn();
@@ -86,30 +94,29 @@ void loop() {
 		Timer_Display = false;
 
 		// Update Timer
-		Terminal.Text(2, 95, BLUE, String(GSM_RTC.Time.Hour));
+		Terminal.Text(2, 95, BLUE, String(Postoffice.Time.Hour));
 		Terminal.Text(2, 97, BLUE, String(":"));
-		Terminal.Text(2, 98, BLUE, String(GSM_RTC.Time.Minute));
+		Terminal.Text(2, 98, BLUE, String(Postoffice.Time.Minute));
 		Terminal.Text(2, 100, BLUE, String(":"));
-		Terminal.Text(2, 101, BLUE, String(GSM_RTC.Time.Second));
+		Terminal.Text(2, 101, BLUE, String(Postoffice.Time.Second));
 
 	}
 
 	// Send Timer
 	if (Timer_Send) {
 
-		if (Postoffice.Send(Pack_Online)) {
-			Terminal.Text(21, 108, GREEN, "Sended   ");
-			delay(1000);
-		} else {
-			Terminal.Text(21, 108, RED, "Failed    ");
-			delay(1000);
-		}
-
-		Terminal.Text(21, 108, GREEN, "         ");
+		Postoffice.Send(Pack_Online);
 
 		// Release Interrupt
 		Timer_Send = false;
 
+	}
+
+	if (GSM_Ring) {
+		
+		Postoffice.Get();
+
+		GSM_Ring = false;
 	}
 
 }
@@ -126,6 +133,27 @@ ISR(TIMER5_COMPA_vect) {
 
 	// Data Send Timer Interrupt
 	if (Timer_Control(60)) Timer_Send = true;
+
+}
+
+// GSM Ring Interrupt
+ISR(PCINT1_vect) {
+
+	// Control Ring Interrupt [PJ2]
+	if ((PINJ & (1 << PINJ2)) == (1 << PINJ2)) {
+		
+		// Set Interrupt Variable
+		GSM_Ring = true;
+
+		// Interrupt Delay
+		delay(75);
+
+	} else {
+		
+		// Set Interrupt Variable
+		GSM_Ring = false;
+
+	}
 
 }
 
@@ -177,5 +205,52 @@ void AVR_Timer_1sn(void) {
 
 	// Start Timer
 	TIMSK5 |= (1 << OCIE5A);
+
+}
+
+// PostOffice Call Back Functions
+void Send_CallBack(uint16_t _Response) {
+
+	// Terminal Beep
+	Terminal.Beep();
+
+	// Control for Command
+	if (_Response == 200) {
+		Terminal.Text(21, 108, GREEN, "Sended   ");
+		delay(1000);
+	} else {
+		Terminal.Text(21, 108, RED, "Failed    ");
+		delay(1000);
+	}
+
+	Terminal.Text(21, 108, GREEN, "         ");
+
+}
+void Command_CallBack(uint16_t _Command, char * _Pack) {
+
+	// Terminal Beep
+	Terminal.Beep();
+
+	Terminal.Text(21, 108, GREEN, "         ");
+	Terminal.Text(21, 110, YELLOW, String(_Command));
+
+	Postoffice.Response(200, "Deneme");
+
+}
+void Device_Data_CallBack(void) {
+
+	// Print Text
+	Terminal.Text(21, 108, YELLOW, "Data Upd.");
+
+	// Set Data Pack
+	Postoffice.Environment(22.22, 33.33);
+	Postoffice.Battery(4.12, 0.34, 99.98, 3, 30.30, 2000, 1200);
+
+}
+void Payload_Data_CallBack(void) {
+
+	// Set Payload Data
+	Postoffice.TimeStamp("2022-03-23 14:18:28");
+	Postoffice.Status(240, 500);
 
 }

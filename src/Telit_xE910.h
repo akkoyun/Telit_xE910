@@ -11,21 +11,6 @@
 		#include "Includes.h"
 	#endif
 
-	// Define Cloud Parameters
-	#ifndef PostOffice_Server
-		#define PostOffice_Server "165.227.154.147"
-	#endif
-	#ifndef PostOffice_EndPoint
-		#define PostOffice_EndPoint "/"
-	#endif
-
-	// Define Pack Type
-	#define Pack_Online 1
-	#define Pack_Timed 2
-	#define Pack_Interrupt 3
-	#define Pack_Alarm 4
-	#define Pack_Offline 5
-
 	// Define JSON Handler
 	#include <ArduinoJson.h>
 
@@ -4219,7 +4204,7 @@
 			 * @return true Function is success.
 			 * @return false Function fail.
 			 */
-			bool SSEND(const uint8_t _ConnID, const uint8_t _Send_Type, const uint16_t _Response_Code, const char * _IP, const char * _URL, const char * _Data_Pack) {
+			bool SSEND(const uint8_t _ConnID, const uint8_t _Header_Type, const uint16_t _Response_Code, const char * _IP, const char * _URL, const char * _Data_Pack) {
 
 				// Clear UART Buffer
 				Clear_UART_Buffer();
@@ -4266,7 +4251,7 @@
 				delay(10);
 
 				// Print HTTP Header
-				this->Send_Header(_Send_Type, _Response_Code, _IP, _URL, _Data_Pack);
+				this->Send_Header(_Header_Type, _Response_Code, _IP, _URL, _Data_Pack);
 
 				// Send Data Pack
 				GSM_Serial->print(_Data_Pack);
@@ -4356,7 +4341,7 @@
 					if (Buffer.Read_Order > 30 and Buffer_Variable[Buffer.Read_Order - 1] == 'O' and Buffer_Variable[Buffer.Read_Order] == 'K') Buffer.Response = true;
 
 					// Increase Read Order
-					if (Buffer_Variable[Buffer.Read_Order] > 31 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
+					if (Buffer_Variable[Buffer.Read_Order] > 32 and Buffer_Variable[Buffer.Read_Order] < 127) Buffer.Read_Order += 1;
 
 					// Handle for timeout
 					if (millis() - Current_Time >= Buffer.Time_Out) return(false);
@@ -4382,7 +4367,7 @@
 					}
 
 					// Handle JSON Data
-					if (Buffer_Variable[i] == '}') Data_Handle = false;
+					if (Buffer_Variable[i-1] == '}') Data_Handle = false;
 
 				}
 
@@ -4521,7 +4506,7 @@
 			 * @return true Function is success.
 			 * @return false Function fail.
 			 */
-			bool Receive_SRING(uint8_t & _Ring) {
+			bool Receive_SRING(void) {
 
 				// Declare Buffer Object
 				Serial_Buffer Buffer = {false, 0, 0, 15000};
@@ -4556,12 +4541,6 @@
 					if (millis() - Current_Time >= Buffer.Time_Out) return(false);
 
 				}
-
-				// Control for Socket ID
-				_Ring = 0;
-				if ((Buffer_Variable[7]) == '1') _Ring = 1;
-				if ((Buffer_Variable[7]) == '2') _Ring = 2;
-				if ((Buffer_Variable[7]) == '3') _Ring = 3;
 
 				// End Function
 				return(true);
@@ -4660,10 +4639,16 @@
 
 	};
 
-	// RTC Class
-	class xE910_RTC : private AT_Command_Set {
+	// Main GSM Class
+	class xE910 : public xE910_Hardware, public AT_Command_Set {
 
 		public:
+
+			// Define Modem Status Structure
+			struct Struct_Status {
+				bool 		Initialize		 	= false;
+				bool		Connection			= false;
+			} Status;
 
 			// Define Time Structure
 			struct Struct_Time {
@@ -4675,328 +4660,6 @@
 				uint8_t 	Minute				= 0;
 				uint8_t 	Second				= 0;
 			} Time;
-
-			/**
-			 * @brief Pair Modem RTC from Time Server
-			 * @return true Function is success.
-			 * @return false Function fail.
-			 */
-			bool Sync(void) {
-
-				// Declare Watchdog Variable
-				uint8_t _Error_WD = 0;
-
-				// Print Command State
-				#ifdef GSM_Debug
-					Terminal_GSM.Text(GSM_Console_Connect_X + 15, 42, WHITE, F("AT+CCLK"));
-					Terminal_GSM.Text(GSM_Console_Connect_X + 15, 73, BLUE, F(" .. "));
-				#endif
-
-				// Process Command
-				while (!this->Time.Time_Update) {
-
-					// Send Command
-					this->Time.Time_Update = CCLK(this->Time.Year, this->Time.Month, this->Time.Day, this->Time.Hour, this->Time.Minute, this->Time.Second);
-
-					// Set WD Variable
-					_Error_WD++;
-
-					// Control for WD
-					if (_Error_WD > 5) break;
-
-				}
-
-				// Print Command State
-				#ifdef GSM_Debug
-					Terminal_GSM.OK_Decide(this->Time.Time_Update, GSM_Console_Connect_X + 15, 73);
-				#endif
-
-				// End Function
-				return(this->Time.Time_Update);
-
-			}
-
-	};
-
-	// Data Incoming Class
-	class xE910_Incoming : private AT_Command_Set {
-
-		private:
-
-			// Define Socket Status Structure
-			struct Socket_Status {
-				uint8_t Conn_ID;
-				uint8_t Cid = 1;
-				uint8_t Server_Port = 80;
-			} Parameter;
-
-			/**
-			 * @brief Handle JSON Pack Function
-			 * @param _Data JSON Pack
-			 * @return uint16_t Request Command
-			 */
-			uint16_t Handle_JSON_Request(const char *_Data) {
-
-				// Declare Variable
-				uint16_t Event = 0;
-
-				// Declare JSON Object
-				StaticJsonDocument<512> Incoming_JSON;
-
-				// Deserialize the JSON document
-				DeserializationError Error = deserializeJson(Incoming_JSON, _Data);
-
-				// Handle JSON
-				if (!Error) Event = Incoming_JSON["Request"]["Event"];
-
-				// End Function
-				return(Event);
-
-			}
-
-		public:
-
-			xE910_Incoming(uint8_t _Conn_ID) : AT_Command_Set() {
-
-				// Set Socket Port
-				this->Parameter.Conn_ID = _Conn_ID;
-
-			}
-
-			/**
-			 * @brief Configure Socket
-			 * @return true Function is success.
-			 * @return false Function fail.
-			 */
-			bool Configure(void) {
-
-				// Declare Watchdog Variable
-				uint8_t _Error_WD = 0;
-
-				// Declare Response Status
-				bool _Response = false;
-
-					// Print Command State
-					#ifdef GSM_Debug
-						//Terminal_GSM.Text(Debug_Connect_X + 5, Debug_Connect_Y, BLUE, F(" .. "));
-					#endif
-
-					// Process Command
-					while (!_Response) {
-
-						// Process Command
-						_Response = SCFG(this->Parameter.Conn_ID, this->Parameter.Cid, 1500, 90, 300, 50);
-
-						// Set WD Variable
-						_Error_WD++;
-
-						// Control for WD
-						if (_Error_WD > 5) break;
-
-					}
-
-					// End Function
-					if (!_Response) return (false);
-
-					// Declare Watchdog Variable
-					_Error_WD = 0;
-
-					// Set Response Variable
-					_Response = false;
-
-					// Process Command
-					while (!_Response) {
-
-						// Process Command
-						_Response = SCFGEXT(this->Parameter.Cid, 1, 0, 1, 0, 0);
-
-						// Set WD Variable
-						_Error_WD++;
-
-						// Control for WD
-						if (_Error_WD > 5) break;
-
-					}
-
-					// Print Command State
-					#ifdef GSM_Debug
-						//Terminal_GSM.OK_Decide(_Response, Debug_Connect_X + 5, Debug_Connect_Y);
-					#endif
-				
-					// End Function
-					if (!_Response) return (false);
-
-				// End Function
-				return(false);
-
-			}
-
-			/**
-			 * @brief Configure Socket for Listen
-			 * @param _State Enable / Disable Socket Listen
-			 * @return true Function is success.
-			 * @return false Function fail.
-			 */
-			bool Listen(const bool _State) {
-
-				// Declare Status Variable
-				uint8_t Socket_Status;
-
-				// Get Socket Status
-				SS(this->Parameter.Conn_ID, Socket_Status);
-
-				// Handle State
-				if (_State) {
-
-					// Control Current State
-					if (Socket_Status != 4) SL(this->Parameter.Conn_ID, 1, this->Parameter.Server_Port, 255);
-
-					// Command Delay
-					delay(20);
-
-					// Get Socket Status
-					SS(this->Parameter.Conn_ID, Socket_Status);
-
-					// Command Delay
-					delay(20);
-
-					// Control Socket
-					if (Socket_Status != 4) return(false);
-
-				} else {
-
-					// Control Current State
-					if (Socket_Status != 0) SL(this->Parameter.Conn_ID, 0, this->Parameter.Server_Port, 255);
-
-					// Command Delay
-					delay(20);
-
-					// Get Socket Status
-					SS(this->Parameter.Conn_ID, Socket_Status);
-
-					// Command Delay
-					delay(20);
-
-					// Control Socket
-					if (Socket_Status != 0) return(false);
-
-				}
-
-				// End Function
-				return(true);
-
-			}
-
-			/**
-			 * @brief Socket Answer Function
-			 * @param _JSON_Data Incoming JSON Pack
-			 * @return true Function is success.
-			 * @return false Function fail.
-			 */
-			bool Answer(char * _JSON_Data) {
-
-				// Declare RING
-				uint8_t RING;
-
-				// Get Ring Port
-				Receive_SRING(RING);
-
-				// Control for <SRING:n>
-				if (RING == 1 or RING == 2 or RING == 3) {
-
-					// Declare Request Length
-					uint16_t Request_Length;
-
-					// Answer Socket
-					SA(RING, 1, Request_Length);
-
-					// Get Request Data
-					SRECV(RING, Request_Length, _JSON_Data);
-
-					// End Function
-					return(true);
-
-				}
-
-				// End Function
-				return(false);
-
-			}
-
-			/**
-			 * @brief Send Request Response Function
-			 * @param _Data Sended Response Data Pack
-			 * @return true Function is success.
-			 * @return false Function fail.
-			 */
-			bool Response(uint16_t _Response_Code, char * _Data) {
-
-				// Send Socket Answer
-				if (SSEND(this->Parameter.Conn_ID, 1, _Response_Code, "", "", _Data)) {
-
-					// Command Delay
-					delay(20);
-
-					// Close Socket
-					if (SH(this->Parameter.Conn_ID)) {
-
-						// Command Delay
-						delay(20);
-
-						// ReOpen Socket
-						bool Socket_Open = this->Listen(true);
-
-						// End Function
-						return(Socket_Open);
-
-					} else {
-
-						// End Function
-						return(false);
-
-					}
-
-				} else {
-
-					// End Function
-					return(false);
-
-				}
-				
-			}
-
-			/**
-			 * @brief Get Server Command Batch Function
-			 * @return uint16_t Server Request Command
-			 */
-			uint16_t Get(char * _Request) {
-
-				// Declare Command Variable
-				uint16_t Event;
-
-				// Answer Socket Connection
-				this->Answer(_Request);
-
-				// Handle JSON Data
-				Event = this->Handle_JSON_Request(_Request);
-
-				// End Function
-				return(Event);
-
-			}
-
-	};
-
-	// Main GSM Class
-	class xE910 : public xE910_Hardware, public AT_Command_Set {
-
-		public:
-
-			// Define Modem Status Structure
-			struct Struct_Status {
-				bool 		Initialize		 	= false;
-				bool		Connection			= false;
-			} Status;
 
 			/**
 			 * @brief Construct a new x E910 object
@@ -6175,6 +5838,174 @@
 
 					#endif
 
+					// SCFG (Send Port) Command
+					#ifdef _AT_SCFG_Out_
+
+						// Print Command State
+						#ifdef GSM_Debug
+							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y, WHITE, F("AT#SCFG=3,1,1500,90,300,50"));
+							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, BLUE, F(" .. "));
+						#endif
+
+						// Declare Watchdog Variable
+						_Error_WD = 0;
+
+						// Set Response Variable
+						_Response = false;
+
+						// Process Command
+						while (!_Response) {
+
+							// Process Command
+							_Response = SCFG(3, 1, 1500, 90, 300, 50);
+
+							// Set WD Variable
+							_Error_WD++;
+
+							// Control for WD
+							if (_Error_WD > 5) break;
+
+						}
+
+						// End Function
+						if (!_Response) return (false);
+
+						// Print Command State
+						#ifdef GSM_Debug
+							Terminal_GSM.OK_Decide(_Response, GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31);
+						#endif
+
+						// Set Variable
+						GSM_Console_Connect_ROW += 1;
+
+					#endif
+
+					// SCFGEXT (Send Port) Command
+					#ifdef _AT_SCFGEXT_Out_
+
+						// Print Command State
+						#ifdef GSM_Debug
+							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y, WHITE, F("AT#SCFGEXT=3,1,0,1,0,0"));
+							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, BLUE, F(" .. "));
+						#endif
+
+						// Declare Watchdog Variable
+						_Error_WD = 0;
+
+						// Set Response Variable
+						_Response = false;
+
+						// Process Command
+						while (!_Response) {
+
+							// Process Command
+							_Response = SCFGEXT(3, 1, 0, 1, 0, 0);
+
+							// Set WD Variable
+							_Error_WD++;
+
+							// Control for WD
+							if (_Error_WD > 5) break;
+
+						}
+
+						// End Function
+						if (!_Response) return (false);
+
+						// Print Command State
+						#ifdef GSM_Debug
+							Terminal_GSM.OK_Decide(_Response, GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31);
+						#endif
+
+						// Set Variable
+						GSM_Console_Connect_ROW += 1;
+
+					#endif
+
+					// SCFG (In Port) Command
+					#ifdef _AT_SCFG_In_
+
+						// Print Command State
+						#ifdef GSM_Debug
+							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y, WHITE, F("AT#SCFG=2,1,1500,90,300,50"));
+							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, BLUE, F(" .. "));
+						#endif
+
+						// Declare Watchdog Variable
+						_Error_WD = 0;
+
+						// Set Response Variable
+						_Response = false;
+
+						// Process Command
+						while (!_Response) {
+
+							// Process Command
+							_Response = SCFG(2, 1, 1500, 90, 300, 50);
+
+							// Set WD Variable
+							_Error_WD++;
+
+							// Control for WD
+							if (_Error_WD > 5) break;
+
+						}
+
+						// End Function
+						if (!_Response) return (false);
+
+						// Print Command State
+						#ifdef GSM_Debug
+							Terminal_GSM.OK_Decide(_Response, GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31);
+						#endif
+
+						// Set Variable
+						GSM_Console_Connect_ROW += 1;
+
+					#endif
+
+					// SCFGEXT (In Port) Command
+					#ifdef _AT_SCFGEXT_In_
+
+						// Print Command State
+						#ifdef GSM_Debug
+							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y, WHITE, F("AT#SCFGEXT=2,1,0,1,0,0"));
+							Terminal_GSM.Text(GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31, BLUE, F(" .. "));
+						#endif
+
+						// Declare Watchdog Variable
+						_Error_WD = 0;
+
+						// Set Response Variable
+						_Response = false;
+
+						// Process Command
+						while (!_Response) {
+
+							// Process Command
+							_Response = SCFGEXT(2, 1, 0, 1, 0, 0);
+
+							// Set WD Variable
+							_Error_WD++;
+
+							// Control for WD
+							if (_Error_WD > 5) break;
+
+						}
+
+						// End Function
+						if (!_Response) return (false);
+
+						// Print Command State
+						#ifdef GSM_Debug
+							Terminal_GSM.OK_Decide(_Response, GSM_Console_Connect_ROW, GSM_Console_Connect_Y + 31);
+						#endif
+
+						// Set Variable
+						GSM_Console_Connect_ROW += 1;
+
+					#endif
+
 					// FRWL Command 1
 					#ifdef _AT_FRWL_1_
 
@@ -6415,10 +6246,61 @@
 
 			}
 
+			/**
+			 * @brief Pair Modem RTC from Time Server
+			 * @return true Function is success.
+			 * @return false Function fail.
+			 */
+			bool RTC_Sync(void) {
+
+				// Declare Watchdog Variable
+				uint8_t _Error_WD = 0;
+
+				// Print Command State
+				#ifdef GSM_Debug
+					Terminal_GSM.Text(GSM_Console_Connect_X + 15, 42, WHITE, F("AT+CCLK"));
+					Terminal_GSM.Text(GSM_Console_Connect_X + 15, 73, BLUE, F(" .. "));
+				#endif
+
+				// Process Command
+				while (!this->Time.Time_Update) {
+
+					// Send Command
+					this->Time.Time_Update = CCLK(this->Time.Year, this->Time.Month, this->Time.Day, this->Time.Hour, this->Time.Minute, this->Time.Second);
+
+					// Set WD Variable
+					_Error_WD++;
+
+					// Control for WD
+					if (_Error_WD > 5) break;
+
+				}
+
+				// Print Command State
+				#ifdef GSM_Debug
+					Terminal_GSM.OK_Decide(this->Time.Time_Update, GSM_Console_Connect_X + 15, 73);
+				#endif
+
+				// End Function
+				return(this->Time.Time_Update);
+
+			}
+
 	};
 
 	// Cloud Functions
 	class PostOffice : public xE910 {
+
+		// Define Cloud Parameters
+		#define PostOffice_Server "165.227.154.147"
+		#define PostOffice_EndPoint "/"
+
+		// Define Pack Type
+		#define Pack_Online 1
+		#define Pack_Timed 2
+		#define Pack_Interrupt 3
+		#define Pack_Alarm 4
+		#define Pack_Offline 5
 
 		// Private Functions
 		private:
@@ -6603,11 +6485,7 @@
 
 			}
 
-			/**
-			 * @brief Handle Send Response
-			 * @param _Data Received Response
-			 * @return uint16_t Command
-			 */		
+			// Handle Send Response
 			uint16_t Handle_JSON_Send_Response(const char *_Data) {
 
 				// Declare JSON Object
@@ -6623,6 +6501,81 @@
 				return(Event);
 
 			}
+			uint16_t Handle_JSON_Request(const char *_Data) {
+
+				// Declare Variable
+				uint16_t Event = 0;
+
+				// Declare JSON Object
+				StaticJsonDocument<512> Incoming_JSON;
+
+				// Deserialize the JSON document
+				DeserializationError Error = deserializeJson(Incoming_JSON, _Data);
+
+				// Handle JSON
+				if (!Error) Event = Incoming_JSON["Request"]["Event"];
+
+				// End Function
+				return(Event);
+
+			}
+
+			// Configure Socket for Listen
+			bool Listen(const bool _State) {
+
+				// Declare Status Variable
+				uint8_t Socket_Status;
+
+				// Get Socket Status
+				SS(2, Socket_Status);
+
+				// Handle State
+				if (_State) {
+
+					// Control Current State
+					if (Socket_Status != 4) SL(2, 1, 80, 255);
+
+					// Command Delay
+					delay(20);
+
+					// Get Socket Status
+					SS(2, Socket_Status);
+
+					// Command Delay
+					delay(20);
+
+					// Control Socket
+					if (Socket_Status != 4) return(false);
+
+				} else {
+
+					// Control Current State
+					if (Socket_Status != 0) SL(2, 0, 80, 255);
+
+					// Command Delay
+					delay(20);
+
+					// Get Socket Status
+					SS(2, Socket_Status);
+
+					// Command Delay
+					delay(20);
+
+					// Control Socket
+					if (Socket_Status != 0) return(false);
+
+				}
+
+				// End Function
+				return(true);
+
+			}
+
+			// Define CallBack Functions
+			void (*_Send_CallBack)(uint16_t);
+			void (*_Device_Data_CallBack)();
+			void (*_Payload_Data_CallBack)();
+			void (*_Request_CallBack)(uint16_t, char*);
 
 		// Public Functions
 		public:
@@ -6633,6 +6586,35 @@
 				// Set Serial Port
 				GSM_Serial = & _Serial;
 
+				// Start GSM Serial
+				Serial3.begin(115200);
+
+			}
+
+			// CallBack Definitions
+			void Device_Data_CallBack(void (*_Device_Data_CallBack)()) {
+
+				// Set CallBack Functions
+				this->_Device_Data_CallBack = _Device_Data_CallBack;
+
+			}
+			void Payload_Data_CallBack(void (*_Payload_Data_CallBack)()) {
+
+				// Set CallBack Functions
+				this->_Payload_Data_CallBack = _Payload_Data_CallBack;
+
+			}
+			void PackSend_CallBack(void (*_Send_CallBack)(uint16_t)) {
+
+				// Set CallBack Functions
+				this->_Send_CallBack = _Send_CallBack;
+
+			}
+			void Request_CallBack(void (*_Command_CallBack)(uint16_t, char*)) {
+
+				// Set CallBack Functions
+				this->_Request_CallBack = _Command_CallBack;
+
 			}
 
 			// Connect Cloud
@@ -6641,60 +6623,12 @@
 				// Set Device ID
 				this->JSON_Data.JSON_Info.Device_ID = _Device_ID;
 
-				// Declare Watchdog Variable
-				uint8_t _Error_WD = 0;
-
-				// Declare Response Status
-				bool _Response = false;
+				// Listen Port
+				bool _Response = this->Listen(true);
 
 				// Print Command State
 				#ifdef GSM_Debug
-					Terminal_GSM.Text(21, 108, YELLOW, F("........."));
-				#endif
-
-				// Process Command
-				while (!_Response) {
-
-					// Process Command
-					_Response = SCFG(3, 1, 1500, 90, 300, 50);
-
-					// Set WD Variable
-					_Error_WD++;
-
-					// Control for WD
-					if (_Error_WD > 5) break;
-
-				}
-
-				// End Function
-				if (!_Response) return (false);
-
-				// Declare Watchdog Variable
-				_Error_WD = 0;
-
-				// Set Response Variable
-				_Response = false;
-
-				// Process Command
-				while (!_Response) {
-
-					// Process Command
-					_Response = SCFGEXT(3, 1, 0, 1, 0, 0);
-
-					// Set WD Variable
-					_Error_WD++;
-
-					// Control for WD
-					if (_Error_WD > 5) break;
-
-				}
-			
-				// End Function
-				if (!_Response) return (false);
-
-				// Print Command State
-				#ifdef GSM_Debug
-					if (_Response) Terminal_GSM.Text(21, 108, GREEN, F("Connected"));
+					if (_Response) Terminal_GSM.Text(21, 108, GREEN, F("Config..."));
 				#endif
 
 				// End Function
@@ -6702,53 +6636,12 @@
 
 			}
 
-			// Set Environment Variables
-			void Environment(float _Temperature, float _Humidity) {
-
-				// Set Environment
-				this->JSON_Data.JSON_Info.Temperature = _Temperature;
-				this->JSON_Data.JSON_Info.Humidity = _Humidity;
-
-			}
-
-			// Set Battery Variables
-			void Battery(float _IV, float _AC, float _SOC, uint8_t _Charge, float _T = 0, uint16_t _FB = 0, uint16_t _IB = 0) {
-
-				// Set Battery Parameters
-				this->JSON_Data.JSON_Battery.IV = _IV;
-				this->JSON_Data.JSON_Battery.AC = _AC;
-				this->JSON_Data.JSON_Battery.SOC = _SOC;
-				this->JSON_Data.JSON_Battery.Charge = _Charge;
-				this->JSON_Data.JSON_Battery.T = _T;			// Optional
-				this->JSON_Data.JSON_Battery.FB = _FB;			// Optional
-				this->JSON_Data.JSON_Battery.IB = _IB;			// Optional
-
-			}
-
-			// Set TimeStamp
-			void TimeStamp(char * _TimeStamp) {
-
-				// Set Time Stamp
-				this->JSON_Data.Time_Stamp = _TimeStamp;
-
-			}
-
-			// Set Status
-			void Status(uint16_t _Device, uint16_t _Fault) {
-
-				// Set Device Status Variables
-				this->JSON_Data.JSON_Status.Device = _Device;
-				this->JSON_Data.JSON_Status.Fault = _Fault;
-
-			}
-
-			/**
-			 * @brief Send Data Batch Function
-			 * @param _Data Sended Data
-			 * @param _Response Received Data
-			 * @return uint16_t Server Request Command
-			 */
+			// Send Data Batch Function
 			bool Send(uint8_t _Pack_Type) {
+
+				// Get Data CallBack
+				_Device_Data_CallBack();
+				_Payload_Data_CallBack();
 
 				// Parse JSON
 				uint16_t _JSON_Size = this->Parse_JSON(Pack_Online);
@@ -6845,25 +6738,30 @@
 					delay(10);
 
 					// Declare Ring Status
-					char _Response[32];
-					uint8_t Ring_ID;
-					uint16_t Length;
-					uint16_t Response_Command;
+					uint8_t _Ring_ID;
+					uint16_t _Length;
 
 					// Get Ring Port
-					if (Send_SRING(Ring_ID, Length)) {
+					if (Send_SRING(_Ring_ID, _Length)) {
+
+						// Declare Response Status
+						char _Response[32];
+						uint16_t _Response_Command;
 
 						// Get Request Data
-						SRECV(3, Length, _Response);
+						SRECV(3, _Length, _Response);
 
 						// Handle JSON
-						Response_Command = this->Handle_JSON_Send_Response(_Response);
+						_Response_Command = this->Handle_JSON_Send_Response(_Response);
 
 						// Close Socket
 						SH(3);
 
+						// Send Data CallBack
+						_Send_CallBack(_Response_Command);
+
 						// End Function
-						if (Response_Command == 200) return(true);
+						if (_Response_Command == 200) return(true);
 						
 					}
 
@@ -6872,8 +6770,121 @@
 
 				}
 
+				// Port Control
+				this->Listen(true);
+
 				// End Function
 				return(false);
+
+			}
+
+			// Get Server Command Function
+			void Get(void) {
+
+				// Declare Variable
+				char _JSON_Data[50];
+
+				// Declare Request Length
+				uint16_t _Request_Length;
+
+				// Handle Ring
+				if (Receive_SRING()) {
+
+					// Answer Socket
+					SA(2, 1, _Request_Length);
+
+					// Get Request Data
+					SRECV(2, _Request_Length, _JSON_Data);
+
+					// Handle JSON Data
+					uint16_t _Event = this->Handle_JSON_Request(_JSON_Data);
+
+					// Send Data CallBack
+					_Request_CallBack(_Event, _JSON_Data);
+
+				}
+
+			}
+
+			// Send Request Response Function
+			bool Response(uint16_t _Response_Code, char * _Data) {
+
+				// Send Socket Answer
+				if (SSEND(2, 1, _Response_Code, "", "", _Data)) {
+
+					// Command Delay
+					delay(20);
+
+					// Close Socket
+					if (SH(2)) {
+
+						// Command Delay
+						delay(20);
+
+						// ReOpen Socket
+						bool Socket_Open = this->Listen(true);
+
+						// End Function
+						return(Socket_Open);
+
+					} else {
+
+						// End Function
+						return(false);
+
+					}
+
+				} else {
+
+					// End Function
+					return(false);
+
+				}
+				
+			}
+
+
+
+
+
+
+			// Set Environment Variables
+			void Environment(float _Temperature, float _Humidity) {
+
+				// Set Environment
+				this->JSON_Data.JSON_Info.Temperature = _Temperature;
+				this->JSON_Data.JSON_Info.Humidity = _Humidity;
+
+			}
+
+			// Set Battery Variables
+			void Battery(float _IV, float _AC, float _SOC, uint8_t _Charge, float _T = 0, uint16_t _FB = 0, uint16_t _IB = 0) {
+
+				// Set Battery Parameters
+				this->JSON_Data.JSON_Battery.IV = _IV;
+				this->JSON_Data.JSON_Battery.AC = _AC;
+				this->JSON_Data.JSON_Battery.SOC = _SOC;
+				this->JSON_Data.JSON_Battery.Charge = _Charge;
+				this->JSON_Data.JSON_Battery.T = _T;			// Optional
+				this->JSON_Data.JSON_Battery.FB = _FB;			// Optional
+				this->JSON_Data.JSON_Battery.IB = _IB;			// Optional
+
+			}
+
+			// Set TimeStamp
+			void TimeStamp(char * _TimeStamp) {
+
+				// Set Time Stamp
+				this->JSON_Data.Time_Stamp = _TimeStamp;
+
+			}
+
+			// Set Status
+			void Status(uint16_t _Device, uint16_t _Fault) {
+
+				// Set Device Status Variables
+				this->JSON_Data.JSON_Status.Device = _Device;
+				this->JSON_Data.JSON_Status.Fault = _Fault;
 
 			}
 

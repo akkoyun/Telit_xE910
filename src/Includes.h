@@ -1,6 +1,10 @@
 #ifndef __Telit_xE910_Includes__
 #define __Telit_xE910_Includes__
 
+	// Serial Communications Definations
+	#define Serial_Terminal 			Serial
+	#define Serial_GSM 					Serial3
+
 	// Define Terminal Defaults
 	#include "Terminal_Defaults.h"
 

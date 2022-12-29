@@ -26,6 +26,13 @@
 	#define _AT_AUTOBND_value_ 1
 #endif
 
+#define _AT_SCFG_Out_
+#define _AT_SCFGEXT_Out_
+#define _AT_SCFG_In_
+#define _AT_SCFGEXT_In_
+
+
+
 
 #define _AT_TXMONMODE_
 #define _AT_CREG_
