@@ -77,7 +77,12 @@ void setup() {
 	Postoffice.Online("70A11D1D01000026");
 
 
-
+	
+	// Environment Structure Define
+	struct Environment_Struct {
+		float Temperature;
+		float Humidity;
+	} Environment;
 
 
 
@@ -123,6 +128,7 @@ void loop() {
 		Timer_Send = false;
 
 	}
+
 
 	if (GSM_Ring) {
 		
@@ -254,21 +260,10 @@ void Device_Data_CallBack(void) {
 	// Print Text
 	Terminal.Text(21, 108, YELLOW, "Data Upd.");
 
-	float T = 22.22;
-	float H = 33.33;
-
 	// Set Data Pack
-	Postoffice.Environment(&T, &H);
+	Postoffice.Environment(22.22, 33.33);
 
-	float IV = 4.12;
-	float AC = 0.34;
-	float SOC = 99.99;
-	uint8_t Charge = 3;
-	float BT = 33.33;
-	uint16_t FB = 2000;
-	uint16_t IB = 1200;
-
-	Postoffice.Battery(&IV, &AC, &SOC, &Charge, &BT, &FB, &IB);
+	Postoffice.Battery(1, 2, 3, 3, 11, 1200, 1000);
 
 	// Print Text
 	Terminal.Text(21, 108, YELLOW, "         ");

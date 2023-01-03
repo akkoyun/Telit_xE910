@@ -30,6 +30,48 @@
 				bool Power = false;
 			} Hardware_Status;
 
+			// Define Modem Status Structure
+			struct Struct_Status {
+				bool		PowerMon			= false;
+				bool 		Initialize		 	= false;
+				bool		Connection			= false;
+			} Status;
+
+			// Define JSON Status Structure
+			struct JSON_Device_Structure {
+
+				// Define JSON Status Structure
+				struct JSON_Info_Structure {
+					char * Device_ID;
+					float Temperature;
+					float Humidity;
+				} JSON_Info;
+
+				// Define JSON Battery Structure
+				struct JSON_Battery_Structure {
+					float IV;
+					float AC;
+					float SOC;
+					uint8_t Charge;
+					float T;
+					uint16_t FB;
+					uint16_t IB;
+				} JSON_Battery;
+
+				// Define JSON Status Structure
+				struct JSON_Status_Structure {
+					uint16_t Device;
+					uint16_t Fault;
+				} JSON_Status;
+
+				// Time Stamp
+				char * Time_Stamp;
+
+				// Define JSON
+				String JSON_Pack;
+
+			} JSON_Data;
+
 			/**
 			 * @brief Get Power Monitor
 			 * @return true Modem Powered
@@ -286,53 +328,11 @@
 
 			}
 
-			// Define Modem Status Structure
-			struct Struct_Status {
-				bool		PowerMon			= false;
-				bool 		Initialize		 	= false;
-				bool		Connection			= false;
-			} Status;
-
-			// Define JSON Status Structure
-			struct JSON_Device_Structure {
-
-				// Define JSON Status Structure
-				struct JSON_Info_Structure {
-					char * Device_ID;
-					float Temperature;
-					float Humidity;
-				} JSON_Info;
-
-				// Define JSON Battery Structure
-				struct JSON_Battery_Structure {
-					float IV;
-					float AC;
-					float SOC;
-					uint8_t Charge;
-					float T;
-					uint16_t FB;
-					uint16_t IB;
-				} JSON_Battery;
-
-				// Define JSON Status Structure
-				struct JSON_Status_Structure {
-					uint16_t Device;
-					uint16_t Fault;
-				} JSON_Status;
-
-				// Time Stamp
-				char * Time_Stamp;
-
-			} JSON_Data;
-
-			// Define JSON
-			String JSON_Pack;
-
 			// Parse JSON Pack
 			uint16_t Parse_JSON(uint8_t _Pack_Type) {
 
 				// Clear Pack
-				this->JSON_Pack = "";
+				this->JSON_Data.JSON_Pack = "";
 
 				// Define Versions
 				#ifndef __Hardware__
@@ -466,7 +466,7 @@
 				JSON.garbageCollect();
 
 				// Serialize JSON	
-				uint16_t _JSON_Size = serializeJson(JSON, this->JSON_Pack);
+				uint16_t _JSON_Size = serializeJson(JSON, this->JSON_Data.JSON_Pack);
 
 				// End Function
 				return(_JSON_Size);
@@ -2473,7 +2473,7 @@
 						GSM_Serial->print(F("\r\n"));
 
 						// Send Data Pack
-						GSM_Serial->print(this->JSON_Pack);
+						GSM_Serial->print(this->JSON_Data.JSON_Pack);
 
 						// Print End Char
 						GSM_Serial->print((char)26);
@@ -2552,7 +2552,6 @@
 
 					// Port Control
 					this->Listen(true);
-
 
 				}
 
@@ -2651,25 +2650,25 @@
 			*************************/
 
 			// Set Environment Variables
-			void Environment(float * _Temperature, float * _Humidity) {
+			void Environment(float _Temperature, float _Humidity) {
 
 				// Set Environment
-				this->JSON_Data.JSON_Info.Temperature = *_Temperature;
-				this->JSON_Data.JSON_Info.Humidity = *_Humidity;
+				this->JSON_Data.JSON_Info.Temperature = _Temperature;
+				this->JSON_Data.JSON_Info.Humidity = _Humidity;
 
 			}
 
 			// Set Battery Variables
-			void Battery(float *_IV, float *_AC, float *_SOC, uint8_t *_Charge, float *_T = 0, uint16_t *_FB = 0, uint16_t *_IB = 0) {
+			void Battery(float _IV, float _AC, float _SOC, uint8_t _Charge, float _T = 0, uint16_t _FB = 0, uint16_t _IB = 0) {
 
 				// Set Battery Parameters
-				this->JSON_Data.JSON_Battery.IV = *_IV;
-				this->JSON_Data.JSON_Battery.AC = *_AC;
-				this->JSON_Data.JSON_Battery.SOC = *_SOC;
-				this->JSON_Data.JSON_Battery.Charge = *_Charge;
-				this->JSON_Data.JSON_Battery.T = *_T;			// Optional
-				this->JSON_Data.JSON_Battery.FB = *_FB;			// Optional
-				this->JSON_Data.JSON_Battery.IB = *_IB;			// Optional
+				this->JSON_Data.JSON_Battery.IV = _IV;
+				this->JSON_Data.JSON_Battery.AC = _AC;
+				this->JSON_Data.JSON_Battery.SOC = _SOC;
+				this->JSON_Data.JSON_Battery.Charge = _Charge;
+				this->JSON_Data.JSON_Battery.T = _T;			// Optional
+				this->JSON_Data.JSON_Battery.FB = _FB;			// Optional
+				this->JSON_Data.JSON_Battery.IB = _IB;			// Optional
 
 			}
 

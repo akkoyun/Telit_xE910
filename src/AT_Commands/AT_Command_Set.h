@@ -3164,9 +3164,22 @@
 
 				// +CCLK: "22/05/31,13:06:06+00"OK
 
-				// Handle Variables
-				sscanf(Buffer_Variable, "+CCLK: \"%02d/%02d/%02d,%02d:%02d:%02d+00\"OK", &_Year, &_Month, &_Day, &_Hour, &_Minute, &_Second);
+				// Handle Time
+				_Year = (((Buffer_Variable[8] - 48) * 10) + (Buffer_Variable[9] - 48));
+				_Month = (((Buffer_Variable[11] - 48) * 10) + (Buffer_Variable[12] - 48));
+				_Day = (((Buffer_Variable[14] - 48) * 10) + (Buffer_Variable[15] - 48));
+				_Hour = (((Buffer_Variable[17] - 48) * 10) + (Buffer_Variable[18] - 48));
+				_Minute = (((Buffer_Variable[20] - 48) * 10) + (Buffer_Variable[21] - 48));
+				_Second = (((Buffer_Variable[23] - 48) * 10) + (Buffer_Variable[24] - 48));
 
+				// Control for Variables
+				if (_Year > 24 and _Year < 22) return(false);	
+				if (_Month > 12 and _Month < 0) return(false);	
+				if (_Day > 31 and _Day < 0) return(false);	
+				if (_Hour > 24 and _Hour < 0) return(false);	
+				if (_Minute > 59 and _Minute < 0) return(false);	
+				if (_Second > 59 and _Second < 0) return(false);
+				
 				// End Function
 				return (true);
 
@@ -3842,19 +3855,6 @@
 
 				// Handle State
 				_State = (Buffer_Variable[7] - 48);
-
-				// Print Command State
-				#ifdef GSM_Debug
-					Terminal_GSM.Text(26, 108, CYAN, "         ");
-					if (_State == 0) Terminal_GSM.Text(26, 108, RED, "Closed   ");
-					if (_State == 1) Terminal_GSM.Text(26, 108, WHITE, "Transfer ");
-					if (_State == 2) Terminal_GSM.Text(26, 108, YELLOW, "Suspend  ");
-					if (_State == 3) Terminal_GSM.Text(26, 108, YELLOW, "Suspend  ");
-					if (_State == 4) Terminal_GSM.Text(26, 108, GREEN, "Listening");
-					if (_State == 5) Terminal_GSM.Text(26, 108, WHITE, "Incoming ");
-					if (_State == 6) Terminal_GSM.Text(26, 108, RED, "DNS      ");
-					if (_State == 7) Terminal_GSM.Text(26, 108, WHITE, "Connecting");
-				#endif
 
 				// End Function
 				return (true);
