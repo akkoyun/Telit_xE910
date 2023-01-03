@@ -8,7 +8,7 @@
 
 	// Define Library Includes
 	#ifndef __Telit_xE910_Includes__
-		#include "Includes.h"
+		#include "Config/Includes.h"
 	#endif
 
 	// Define Library Includes
