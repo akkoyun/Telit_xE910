@@ -13,7 +13,7 @@ void Command_CallBack(uint16_t);
 Console Terminal(Serial_Terminal);
 
 // Set PostOffice Cloud API
-PostOffice Postoffice(Serial_GSM);
+PostOffice Postoffice(Serial3);
 
 
 
@@ -44,26 +44,38 @@ void setup() {
 	Terminal.Telit_xE910();
 
 
+
+
 	// Power ON GSM Modem
-	Postoffice.Power(true);
+	Postoffice.Power(false);
 
-	// Initialize Modem
-	Postoffice.Initialize();
-	Postoffice.Online();
-
-	// Time Update
-	Postoffice.RTC_Sync();
-
-
-
-	// Set PostOffice
-	Postoffice.Connect("70A11D1D01000026");
 
 	// Set CallBacks
 	Postoffice.Device_Data_CallBack(Device_Data_CallBack);
 	Postoffice.Payload_Data_CallBack(Payload_Data_CallBack);
 	Postoffice.PackSend_CallBack(Send_CallBack);
 	Postoffice.Request_CallBack(Command_CallBack);
+
+
+
+
+
+
+
+	// Power ON GSM Modem
+	Postoffice.Power(true);
+
+	// Initialize Modem
+	Postoffice.Initialize();
+	Postoffice.Connect();
+
+
+
+
+
+	// Set PostOffice
+	Postoffice.Online("70A11D1D01000026");
+
 
 
 
@@ -237,20 +249,35 @@ void Command_CallBack(uint16_t _Command, char * _Pack) {
 	Postoffice.Response(200, "Deneme");
 
 }
-void Device_Data_CallBack(void) {
+void Device_Data_CallBack(void) { 
 
 	// Print Text
 	Terminal.Text(21, 108, YELLOW, "Data Upd.");
 
+	float T = 22.22;
+	float H = 33.33;
+
 	// Set Data Pack
-	Postoffice.Environment(22.22, 33.33);
-	Postoffice.Battery(4.12, 0.34, 99.98, 3, 30.30, 2000, 1200);
+	Postoffice.Environment(&T, &H);
+
+	float IV = 4.12;
+	float AC = 0.34;
+	float SOC = 99.99;
+	uint8_t Charge = 3;
+	float BT = 33.33;
+	uint16_t FB = 2000;
+	uint16_t IB = 1200;
+
+	Postoffice.Battery(&IV, &AC, &SOC, &Charge, &BT, &FB, &IB);
+
+	// Print Text
+	Terminal.Text(21, 108, YELLOW, "         ");
 
 }
 void Payload_Data_CallBack(void) {
 
 	// Set Payload Data
 	Postoffice.TimeStamp("2022-03-23 14:18:28");
-	Postoffice.Status(240, 500);
+	Postoffice.SetStatus(240, 500);
 
 }
